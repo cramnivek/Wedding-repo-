@@ -60,15 +60,18 @@
 
   :focus-visible { outline: 1px solid var(--sage-light); outline-offset: 4px; }
 
-  /* Petals drift over the whole page; the silk sits inside the header only.
-     Neither ever intercepts a click. */
-  #petals { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  /* One artwork layer for the whole document: the silk ribbon and the petals
+     share a canvas so they compose in order and run on one loop. It is fixed to
+     the viewport and drawn against scroll position, which keeps the ribbon
+     continuous down a page of any length without a canvas to match. */
+  #art { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
   .stack { position: relative; z-index: 1; }
 
   /* One gutter and one measure for every band, set once here, so no section
      adds horizontal padding of its own. */
   .band { padding-block: 5rem; padding-inline: 1.25rem; position: relative; }
-  .band--panel { background: var(--panel); }
+  /* No alternating panels — the artwork behind is what separates sections. */
+  .band--panel { background: transparent; }
   .inner {
     max-width: var(--measure);
     margin-inline: auto;
@@ -119,11 +122,9 @@
   /* ---------- the invitation ---------- */
   .invite {
     position: relative;
-    padding-block: 4.5rem 6rem;
+    padding-block: 5rem 6rem;
     padding-inline: 1.25rem;
-    overflow: hidden;
   }
-  #silk { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
   .invite-inner {
     position: relative;
     z-index: 1;
@@ -228,7 +229,8 @@
   /* ---------- reception ---------- */
   .venue-card {
     border: 1px solid var(--hairline);
-    background: var(--panel-lift);
+    background: rgba(6, 6, 6, 0.5);
+    backdrop-filter: blur(3px);
     padding: clamp(1.5rem, 5vw, 2.25rem);
     display: flex;
     flex-direction: column;
@@ -329,7 +331,8 @@
     gap: 1.75rem;
     align-items: center;
     border: 1px solid var(--hairline);
-    background: var(--panel-lift);
+    background: rgba(6, 6, 6, 0.5);
+    backdrop-filter: blur(3px);
     padding: clamp(1.25rem, 4vw, 2rem);
   }
   .qr-plate {
@@ -346,7 +349,8 @@
   /* ---------- rsvp ---------- */
   .card {
     border: 1px solid var(--hairline);
-    background: var(--panel-lift);
+    background: rgba(6, 6, 6, 0.5);
+    backdrop-filter: blur(3px);
     padding: clamp(1.5rem, 5vw, 2.25rem);
     display: flex;
     flex-direction: column;
@@ -485,6 +489,121 @@
     }
   }
 
+  /* ---------- the sealed envelope ---------- */
+  /* A real gate, because it was asked for: the page behind is fully built and a
+     press anywhere on the veil opens it. Reduced motion skips it entirely. */
+  body.sealed { overflow: hidden; }
+  #veil {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+    background: radial-gradient(130% 100% at 50% 42%, #15130F 0%, #050505 68%);
+    cursor: pointer;
+    transition: opacity 0.8s ease, visibility 0.8s;
+  }
+  #veil.gone { opacity: 0; visibility: hidden; }
+  .veil-stack { display: flex; flex-direction: column; align-items: center; gap: 1.75rem; }
+
+  .envelope {
+    position: relative;
+    width: min(23rem, 84vw);
+    aspect-ratio: 1.5;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    perspective: 1200px;
+    transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .envelope:hover { transform: translateY(-5px); }
+  .env-back, .env-front, .env-flap, .env-letter { position: absolute; }
+
+  .env-back {
+    inset: 0;
+    background: linear-gradient(158deg, #15120E, #0A0908);
+    border: 1px solid rgba(124, 132, 71, 0.32);
+  }
+  /* The card rises out of the envelope once the flap has swung clear of it. */
+  .env-letter {
+    inset: 7% 8% auto 8%;
+    height: 76%;
+    z-index: 1;
+    background: linear-gradient(180deg, #F3EFE8, #DED8CF);
+    display: grid;
+    place-items: start center;
+    padding-top: 13%;
+    transform: translateY(7%);
+    transition: transform 0.95s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s;
+  }
+  .env-letter span {
+    font-family: "Allura", cursive;
+    font-size: clamp(1.2rem, 5vw, 1.8rem);
+    line-height: 1.15;
+    color: #2C1016;
+    text-align: center;
+    padding-inline: 1rem;
+  }
+  #veil.opened .env-letter { transform: translateY(-44%); }
+
+  .env-front {
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(168deg, #120F0B, #080707);
+    clip-path: polygon(0 0, 50% 41%, 100% 0, 100% 100%, 0 100%);
+  }
+  .env-flap {
+    inset: 0 0 auto 0;
+    height: 62%;
+    z-index: 3;
+    background: linear-gradient(180deg, #241F18, #120F0C);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.85));
+    transform-origin: 50% 0;
+    transform: rotateX(0deg);
+    backface-visibility: hidden;
+    transition: transform 0.95s cubic-bezier(0.55, 0, 0.28, 1), z-index 0s 0.5s;
+  }
+  #veil.opened .env-flap { transform: rotateX(-172deg); z-index: 0; }
+
+  .env-seal {
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    z-index: 4;
+    width: 78px;
+    height: 78px;
+    margin: -39px 0 0 -39px;
+    border-radius: 49% 51% 47% 53% / 52% 48% 52% 48%;
+    display: grid;
+    place-items: center;
+    font-family: "Allura", cursive;
+    font-size: 1.6rem;
+    color: #F2DDE2;
+    background:
+      radial-gradient(circle at 38% 34%, rgba(255,255,255,0.10), transparent 52%),
+      radial-gradient(circle at 50% 55%, #8E2440, #6B1526 72%, #4A0F1B);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.7),
+                inset 0 0 0 1px rgba(255,255,255,0.07),
+                inset 0 -3px 10px rgba(0,0,0,0.55),
+                inset 0 2px 4px rgba(255,255,255,0.08);
+    animation: breathe 2.8s ease-in-out infinite;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+  }
+  @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+  #veil.opened .env-seal { animation: none; transform: scale(1.6); opacity: 0; }
+
+  .veil-hint {
+    font-size: 0.625rem;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: var(--muted);
+    animation: breathe 2.8s ease-in-out infinite;
+  }
+  #veil.opened .veil-hint { opacity: 0; transition: opacity 0.4s ease; animation: none; }
+
   .if-attending[hidden] { display: none; }
 
   @media (max-width: 30rem) {
@@ -502,7 +621,20 @@
   }
 </style>
 
-<canvas id="petals" aria-hidden="true"></canvas>
+<canvas id="art" aria-hidden="true"></canvas>
+
+<div id="veil">
+  <div class="veil-stack">
+    <button class="envelope" id="envelope" type="button" aria-label="Open the invitation">
+      <span class="env-back"></span>
+      <span class="env-letter"><span>Marc-Kevin &amp; Florence</span></span>
+      <span class="env-front"></span>
+      <span class="env-flap"></span>
+      <span class="env-seal">M&amp;F</span>
+    </button>
+    <p class="veil-hint">Press to open</p>
+  </div>
+</div>
 
 <!-- The day, in one place. The countdown and the calendar link both read from
      here, so the two can never disagree. -->
@@ -521,7 +653,6 @@
   </nav>
 
   <header class="invite">
-    <canvas id="silk" aria-hidden="true"></canvas>
     <div class="invite-inner">
       <p class="join">Join us for the wedding of</p>
       <h1 class="names">
@@ -801,6 +932,36 @@
 <script>
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var cfg = document.querySelector(".stack");
+
+  /* The envelope. A press anywhere on the veil runs the sequence — seal lifts,
+     flap swings, card rises — then the veil fades and is removed from the DOM
+     so nothing is left sitting over the page. */
+  (function () {
+    var veil = document.getElementById("veil");
+    if (!veil) return;
+    if (reduced) { veil.remove(); return; }
+
+    document.body.classList.add("sealed");
+    var opened = false;
+
+    function open() {
+      if (opened) return;
+      opened = true;
+      veil.classList.add("opened");
+      setTimeout(function () {
+        veil.classList.add("gone");
+        document.body.classList.remove("sealed");
+      }, 1500);
+      setTimeout(function () { veil.remove(); }, 2400);
+    }
+
+    veil.addEventListener("click", open);
+    veil.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " " || e.key === "Escape") { e.preventDefault(); open(); }
+    });
+    var env = document.getElementById("envelope");
+    if (env) env.focus({ preventScroll: true });
+  })();
   var when = new Date(cfg.dataset.when);
   var ends = new Date(cfg.dataset.ends);
 
@@ -862,100 +1023,35 @@
     });
   })();
 
-  /* The green silk from the invitation, drawn rather than pasted: a band
-     between two travelling sine curves, with lighter creases following the
-     same path so it reads as folded fabric instead of a flat ribbon. */
+  /* The artwork: one continuous green silk ribbon meandering down the whole
+     document, with the invitation's loose petals tumbling in front of it.
+
+     The canvas is viewport-sized and fixed, but every point on the ribbon is a
+     function of (y + scrollY), so the ribbon reads as a single unbroken length
+     of fabric running the height of the page however long the page gets — no
+     document-sized canvas, no per-section band. */
   (function () {
-    var cv = document.getElementById("silk");
-    var host = document.querySelector(".invite");
-    if (!cv || !host) return;
+    var cv = document.getElementById("art");
+    if (!cv) return;
     var ctx = cv.getContext("2d");
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var w = 0, h = 0, drift = 0, sway = 0, targetSway = 0;
+    var petals = [];
+    var TONES = ["201, 56, 43", "140, 31, 58", "116, 48, 60"];
 
     function size() {
-      w = host.clientWidth; h = host.clientHeight;
+      w = window.innerWidth; h = window.innerHeight;
       cv.width = w * dpr; cv.height = h * dpr;
       cv.style.width = w + "px"; cv.style.height = h + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    function curve(x, phase, lift) {
-      var p = x / w;
-      return h * 0.93 + lift
-        + Math.sin(p * 3.0 + phase) * h * 0.065
-        + Math.sin(p * 6.7 + phase * 1.7) * h * 0.03;
-    }
-
-    function band(phase, thick, alpha, hueShift) {
-      ctx.beginPath();
-      var x;
-      for (x = -30; x <= w + 30; x += 7) ctx.lineTo(x, curve(x, phase, 0) - thick * (0.5 + 0.5 * Math.sin(x / w * 2.4 + phase)));
-      for (x = w + 30; x >= -30; x -= 7) ctx.lineTo(x, curve(x, phase, 0) + thick * (0.5 + 0.5 * Math.sin(x / w * 2.1 - phase)));
-      ctx.closePath();
-      var g = ctx.createLinearGradient(0, 0, w, 0);
-      g.addColorStop(0.00, "rgba(" + hueShift + ", 0)");
-      g.addColorStop(0.18, "rgba(" + hueShift + ", " + (alpha * 0.75).toFixed(3) + ")");
-      g.addColorStop(0.50, "rgba(" + hueShift + ", " + alpha.toFixed(3) + ")");
-      g.addColorStop(0.82, "rgba(" + hueShift + ", " + (alpha * 0.7).toFixed(3) + ")");
-      g.addColorStop(1.00, "rgba(" + hueShift + ", 0)");
-      ctx.fillStyle = g;
-      ctx.fill();
-    }
-
-    function frame() {
-      drift += 0.0022;
-      sway += (targetSway - sway) * 0.04;
-      ctx.clearRect(0, 0, w, h);
-      /* Deep fold behind, the lit face over it, then a pale crease on top. */
-      band(drift + sway + 0.6, h * 0.075, 0.55, "74, 81, 48");
-      band(drift + sway, h * 0.055, 0.72, "124, 132, 71");
-      band(drift + sway - 0.35, h * 0.016, 0.42, "167, 174, 118");
-      requestAnimationFrame(frame);
-    }
-
-    size();
-    if (reduced) {
-      /* Still draw the silk — just hold it still. */
-      ctx.clearRect(0, 0, w, h);
-      band(0.6, h * 0.075, 0.55, "74, 81, 48");
-      band(0, h * 0.055, 0.72, "124, 132, 71");
-      band(-0.35, h * 0.016, 0.42, "167, 174, 118");
-    } else {
-      frame();
-      host.addEventListener("pointermove", function (e) {
-        targetSway = ((e.clientX - host.getBoundingClientRect().left) / w - 0.5) * 0.9;
-      });
-      host.addEventListener("pointerleave", function () { targetSway = 0; });
-    }
-    window.addEventListener("resize", function () { size(); });
-  })();
-
-  /* Loose petals, as on the invitation: two mirrored curves per petal, tumbling
-     slowly. Skipped outright when the viewer has asked for reduced motion. */
-  (function () {
-    var cv = document.getElementById("petals");
-    if (!cv || reduced) { if (cv) cv.remove(); return; }
-    var ctx = cv.getContext("2d");
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var petals = [];
-    var TONES = ["201, 56, 43", "140, 31, 58", "116, 48, 60"];
-
-    function size() {
-      cv.width = window.innerWidth * dpr;
-      cv.height = window.innerHeight * dpr;
-      cv.style.width = window.innerWidth + "px";
-      cv.style.height = window.innerHeight + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    function seed() {
-      var count = window.innerWidth < 600 ? 14 : 26;
+    function seedPetals() {
+      var count = w < 600 ? 14 : 26;
       petals = [];
       for (var i = 0; i < count; i++) {
         petals.push({
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * window.innerHeight,
+          x: Math.random() * w, y: Math.random() * h,
           len: Math.random() * 11 + 7,
           vy: Math.random() * 0.22 + 0.07,
           drift: Math.random() * 0.5 + 0.2,
@@ -966,6 +1062,54 @@
           a: Math.random() * 0.4 + 0.22
         });
       }
+    }
+
+    /* Centre line of the ribbon at a given screen y, for the current scroll. */
+    function spine(y, scroll) {
+      var t = y + scroll;
+      var amp = w * 0.30;
+      return w * 0.5
+        + Math.sin(t * 0.0015 + drift + sway) * amp
+        + Math.sin(t * 0.0037 + drift * 1.4) * amp * 0.34;
+    }
+
+    function band(scroll, offset, thick, alpha, rgb) {
+      var y;
+      ctx.beginPath();
+      for (y = -60; y <= h + 60; y += 9) {
+        ctx.lineTo(spine(y, scroll) + offset - thick * (0.62 + 0.38 * Math.sin((y + scroll) * 0.0028)), y);
+      }
+      for (y = h + 60; y >= -60; y -= 9) {
+        ctx.lineTo(spine(y, scroll) + offset + thick * (0.62 + 0.38 * Math.sin((y + scroll) * 0.0024 + 1.1)), y);
+      }
+      ctx.closePath();
+      /* Sheen runs across the page, so the fabric lights up as it sweeps. */
+      var g = ctx.createLinearGradient(0, 0, w, 0);
+      g.addColorStop(0.00, "rgba(" + rgb + ", " + (alpha * 0.45).toFixed(3) + ")");
+      g.addColorStop(0.35, "rgba(" + rgb + ", " + alpha.toFixed(3) + ")");
+      g.addColorStop(0.72, "rgba(" + rgb + ", " + (alpha * 0.6).toFixed(3) + ")");
+      g.addColorStop(1.00, "rgba(" + rgb + ", " + (alpha * 0.3).toFixed(3) + ")");
+      ctx.fillStyle = g;
+      ctx.fill();
+    }
+
+    /* A soft column of shade over the reading measure, so the ribbon passes
+       behind the text without ever fighting it. Tracks the real column width,
+       and fades out on narrow screens where the column is the whole page. */
+    function scrim() {
+      var col = Math.min(36 * 16 + 40, w);
+      var frac = col / w;
+      if (frac > 0.94) return;
+      var l = 0.5 - frac / 2, r = 0.5 + frac / 2;
+      var g = ctx.createLinearGradient(0, 0, w, 0);
+      g.addColorStop(0, "rgba(5, 5, 5, 0)");
+      g.addColorStop(Math.max(0, l), "rgba(5, 5, 5, 0)");
+      g.addColorStop(Math.min(1, l + 0.15), "rgba(5, 5, 5, 0.58)");
+      g.addColorStop(Math.max(0, r - 0.15), "rgba(5, 5, 5, 0.58)");
+      g.addColorStop(Math.min(1, r), "rgba(5, 5, 5, 0)");
+      g.addColorStop(1, "rgba(5, 5, 5, 0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
     }
 
     function petal(p) {
@@ -979,31 +1123,56 @@
       ctx.fill();
     }
 
+    function paintSilk(scroll) {
+      ctx.clearRect(0, 0, w, h);
+      /* Deep fold behind, lit face over it, pale crease on top. */
+      band(scroll,  0, h * 0.070, 0.42, "74, 81, 48");
+      band(scroll,  0, h * 0.048, 0.52, "124, 132, 71");
+      band(scroll, -h * 0.019, h * 0.012, 0.34, "167, 174, 118");
+      scrim();
+    }
+
     function frame() {
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      drift += 0.0016;
+      sway += (targetSway - sway) * 0.04;
+      paintSilk(window.scrollY || window.pageYOffset || 0);
       for (var i = 0; i < petals.length; i++) {
-        var p = petals[i];
-        p.phase += 0.01;
-        p.y += p.vy;
-        p.x += Math.sin(p.phase) * p.drift;
-        p.rot += p.spin;
-        if (p.y > window.innerHeight + 20) { p.y = -20; p.x = Math.random() * window.innerWidth; }
-        if (p.x < -25) p.x = window.innerWidth + 25;
-        if (p.x > window.innerWidth + 25) p.x = -25;
+        var pt = petals[i];
+        pt.phase += 0.01;
+        pt.y += pt.vy;
+        pt.x += Math.sin(pt.phase) * pt.drift;
+        pt.rot += pt.spin;
+        if (pt.y > h + 20) { pt.y = -20; pt.x = Math.random() * w; }
+        if (pt.x < -25) pt.x = w + 25;
+        if (pt.x > w + 25) pt.x = -25;
         ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        /* A slight horizontal squash as it turns reads as a petal tumbling
-           rather than a flat shape spinning in place. */
-        ctx.scale(0.6 + 0.4 * Math.abs(Math.cos(p.phase * 0.7)), 1);
-        petal(p);
+        ctx.translate(pt.x, pt.y);
+        ctx.rotate(pt.rot);
+        /* A horizontal squash as it turns reads as a petal tumbling rather
+           than a flat shape spinning in place. */
+        ctx.scale(0.6 + 0.4 * Math.abs(Math.cos(pt.phase * 0.7)), 1);
+        petal(pt);
         ctx.restore();
       }
       requestAnimationFrame(frame);
     }
 
-    size(); seed(); frame();
-    window.addEventListener("resize", function () { size(); seed(); });
+    size();
+    if (reduced) {
+      /* Still draw the silk — just hold it, and drop the petals. */
+      paintSilk(0);
+      window.addEventListener("scroll", function () {
+        paintSilk(window.scrollY || 0);
+      }, { passive: true });
+      window.addEventListener("resize", function () { size(); paintSilk(window.scrollY || 0); });
+      return;
+    }
+    seedPetals();
+    frame();
+    window.addEventListener("pointermove", function (e) {
+      targetSway = (e.clientX / w - 0.5) * 0.7;
+    }, { passive: true });
+    window.addEventListener("resize", function () { size(); seedPetals(); });
   })();
 
   /* The invitation leans toward the pointer. Fine pointers only — a touch
