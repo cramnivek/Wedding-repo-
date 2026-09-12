@@ -28,12 +28,16 @@ and almost no colour that isn't ember, bone or blood.
 Every text token clears WCAG AA on the ground it sits on. `--blood-lt` (`#C21F26`)
 is only ever a border or a list marker, never text.
 
-Typefaces, from Google Fonts: **Pirata One** for the names and section headings,
-**Cinzel** for every letterspaced cap — the nav, labels, the date, the order of
-the day — **Cormorant Garamond** for body text, and **Allura** for the footer
-monogram. The blackletter is deliberately kept off anything small: it is drawn
-for mixed case at size, and at 11px it stops being readable. If the fonts fail to
-load the page falls back to system serif and still reads correctly.
+Typefaces: **Diablo Heavy** for the names, self-hosted from `fonts/` (see the
+note in there — it is a 1997 fan face, not the games' own Exocet). From Google
+Fonts: **Cinzel** for every heading and letterspaced cap, **Cormorant Garamond**
+for body text, **Allura** for the footer monogram.
+
+The display face is used for the names and nothing else. It has no true
+lowercase — lowercase input selects alternate capital forms, which is what puts
+the slashed `O` in FLORENCE — so it cannot set a heading, a label or a line of
+body text. If any font fails to load the page falls back to system serif and
+still reads correctly.
 
 The eclipse, its corona, the light falling from it, the fog, the dead branches
 and the whole opening gate are all drawn on `<canvas>` at runtime. The fourteen
@@ -53,7 +57,11 @@ Outstanding:
 - **The ceremony venue** — the invitation only names the reception
 - **Five of the six times** in the order of the day; only 5:00 is real
 - **Reply-by date**
-- Parking, travel from the airport or pier, hotels
+- Parking at the venue, and whether a room block is held anywhere
+
+Travel is filled in from public sources: the airport transfer, the Cebu ferry,
+named hotels in Tagbilaran and what October weather does. Fares and schedules
+drift — worth a check closer to the date.
 
 The contact address is filled in — `marcarlinghaus@gmail.com`. It lives in three
 places that must agree, so change all three together: the RSVP note, the footer's
@@ -64,14 +72,17 @@ var TO = "marcarlinghaus@gmail.com";
 ```
 
 The date lives in one place — the `data-` attributes on `.stack`. The countdown
-and the Google Calendar link both read from there, so they can't disagree.
+and the Google Calendar link both read from there, so they can't disagree. The
+`+08:00` is load-bearing: without it the time is parsed in whatever zone the
+visitor's browser is in, and a guest abroad gets a countdown and a calendar entry
+several hours out.
 
 ```html
 <div class="stack"
-     data-when="2026-10-06T17:00"
-     data-ends="2026-10-06T23:00"
+     data-when="2026-10-06T17:00+08:00"
+     data-ends="2026-10-06T23:00+08:00"
      data-title="Wedding of Marc-Kevin &amp; Florence"
-     data-where="Smoque Bistro, Carlos P. Garcia East Avenue, Tagbilaran City, Bohol">
+     data-where="Smoque Bistro, Carlos P. Garcia East Avenue, Bool, Tagbilaran City, Bohol">
 ```
 
 ## How RSVPs work right now
