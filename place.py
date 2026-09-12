@@ -73,6 +73,16 @@ JOBS = [
     ("hall",        0.010, 0.0,      0.42,         1.12,     0.72,   1500),
     ("garments",    0.008, 0.0,      0.5,          1.10,     0.60,   1100),
     ("hands",       0.0,   0.0,      None,         1.02,     0.94,   1100),
+
+    # The prenup set arrived with five different colour temperatures — firelight,
+    # blue daylight, a pink sky, torchlight, overcast grey. Each is pulled toward
+    # the page's ramp by however much its own light needs: the warm ones keep most
+    # of themselves, the cold ones give up more.
+    ("vow",         0.0,   0.0,      0.62,         1.06,     0.90,   1300),
+    ("camp",        0.0,   0.0,      0.58,         1.06,     0.86,   1500),
+    ("ridge",       0.0,   0.0,      0.34,         1.12,     0.72,   1500),
+    ("knight",      0.0,   0.0,      0.40,         1.10,     0.78,   1200),
+    ("walk",        0.0,   0.0,      0.40,         1.10,     0.76,   1800),
 ]
 
 

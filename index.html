@@ -659,6 +659,43 @@
     margin-inline: auto;
   }
 
+  /* ---------- the prenup ---------- */
+  .prenup { display: flex; flex-direction: column; gap: 1.25rem; }
+  .prenup figure { margin: 0; }
+  .prenup img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--hairline);
+  }
+  .prenup .lead { max-width: 26rem; margin-inline: auto; }
+  /* The pair is a landscape and a portrait, so both are cropped to one square
+     rather than left to sit at different heights beside each other. */
+  .prenup .two { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .prenup .two img { aspect-ratio: 1 / 1; object-fit: cover; }
+  .prenup .two .r img { object-position: 62% 50%; }
+  .prenup .two .k img { object-position: 50% 32%; }
+  @media (max-width: 30rem) { .prenup .two { grid-template-columns: 1fr; } }
+
+  /* Full-bleed band that hands the page from the prenup to the reception. */
+  .band-img {
+    position: relative;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    display: block;
+    margin-block: 1rem;
+  }
+  .band-img img {
+    display: block;
+    width: 100%;
+    height: clamp(13rem, 34vh, 22rem);
+    object-fit: cover;
+    object-position: 50% 46%;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 74%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 74%, transparent 100%);
+  }
+
   /* ---------- the two of us ---------- */
   .plate-ink {
     margin: 0;
@@ -749,6 +786,7 @@
 
   <nav class="rail">
     <a href="#us">Us</a>
+    <a href="#prenup">Prenup</a>
     <a href="#reception">Reception</a>
     <a href="#dress">What to wear</a>
     <a href="#day">The day</a>
@@ -803,6 +841,44 @@
       </div>
     </div>
   </section>
+
+  <section class="band band--panel" id="prenup">
+    <div class="inner reveal">
+      <div class="sec-head">
+        <p class="eyebrow">Before the day</p>
+        <h2>The prenup</h2>
+      </div>
+      <div class="prenup">
+        <figure class="lead">
+          <img src="img/vow.jpg" width="1300" height="1300" loading="lazy"
+               alt="Marc-Kevin and Florence in armour and black robes, foreheads touching, a ring of red light behind them and a torch burning to one side.">
+        </figure>
+        <p class="hand">
+          We are not, in real life, at war. We did want one photograph where it
+          looks like we might be.
+        </p>
+        <figure>
+          <img src="img/camp.jpg" width="1500" height="1006" loading="lazy"
+               alt="Night camp: Marc-Kevin sharpening a greatsword by firelight while Florence sleeps against his shoulder, wrapped in his cloak.">
+        </figure>
+        <div class="two">
+          <figure class="r">
+            <img src="img/ridge.jpg" width="1500" height="837" loading="lazy"
+                 alt="The two of them seen from behind on a ridge, looking out over a burned valley.">
+          </figure>
+          <figure class="k">
+            <img src="img/knight.jpg" width="967" height="1200" loading="lazy"
+                 alt="Marc-Kevin kneeling in rubble, greatsword across his knee, banners and a ruined citadel behind him.">
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <figure class="band-img">
+    <img src="img/walk.jpg" width="1800" height="890" loading="lazy"
+         alt="The two of them walking a muddy road hand in hand toward a distant citadel, an eclipse in the sky above.">
+  </figure>
 
   <section class="band band--panel" id="reception">
     <div class="inner reveal">
