@@ -607,6 +607,57 @@
   #gate.struck .gate-hint { opacity: 0; transition: opacity 0.3s linear; animation: none; }
   @keyframes pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 
+  /* ---------- the two of us ---------- */
+  .plate-ink {
+    margin: 0;
+    max-width: 30rem;
+    margin-inline: auto;
+    position: relative;
+  }
+  .plate-ink img {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* The render is already ink and blood, so rather than framing it, its
+       edges are dissolved into the page and it becomes part of the artwork
+       instead of a picture sitting on top of it. */
+    -webkit-mask-image: radial-gradient(96% 88% at 50% 46%, #000 46%, transparent 99%);
+    mask-image: radial-gradient(96% 88% at 50% 46%, #000 46%, transparent 99%);
+  }
+
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .pair figure { margin: 0; }
+  .pair img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--hairline);
+    /* Held back to the page's register, and let back into full colour on
+       hover — the world is grim, the people in it are not. */
+    filter: grayscale(0.55) contrast(1.05) brightness(0.78) sepia(0.12);
+    transition: filter 0.6s var(--ease);
+  }
+  .pair figure:hover img, .pair figure:focus-within img {
+    filter: grayscale(0) contrast(1) brightness(1) sepia(0);
+  }
+  figcaption {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 0.7rem;
+  }
+  @media (max-width: 30rem) {
+    .pair { grid-template-columns: 1fr; }
+  }
+
   .if-attending[hidden] { display: none; }
 
   @media (max-width: 30rem) {
@@ -645,6 +696,7 @@
      data-where="Smoque Bistro, Carlos P. Garcia East Avenue, Tagbilaran City, Bohol">
 
   <nav class="rail">
+    <a href="#us">Us</a>
     <a href="#reception">Reception</a>
     <a href="#dress">What to wear</a>
     <a href="#day">The day</a>
@@ -669,6 +721,35 @@
       <div class="countdown" id="countdown" aria-live="off"></div>
     </div>
   </header>
+
+  <section class="band" id="us">
+    <div class="inner reveal">
+      <div class="sec-head">
+        <p class="eyebrow">The two of us</p>
+        <h2>Under a black sun</h2>
+      </div>
+      <figure class="plate-ink">
+        <img src="img/them-ink.jpg" width="1000" height="1500" loading="lazy"
+             alt="Marc-Kevin and Florence drawn as an armoured swordsman and his companion on a ruined stair, a red-ringed eclipse above a burning citadel behind them.">
+      </figure>
+      <p class="hand">
+        Somewhere between the eclipse and the reception, there are two people who
+        just like the same things.
+      </p>
+      <div class="pair">
+        <figure>
+          <img src="img/us-1.jpg" width="825" height="1100" loading="lazy"
+               alt="Marc-Kevin and Florence in a clothing shop, both in black, taking a mirror photo.">
+          <figcaption>In practice</figcaption>
+        </figure>
+        <figure>
+          <img src="img/us-2.jpg" width="1400" height="1050" loading="lazy"
+               alt="Marc-Kevin and Florence leaning together on a boat, both wearing glasses.">
+          <figcaption>Also in practice</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
 
   <section class="band band--panel" id="reception">
     <div class="inner reveal">
