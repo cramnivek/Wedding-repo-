@@ -84,6 +84,16 @@ JOBS = [
     ("knight",      0.0,   0.0,      0.28,         1.30,     0.86,   1200),
     ("walk",        0.0,   0.0,      0.28,         1.30,     0.84,   1800),
 
+    # The black-sun scene arrives with a red eclipse and a grey sky. Pulled hard
+    # through the ramp so the corona lands on the page's gold instead of fighting
+    # it, and darkened so the plate's mask can dissolve its edges into the page.
+    ("sun",         0.0,   0.0,      0.26,         1.28,     0.84,   1500),
+
+    # The chamber portrait is the one render where the faces read as themselves,
+    # so it keeps most of its own light — grading it as hard as the rest would
+    # cost the likeness, which is the only reason it is on the page.
+    ("chamber",     0.0,   0.0,      0.58,         1.10,     0.94,   1200),
+
     # The two real photographs keep most of themselves — they are the one place
     # the page is not a painted world, and over-grading them loses the contrast
     # that section is built on.

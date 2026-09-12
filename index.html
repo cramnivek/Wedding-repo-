@@ -679,6 +679,8 @@
   .prenup .two img { aspect-ratio: 1 / 1; object-fit: cover; }
   .prenup .two .r img { object-position: 62% 50%; }
   .prenup .two .k img { object-position: 50% 32%; }
+  /* Tall portrait squared off: hold the crop on their faces, not the stair. */
+  .prenup .two .t img { object-position: 50% 26%; }
   @media (max-width: 30rem) { .prenup .two { grid-template-columns: 1fr; } }
 
   /* Full-bleed band that hands the page from the prenup to the reception. */
@@ -829,10 +831,10 @@
       </div>
       <figure class="plate-ink">
         <picture>
-          <source srcset="img/them-ink.avif" type="image/avif">
-          <source srcset="img/them-ink.webp" type="image/webp">
-          <img src="img/them-ink.jpg" width="1000" height="1500" loading="lazy"
-             alt="Marc-Kevin and Florence drawn as an armoured swordsman and his companion on a ruined stair, a red-ringed eclipse above a burning citadel behind them.">
+          <source srcset="img/sun.avif" type="image/avif">
+          <source srcset="img/sun.webp" type="image/webp">
+          <img src="img/sun.jpg" width="1208" height="1500"
+             alt="Marc-Kevin in armour with a greatsword, Florence beside him in a black hooded gown, standing on a broken road through a battlefield. An eclipse rings the sky above a ruined citadel.">
         </picture>
       </figure>
       <p class="hand">
@@ -904,6 +906,24 @@
               <source srcset="img/knight.webp" type="image/webp">
               <img src="img/knight.jpg" width="967" height="1200" loading="lazy"
                  alt="Marc-Kevin kneeling in rubble, greatsword across his knee, banners and a ruined citadel behind him.">
+            </picture>
+          </figure>
+        </div>
+        <div class="two">
+          <figure class="t">
+            <picture>
+              <source srcset="img/them-ink.avif" type="image/avif">
+              <source srcset="img/them-ink.webp" type="image/webp">
+              <img src="img/them-ink.jpg" width="1000" height="1500" loading="lazy"
+                 alt="The two of them seated on a ruined stair, Marc-Kevin in armour with a greatsword upright beside him, Florence resting against his shoulder.">
+            </picture>
+          </figure>
+          <figure>
+            <picture>
+              <source srcset="img/chamber.avif" type="image/avif">
+              <source srcset="img/chamber.webp" type="image/webp">
+              <img src="img/chamber.jpg" width="1200" height="1200" loading="lazy"
+                 alt="Marc-Kevin and Florence close together in a stone chamber, hands clasped, lit by a shaft of light from a window out of frame.">
             </picture>
           </figure>
         </div>
