@@ -1650,13 +1650,20 @@
         });
       }
       fog = [];
-      for (var m = 0; m < 5; m++) {
+      for (var m = 0; m < 7; m++) {
+        /* Far banks are paler, larger and barely move with the page; near ones
+           are warmer, tighter and slide past faster. That difference is the
+           whole illusion of depth. */
+        var far = m < 4;
         fog.push({
-          x: Math.random() * w, y: Math.random() * h,
-          r: Math.max(w, h) * (0.3 + Math.random() * 0.24),
-          vx: (Math.random() - 0.5) * 0.08,
-          vy: (Math.random() - 0.5) * 0.04,
-          a: 0.07 + Math.random() * 0.05
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.max(w, h) * (far ? 0.34 + Math.random() * 0.2 : 0.2 + Math.random() * 0.16),
+          vx: (Math.random() - 0.5) * (far ? 0.05 : 0.11),
+          vy: (Math.random() - 0.5) * 0.03,
+          depth: far ? 0.1 + Math.random() * 0.1 : 0.34 + Math.random() * 0.2,
+          tint: far ? "62, 72, 86" : "74, 52, 44",
+          a: far ? 0.06 + Math.random() * 0.04 : 0.05 + Math.random() * 0.04
         });
       }
     }
@@ -1724,23 +1731,55 @@
       ctx.restore();
     }
 
-    function drawFog() {
+    function drawFog(scroll) {
       ctx.globalCompositeOperation = "lighter";
       for (var i = 0; i < fog.length; i++) {
         var m = fog[i];
         m.x += m.vx; m.y += m.vy;
         if (m.x < -m.r) m.x = w + m.r;
         if (m.x > w + m.r) m.x = -m.r;
-        if (m.y < -m.r) m.y = h + m.r;
-        if (m.y > h + m.r) m.y = -m.r;
-        var g = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r);
-        g.addColorStop(0, "rgba(48, 56, 68, " + m.a.toFixed(3) + ")");
-        g.addColorStop(0.5, "rgba(30, 34, 44, " + (m.a * 0.42).toFixed(3) + ")");
+        /* Each bank is carried by the page at its own rate and wrapped, so a
+           plane never runs out however far you scroll. */
+        var span = h + m.r * 2;
+        var fy = (((m.y - scroll * m.depth) % span) + span) % span - m.r;
+        var g = ctx.createRadialGradient(m.x, fy, 0, m.x, fy, m.r);
+        g.addColorStop(0, "rgba(" + m.tint + ", " + m.a.toFixed(3) + ")");
+        g.addColorStop(0.5, "rgba(" + m.tint + ", " + (m.a * 0.42).toFixed(3) + ")");
         g.addColorStop(1, "rgba(16, 18, 26, 0)");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, w, h);
       }
       ctx.globalCompositeOperation = "source-over";
+    }
+
+    /* Volumetric shafts off the eclipse. Long soft wedges rather than the short
+       torn spokes of the corona — this is the light in the air, not the edge of
+       the disc, and it is what gives the header a sense of volume. */
+    function drawRays(scroll) {
+      if (ignite <= 0.01) return;
+      var cy = eclipseY - scroll, cx = w / 2;
+      if (cy < -h * 1.5 || cy > h * 2.2) return;
+      var reach = Math.max(w, h) * 1.9;
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      for (var i = 0; i < 11; i++) {
+        var j = ((i * 2654435761) % 1000) / 1000;
+        var ang = (i / 11) * Math.PI * 2 + Math.sin(t * 0.0011 + i * 1.7) * 0.05;
+        var spread = 0.02 + j * 0.045;
+        var lit = (0.1 + j * 0.1) * ignite;
+        var g = ctx.createRadialGradient(cx, cy, eclipseR * 0.92, cx, cy, reach);
+        g.addColorStop(0.00, "rgba(244, 202, 130, " + lit.toFixed(3) + ")");
+        g.addColorStop(0.30, "rgba(214, 146, 66, " + (lit * 0.4).toFixed(3) + ")");
+        g.addColorStop(0.70, "rgba(150, 60, 30, " + (lit * 0.12).toFixed(3) + ")");
+        g.addColorStop(1.00, "rgba(90, 30, 18, 0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, reach, ang - spread, ang + spread);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
     }
 
     function drawBranches(scroll) {
@@ -1778,8 +1817,12 @@
 
     function scene(scroll, still) {
       ctx.clearRect(0, 0, w, h);
+      /* Shafts, then the disc over their roots — it is the thing occluding the
+         light — then fog over both, so the beams read as passing through air
+         rather than being painted on top of the scene. */
+      drawRays(scroll);
       drawEclipse(scroll);
-      drawFog();
+      drawFog(scroll);
       drawBranches(scroll);
       if (shade) ctx.drawImage(shade, 0, 0, w, h);
       if (!still) drawEmbers();
