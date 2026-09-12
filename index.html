@@ -618,10 +618,13 @@
     color: #6E6558;
     white-space: nowrap;
     pointer-events: none;
-    animation: pulse 3s ease-in-out infinite;
+    /* Held back until the mark has finished being cut. */
+    animation: appear 0.9s var(--ease) both 1.9s,
+               pulse 3s ease-in-out infinite 2.8s;
   }
   #gate.struck .gate-hint { opacity: 0; transition: opacity 0.3s linear; animation: none; }
   @keyframes pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+  @keyframes appear { from { opacity: 0; letter-spacing: 0.6em; } to { opacity: 0.55; letter-spacing: 0.34em; } }
 
   /* The ground under the invitation. Full-bleed across the bottom of the
      header, masked so it rises out of black rather than starting at an edge,
@@ -1223,7 +1226,9 @@
     var t0 = 0, struck = false, raf = 0, done = false;
     var drips = [];
 
-    /* An angular cattle-brand: one spine, four barbs. */
+    /* An angular cattle-brand: one spine, four barbs. Ordered spine-first,
+       and each barb runs outward from the spine, which is the order a hand
+       would cut it. */
     var MARK = [
       [[0, -1.00], [0, 1.00]],
       [[0, -0.34], [-0.62, -0.96]],
@@ -1231,6 +1236,13 @@
       [[0, 0.30], [-0.50, 0.86]],
       [[0, 0.30], [0.50, 0.86]]
     ];
+
+    /* Weighting each stroke by its own length keeps the scoring speed even —
+       the spine is nearly twice a barb and should take nearly twice as long. */
+    var LENS = MARK.map(function (seg) {
+      return Math.hypot(seg[1][0] - seg[0][0], seg[1][1] - seg[0][1]);
+    });
+    var SPAN = LENS.reduce(function (a, b) { return a + b; }, 0);
 
     function size() {
       w = window.innerWidth; h = window.innerHeight;
@@ -1240,7 +1252,10 @@
       unit = Math.min(w, h) * 0.11;
     }
 
-    function drawMark(heat, glow) {
+    /* `drawn` is how much of the mark exists yet, 0 to 1. Below 1 the mark is
+       still being scored and a hot point rides the leading end. */
+    function drawMark(heat, glow, drawn) {
+      if (drawn === undefined) drawn = 1;
       ctx.save();
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
@@ -1254,13 +1269,38 @@
       var b = Math.round(58 + heat * 120);
       ctx.strokeStyle = "rgb(" + r + "," + g + "," + b + ")";
       ctx.lineWidth = unit * (0.19 + heat * 0.05);
+
+      var acc = 0, head = null;
       for (var i = 0; i < MARK.length; i++) {
+        var from = acc / SPAN, to = (acc + LENS[i]) / SPAN;
+        acc += LENS[i];
+        if (drawn <= from) break;
+        var k = Math.min(1, (drawn - from) / (to - from));
+        var x1 = cx + MARK[i][0][0] * unit, y1 = cy + MARK[i][0][1] * unit;
+        var x2 = cx + MARK[i][1][0] * unit, y2 = cy + MARK[i][1][1] * unit;
+        var hx = x1 + (x2 - x1) * k, hy = y1 + (y2 - y1) * k;
         ctx.beginPath();
-        ctx.moveTo(cx + MARK[i][0][0] * unit, cy + MARK[i][0][1] * unit);
-        ctx.lineTo(cx + MARK[i][1][0] * unit, cy + MARK[i][1][1] * unit);
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(hx, hy);
         ctx.stroke();
+        if (k < 1) head = [hx, hy];
       }
       ctx.restore();
+
+      /* The point of the iron: a small hot spark only while it is cutting. */
+      if (head) {
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        var sp = ctx.createRadialGradient(head[0], head[1], 0, head[0], head[1], unit * 0.42);
+        sp.addColorStop(0.0, "rgba(255, 245, 220, 0.95)");
+        sp.addColorStop(0.3, "rgba(245, 190, 110, 0.5)");
+        sp.addColorStop(1.0, "rgba(200, 90, 30, 0)");
+        ctx.fillStyle = sp;
+        ctx.beginPath();
+        ctx.arc(head[0], head[1], unit * 0.42, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
     }
 
     function seedDrips() {
@@ -1342,8 +1382,17 @@
       ctx.clearRect(0, 0, w, h);
 
       if (!struck) {
-        /* Idle: cold iron, breathing. */
-        drawMark(0.06 + 0.05 * Math.sin(ms / 620), 0.05);
+        var SCORE = 1700;
+        if (ms < SCORE) {
+          /* Being cut: eased so it slows as each stroke lands, and warm at the
+             point because that is where the iron is working. */
+          var d = 1 - Math.pow(1 - ms / SCORE, 2.2);
+          drawMark(0.34, 0.5, d);
+        } else {
+          /* Cut, and cooling: cold iron, breathing, waiting to be pressed. */
+          var cool = Math.min(1, (ms - SCORE) / 900);
+          drawMark(0.34 - cool * 0.26 + 0.05 * Math.sin(ms / 620), 0.5 - cool * 0.45);
+        }
       } else {
         var STRIKE = 420, BLEED = 1500, ERUPT = 1250;
         if (ms < STRIKE) {
