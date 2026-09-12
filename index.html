@@ -1290,7 +1290,7 @@
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var w = 0, h = 0, cx = 0, cy = 0, EW = 0, EH = 0, unit = 0;
     var targetY = 0, targetR = 0;
-    var t0 = 0, struck = false, raf = 0, done = false;
+    var t0 = 0, struck = false, raf = 0, done = false, fired = false;
     var tone = {}, drips = [], cracks = [], tears = [];
 
     var PAPER = "#E6D9BE";
@@ -1653,8 +1653,33 @@
       var k = Math.min(1, e / 0.62);
       var ease = k * k * (3 - 2 * k);
       var R = targetR * k;
-      if (R <= 0.5) return;
       var ey = cy + (targetY - cy) * ease;
+
+      /* The blast. A flash on the frame the tear gives way, then a ring running
+         out past the edges of the screen — without these the eclipse merely
+         appears, and the envelope opening reads as something that happened just
+         before it rather than the thing that caused it. Drawn before the disc's
+         own size is checked, because at the instant of the blast there is no
+         disc yet — that is the point. */
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      var flash = Math.max(0, 1 - e / 0.14);
+      if (flash > 0) {
+        ctx.fillStyle = "rgba(255, 240, 205, " + (flash * flash * 0.55).toFixed(3) + ")";
+        ctx.fillRect(0, 0, w, h);
+      }
+      var sw = Math.min(1, e / 0.5);
+      if (sw < 1) {
+        var reach = Math.hypot(w, h) * 0.62;
+        ctx.strokeStyle = "rgba(255, 234, 190, " + ((1 - sw) * (1 - sw) * 0.5).toFixed(3) + ")";
+        ctx.lineWidth = Math.max(1, 26 * (1 - sw));
+        ctx.beginPath();
+        ctx.arc(cx, ey, reach * sw, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      if (R <= 0.5) return;
 
       /* Corona first, black disc over it. A radial gradient paints everything
          inside its inner circle with the first stop, so drawing the disc first
@@ -1778,6 +1803,15 @@
           drawDrips((ms - STRIKE) / 16);
         } else if (ms < STRIKE + BLEED + TEAR) {
           var tk = (ms - STRIKE - BLEED) / TEAR;
+          /* The envelope coming open is what sets the eclipse off. The page's
+             artwork holds its eclipse unlit until this fires, and then takes
+             about as long to reach full as the gate has left to run — so the
+             thing burning behind the gate and the thing burning in front of you
+             afterwards are one event, started here. */
+          if (!fired) {
+            fired = true;
+            document.dispatchEvent(new CustomEvent("eclipse:ignite"));
+          }
           drawEnvelope(1, tk);
           drawSeal(1, 3);
           drawBrand(1, PAPER, 0.92);
@@ -1901,6 +1935,13 @@
        instead of a panel sliding around. Nothing to click, nothing to wait
        through — the page is already the page while it lights. */
     var ignite = 0;
+    /* `lit` is whether the eclipse has been set off yet, `it` its own clock —
+       separate from `t`, which keeps running the drift and flicker regardless.
+       If no gate is on the page there is nothing to wait for, so it is already
+       true. */
+    var it = 0;
+    var lit = !document.getElementById("gate");
+    document.addEventListener("eclipse:ignite", function () { lit = true; }, { once: true });
     var embers = [], fog = [];
 
     function mulberry32(a) {
@@ -2264,8 +2305,15 @@
 
     function frame() {
       t += 1;
-      /* ~2.4s to full, eased out, then it stops being computed. */
-      if (ignite < 1) ignite = Math.min(1, 1 - Math.pow(1 - t / 145, 3));
+      /* ~2.4s to full, eased out, then it stops being computed. The clock only
+         starts once the gate's envelope tears open — before that the sun has
+         simply not gone out yet. Without a gate to wait for (reduced motion, or
+         someone arriving after it has been removed) it starts immediately, so
+         the page is never left dark waiting for an event that cannot come. */
+      if (lit) {
+        it += 1;
+        if (ignite < 1) ignite = Math.min(1, 1 - Math.pow(1 - it / 145, 3));
+      }
       scene(window.scrollY || window.pageYOffset || 0, false);
       requestAnimationFrame(frame);
     }
