@@ -29,6 +29,10 @@
     --hairline:    rgba(168, 132, 62, 0.22);
     --hairline-2:  rgba(168, 132, 62, 0.42);
 
+    /* One weighted curve for everything that moves, so the page has a single
+       sense of mass rather than a different physics per component. */
+    --ease: cubic-bezier(0.32, 0.72, 0, 1);
+
     --measure: 36rem;
     --s-0:  1.0625rem;
     --s-1:  1.25rem;
@@ -62,16 +66,28 @@
 
   :focus-visible { outline: 1px solid var(--rose); outline-offset: 4px; }
 
-  /* One artwork layer for the whole document: the silk ribbon and the petals
-     share a canvas so they compose in order and run on one loop. It is fixed to
-     the viewport and drawn against scroll position, which keeps the ribbon
-     continuous down a page of any length without a canvas to match. */
+  /* One artwork layer for the whole document: the branches, the mist, the
+     candlelight and the petals share a canvas so they compose in order and run
+     on one loop. Fixed to the viewport and drawn against scroll position, which
+     keeps the thicket continuous down a page of any length. */
   #art { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
   .stack { position: relative; z-index: 1; }
 
+  /* Film grain over the whole page. Fixed and inert, so it never repaints with
+     scrolling content — the texture is what keeps flat black from looking like
+     an unpainted background. */
+  #grain {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.055;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
   /* One gutter and one measure for every band, set once here, so no section
      adds horizontal padding of its own. */
-  .band { padding-block: 5rem; padding-inline: 1.25rem; position: relative; }
+  .band { padding-block: clamp(4rem, 11vh, 7rem); padding-inline: 1.25rem; position: relative; }
   /* No alternating panels — the artwork behind is what separates sections. */
   .band--panel { background: transparent; }
   .inner {
@@ -91,7 +107,7 @@
     color: var(--gild);
   }
 
-  /* Details we do not have yet. A sage hairline rather than a highlighter
+  /* Details we do not have yet. A gilt hairline rather than a highlighter
      block, so the page still reads as finished while the gaps stay findable. */
   .slot {
     color: var(--rose);
@@ -119,7 +135,7 @@
     text-transform: uppercase;
     color: var(--muted);
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: color 0.3s var(--ease);
   }
   .rail a:hover { color: var(--rose); }
 
@@ -243,8 +259,7 @@
   /* ---------- reception ---------- */
   .venue-card {
     border: 1px solid var(--hairline);
-    background: rgba(8, 5, 8, 0.55);
-    backdrop-filter: blur(3px);
+    background: rgba(8, 5, 8, 0.62);
     padding: clamp(1.5rem, 5vw, 2.25rem);
     display: flex;
     flex-direction: column;
@@ -347,8 +362,7 @@
     gap: 1.75rem;
     align-items: center;
     border: 1px solid var(--hairline);
-    background: rgba(8, 5, 8, 0.55);
-    backdrop-filter: blur(3px);
+    background: rgba(8, 5, 8, 0.62);
     padding: clamp(1.25rem, 4vw, 2rem);
   }
   .qr-plate {
@@ -365,8 +379,7 @@
   /* ---------- rsvp ---------- */
   .card {
     border: 1px solid var(--hairline);
-    background: rgba(8, 5, 8, 0.55);
-    backdrop-filter: blur(3px);
+    background: rgba(8, 5, 8, 0.62);
     padding: clamp(1.5rem, 5vw, 2.25rem);
     display: flex;
     flex-direction: column;
@@ -392,7 +405,7 @@
     border-radius: 0;
     padding: 0.45rem 0.1rem;
     width: 100%;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s var(--ease);
   }
   input:focus, textarea:focus { border-bottom-color: var(--rose); }
   input::placeholder, textarea::placeholder { color: #5C5650; }
@@ -409,7 +422,7 @@
     cursor: pointer;
     font-size: 0.9375rem;
     color: var(--bone-soft);
-    transition: border-color 0.3s ease, color 0.3s ease;
+    transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
   }
   .choice input { accent-color: var(--blood-lt); margin: 0; }
   .choice:has(input:checked) { border-color: var(--sage); color: var(--white); }
@@ -432,7 +445,7 @@
     cursor: pointer;
     align-self: flex-start;
     display: inline-block;
-    transition: background-color 0.35s ease, color 0.35s ease;
+    transition: background-color 0.35s var(--ease), color 0.35s var(--ease);
   }
   button:hover, .btn-link:hover { background: var(--blood); color: var(--white); }
   button.ghost { border-color: var(--hairline-2); color: var(--bone-soft); }
@@ -519,7 +532,7 @@
     padding: 1.25rem;
     background: radial-gradient(130% 100% at 50% 42%, #1A1014 0%, #050406 68%);
     cursor: pointer;
-    transition: opacity 0.8s ease, visibility 0.8s;
+    transition: opacity 0.8s var(--ease), visibility 0.8s;
   }
   #veil.gone { opacity: 0; visibility: hidden; }
   .veil-stack { display: flex; flex-direction: column; align-items: center; gap: 1.75rem; }
@@ -607,7 +620,7 @@
                 inset 0 -3px 10px rgba(0,0,0,0.55),
                 inset 0 2px 4px rgba(255,255,255,0.08);
     animation: breathe 2.8s ease-in-out infinite;
-    transition: transform 0.5s ease, opacity 0.5s ease;
+    transition: transform 0.5s var(--ease), opacity 0.5s var(--ease);
   }
   @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
   #veil.opened .env-seal { animation: none; transform: scale(1.6); opacity: 0; }
@@ -619,7 +632,7 @@
     color: var(--muted);
     animation: breathe 2.8s ease-in-out infinite;
   }
-  #veil.opened .veil-hint { opacity: 0; transition: opacity 0.4s ease; animation: none; }
+  #veil.opened .veil-hint { opacity: 0; transition: opacity 0.4s var(--ease); animation: none; }
 
   .if-attending[hidden] { display: none; }
 
@@ -639,6 +652,7 @@
 </style>
 
 <canvas id="art" aria-hidden="true"></canvas>
+<div id="grain" aria-hidden="true"></div>
 
 <div id="veil">
   <div class="veil-stack">
