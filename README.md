@@ -10,29 +10,38 @@ in a browser to see it; edit it in any text editor to change it.
 
 ## Design
 
-Taken from the printed invitation rather than invented: black ground, Calla Green
-silk, Merlot and burgundy blooms, white script names.
+Burgundy and black from the printed invitation, lit the way *Shadow of the
+Erdtree* lights its key art: a near-black ground, gold falling out of an eclipse,
+and almost no colour that isn't ember, bone or blood.
 
-| Role | Value |
-| --- | --- |
-| Ground | `#050505` |
-| Silk / accent | `#7C8447` — close to Pantone 18-0435 TCX Calla Green |
-| Merlot | `#74303C` — Pantone 19-1534 TCX |
-| Burgundy | `#8C1F3A` |
-| Bloom (petals) | `#C9382B` |
+| Role | Token | Value |
+| --- | --- | --- |
+| Ground | `--ink` | `#0A0806` |
+| Panel | `--panel` | `#0D0A07` |
+| Text | `--bone` | `#EBDCC0` |
+| Text, secondary | `--bone-soft` | `#C4B296` |
+| Text, muted | `--muted` | `#9C8B70` — 6.04:1 on `--ink` |
+| Blood | `--blood` | `#8E1119` |
+| Ember | `--ember` | `#E8A23A` |
+| Gold | `--gold` | `#D9A441` |
 
-Typefaces, from Google Fonts: **Allura** for the names and monogram (an
-approximation of the invitation's calligraphy, not the same file), **Cormorant
-Garamond** for headings and italic asides, **Montserrat** for the letterspaced
-caps and body. If they fail to load the page falls back to system serif and sans
-and still reads correctly.
+Every text token clears WCAG AA on the ground it sits on. `--blood-lt` (`#C21F26`)
+is only ever a border or a list marker, never text.
 
-The green silk and the drifting petals are drawn on `<canvas>` at runtime — there
-are no image files in this repo.
+Typefaces, from Google Fonts: **Allura** for the monogram and the gate card,
+**Cinzel** for every heading and letterspaced cap, **Cormorant Garamond** for
+body text. If they fail to load the page falls back to system serif and sans and
+still reads correctly.
+
+The eclipse, its corona, the light falling from it, the fog and the dead branches
+are all drawn on `<canvas>` at runtime. The twelve plates in `img/` are the only
+image files, and `place.py` is what grades them — it maps each one's luminance
+through the page's own palette ramp, so a render made in any light still belongs
+here.
 
 ## What is still blank
 
-Details we don't have yet are wrapped in `<span class="slot">` and show as sage
+Details we don't have yet are wrapped in `<span class="slot">` and show as rose
 text with a dashed underline. Search the file for `class="slot"` to find them all.
 Replace the text inside each one; you can then drop the `class="slot"` attribute
 so the dashed underline goes away.

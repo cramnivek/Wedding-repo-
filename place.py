@@ -25,11 +25,13 @@ OUT = "img"
 
 # The page's own tokens, as a luminance ramp: ink, warm shadow, bone, ember.
 RAMP_STOPS = [
-    (0.00, (7, 7, 10)),
-    (0.32, (38, 28, 22)),
-    (0.60, (122, 106, 86)),
-    (0.84, (198, 182, 150)),
-    (1.00, (243, 219, 170)),
+    (0.00, (5, 5, 7)),
+    (0.16, (22, 15, 10)),
+    (0.34, (66, 44, 24)),
+    (0.46, (112, 74, 32)),
+    (0.70, (190, 136, 56)),
+    (0.88, (238, 198, 116)),
+    (1.00, (255, 243, 212)),
 ]
 
 
@@ -69,20 +71,24 @@ def trim_border(im, frac):
 
 JOBS = [
     # name         border  crop_top  palette_keep  contrast  bright  longest
-    ("battlefield", 0.030, 0.28,     None,         1.08,     0.80,   1800),
-    ("hall",        0.010, 0.0,      0.42,         1.12,     0.72,   1500),
-    ("garments",    0.008, 0.0,      0.5,          1.10,     0.60,   1100),
-    ("hands",       0.0,   0.0,      None,         1.02,     0.94,   1100),
+    ("battlefield", 0.030, 0.28,     0.34,         1.24,     0.86,   1800),
+    ("hall",        0.010, 0.0,      0.30,         1.26,     0.80,   1500),
+    ("garments",    0.008, 0.0,      0.40,         1.22,     0.68,   1100),
+    ("hands",       0.0,   0.0,      0.45,         1.16,     0.96,   1100),
+    ("them-ink",    0.0,   0.0,      0.34,         1.22,     0.86,   1500),
 
-    # The prenup set arrived with five different colour temperatures — firelight,
-    # blue daylight, a pink sky, torchlight, overcast grey. Each is pulled toward
-    # the page's ramp by however much its own light needs: the warm ones keep most
-    # of themselves, the cold ones give up more.
-    ("vow",         0.0,   0.0,      0.62,         1.06,     0.90,   1300),
-    ("camp",        0.0,   0.0,      0.58,         1.06,     0.86,   1500),
-    ("ridge",       0.0,   0.0,      0.34,         1.12,     0.72,   1500),
-    ("knight",      0.0,   0.0,      0.40,         1.10,     0.78,   1200),
-    ("walk",        0.0,   0.0,      0.40,         1.10,     0.76,   1800),
+    # The prenup set: same ramp, each pulled by however much its own light needs.
+    ("vow",         0.0,   0.0,      0.34,         1.26,     0.96,   1300),
+    ("camp",        0.0,   0.0,      0.32,         1.26,     0.92,   1500),
+    ("ridge",       0.0,   0.0,      0.24,         1.30,     0.80,   1500),
+    ("knight",      0.0,   0.0,      0.28,         1.30,     0.86,   1200),
+    ("walk",        0.0,   0.0,      0.28,         1.30,     0.84,   1800),
+
+    # The two real photographs keep most of themselves — they are the one place
+    # the page is not a painted world, and over-grading them loses the contrast
+    # that section is built on.
+    ("us-1",        0.0,   0.0,      0.62,         1.12,     0.92,   1100),
+    ("us-2",        0.0,   0.0,      0.62,         1.12,     0.92,   1400),
 ]
 
 
