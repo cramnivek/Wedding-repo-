@@ -560,6 +560,53 @@
     .countdown { animation: surface 1.4s var(--ease) both 1.5s; }
   }
 
+  /* ---------- the gate ---------- */
+  /* Everything here is drawn on one canvas: a brand, struck and bleeding, that
+     erupts into the eclipse and hands you to the page. No layered boxes
+     pretending to be an object. */
+  body.gated { overflow: hidden; }
+  #gate {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: #000;
+    cursor: pointer;
+    transition: opacity 0.9s var(--ease), visibility 0.9s;
+  }
+  #gate.done { opacity: 0; visibility: hidden; }
+  #gate canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .gate-btn {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    align-self: auto;
+  }
+  /* This button covers the viewport, so it must beat the shared button:hover
+     fill — otherwise pointing anywhere floods the gate with blood red. */
+  .gate-btn, .gate-btn:hover, .gate-btn:focus { background: none; border: 0; }
+  .gate-btn:focus-visible { outline: 1px solid var(--ember); outline-offset: -6px; }
+  .gate-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 13%;
+    transform: translateX(-50%);
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: #6E6558;
+    white-space: nowrap;
+    pointer-events: none;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  #gate.struck .gate-hint { opacity: 0; transition: opacity 0.3s linear; animation: none; }
+  @keyframes pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
   .if-attending[hidden] { display: none; }
 
   @media (max-width: 30rem) {
@@ -576,6 +623,12 @@
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 </style>
+
+<div id="gate">
+  <canvas id="gate-art" aria-hidden="true"></canvas>
+  <button class="gate-btn" id="gate-btn" type="button" aria-label="Press the brand to enter"></button>
+  <p class="gate-hint">Press the brand</p>
+</div>
 
 <canvas id="art" aria-hidden="true"></canvas>
 <div id="hatch" aria-hidden="true"></div>
@@ -880,6 +933,191 @@
 <script>
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var cfg = document.querySelector(".stack");
+
+  /* The gate. A brand is struck, bleeds, and the wound opens into the eclipse
+     that then carries you to the page — the two images Berserk is built on,
+     in the order the story uses them.
+
+     The mark is an original sigil, not the Brand of Sacrifice itself: same
+     read, drawn rather than copied. Everything is one canvas on one timeline,
+     so there are no stacked boxes imitating an object. */
+  (function () {
+    var gate = document.getElementById("gate");
+    if (!gate) return;
+    if (reduced) { gate.remove(); return; }
+
+    var cv = document.getElementById("gate-art");
+    var ctx = cv.getContext("2d");
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = 0, h = 0, cx = 0, cy = 0, unit = 0;
+    var t0 = 0, struck = false, raf = 0, done = false;
+    var drips = [];
+
+    /* An angular cattle-brand: one spine, four barbs. */
+    var MARK = [
+      [[0, -1.00], [0, 1.00]],
+      [[0, -0.34], [-0.62, -0.96]],
+      [[0, -0.34], [0.62, -0.96]],
+      [[0, 0.30], [-0.50, 0.86]],
+      [[0, 0.30], [0.50, 0.86]]
+    ];
+
+    function size() {
+      w = window.innerWidth; h = window.innerHeight;
+      cv.width = w * dpr; cv.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cx = w / 2; cy = h * 0.44;
+      unit = Math.min(w, h) * 0.11;
+    }
+
+    function drawMark(heat, glow) {
+      ctx.save();
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      if (glow > 0) {
+        ctx.shadowColor = "rgba(255, 190, 110, " + Math.min(1, glow).toFixed(3) + ")";
+        ctx.shadowBlur = 18 + glow * 60;
+      }
+      /* Cold iron at rest, white-hot at the strike. */
+      var r = Math.round(70 + heat * 185);
+      var g = Math.round(62 + heat * 150);
+      var b = Math.round(58 + heat * 120);
+      ctx.strokeStyle = "rgb(" + r + "," + g + "," + b + ")";
+      ctx.lineWidth = unit * (0.19 + heat * 0.05);
+      for (var i = 0; i < MARK.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(cx + MARK[i][0][0] * unit, cy + MARK[i][0][1] * unit);
+        ctx.lineTo(cx + MARK[i][1][0] * unit, cy + MARK[i][1][1] * unit);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function seedDrips() {
+      drips = [];
+      for (var i = 0; i < 16; i++) {
+        var along = Math.random();
+        drips.push({
+          x: cx + (Math.random() - 0.5) * unit * 1.5,
+          y: cy + (along * 1.9 - 0.95) * unit,
+          len: 0,
+          max: unit * (0.6 + Math.random() * 2.6),
+          v: 0.5 + Math.random() * 2.2,
+          wid: 1 + Math.random() * 2.6,
+          delay: Math.random() * 26
+        });
+      }
+    }
+
+    function drawDrips(age) {
+      for (var i = 0; i < drips.length; i++) {
+        var d = drips[i];
+        if (age < d.delay) continue;
+        if (d.len < d.max) d.len += d.v;
+        var grad = ctx.createLinearGradient(d.x, d.y, d.x, d.y + d.len);
+        grad.addColorStop(0, "rgba(120, 12, 20, 0.9)");
+        grad.addColorStop(1, "rgba(194, 31, 38, 0.15)");
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = d.wid;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x, d.y + d.len);
+        ctx.stroke();
+        /* the bead at the running end */
+        ctx.beginPath();
+        ctx.arc(d.x, d.y + d.len, d.wid * 0.7, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(178, 22, 32, 0.85)";
+        ctx.fill();
+      }
+    }
+
+    /* The wound opens: a black disc grows out of the mark with a corona
+       tearing outward ahead of it. */
+    function drawEruption(k) {
+      var R = Math.max(w, h) * 1.15 * k;
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      var halo = ctx.createRadialGradient(cx, cy, R * 0.8, cx, cy, R * 1.5);
+      halo.addColorStop(0.00, "rgba(255, 232, 186, " + (0.85 * (1 - k * 0.45)).toFixed(3) + ")");
+      halo.addColorStop(0.10, "rgba(232, 162, 58, " + (0.45 * (1 - k * 0.4)).toFixed(3) + ")");
+      halo.addColorStop(0.40, "rgba(150, 26, 26, " + (0.2 * (1 - k)).toFixed(3) + ")");
+      halo.addColorStop(1.00, "rgba(40, 6, 10, 0)");
+      ctx.fillStyle = halo;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.lineCap = "round";
+      for (var i = 0; i < 110; i++) {
+        var a = (i / 110) * Math.PI * 2;
+        var j = ((i * 2654435761) % 1000) / 1000;
+        var len = R * (0.08 + j * 0.42);
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * R * 0.97, cy + Math.sin(a) * R * 0.97);
+        ctx.lineTo(cx + Math.cos(a) * (R + len), cy + Math.sin(a) * (R + len));
+        ctx.lineWidth = j > 0.85 ? 3 : 1.2;
+        ctx.strokeStyle = "rgba(245, 205, 140, " + (0.16 * (1 - k * 0.6)).toFixed(3) + ")";
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      ctx.fillStyle = "#000";
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function frame(now) {
+      if (!t0) t0 = now;
+      var ms = now - t0;
+      ctx.clearRect(0, 0, w, h);
+
+      if (!struck) {
+        /* Idle: cold iron, breathing. */
+        drawMark(0.06 + 0.05 * Math.sin(ms / 620), 0.05);
+      } else {
+        var STRIKE = 420, BLEED = 1500, ERUPT = 1250;
+        if (ms < STRIKE) {
+          var k = ms / STRIKE;
+          drawMark(k, k * 1.6);
+        } else if (ms < STRIKE + BLEED) {
+          var b = (ms - STRIKE) / BLEED;
+          drawDrips((ms - STRIKE) / 16);
+          drawMark(1 - b * 0.45, 1.4 - b);
+        } else {
+          var e = Math.min(1, (ms - STRIKE - BLEED) / ERUPT);
+          drawDrips(999);
+          drawMark(0.5, 0.4);
+          drawEruption(e * e);
+          if (e >= 1 && !done) {
+            done = true;
+            gate.classList.add("done");
+            document.body.classList.remove("gated");
+            setTimeout(function () {
+              cancelAnimationFrame(raf);
+              gate.remove();
+            }, 950);
+          }
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    function strike() {
+      if (struck) return;
+      struck = true;
+      t0 = 0;
+      gate.classList.add("struck");
+      seedDrips();
+    }
+
+    size();
+    document.body.classList.add("gated");
+    window.addEventListener("resize", function () { size(); });
+    gate.addEventListener("click", strike);
+    raf = requestAnimationFrame(frame);
+    var btn = document.getElementById("gate-btn");
+    if (btn) btn.focus({ preventScroll: true });
+  })();
   var when = new Date(cfg.dataset.when);
   var ends = new Date(cfg.dataset.ends);
 
