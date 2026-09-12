@@ -89,6 +89,12 @@ JOBS = [
     # it, and darkened so the plate's mask can dissolve its edges into the page.
     ("sun",         0.0,   0.0,      0.26,         1.28,     0.84,   1500),
 
+    # Already crimson and near-black before it got here — it was generated into
+    # the palette rather than corrected into it — so it keeps most of itself and
+    # only gets nudged. Grading this one hard would flatten the wet armour, which
+    # is most of why it works.
+    ("rescue",      0.0,   0.0,      0.55,         1.12,     0.9,    1500),
+
     # The chamber portrait is the one render where the faces read as themselves,
     # so it keeps most of its own light — grading it as hard as the rest would
     # cost the likeness, which is the only reason it is on the page.
