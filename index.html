@@ -1,6 +1,8 @@
 <title>Marc-Kevin &amp; Florence</title>
 <!-- The gate cannot play its centrepiece until this has arrived, and the gate is
      the first thing anyone sees, so it is asked for before the fonts are. -->
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
 <link rel="preload" href="img/behelit.webp" as="image" type="image/webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -455,6 +457,28 @@
   .share-copy { display: flex; flex-direction: column; gap: 0.7rem; align-items: flex-start; }
   .share-copy p { color: var(--bone-soft); font-size: 0.9375rem; }
 
+  /* Sits above the artwork and below the gate, so it is reachable the moment
+     the page is, and never covers the invitation on a phone. */
+  #sound-toggle {
+    position: fixed;
+    right: 0.9rem;
+    bottom: 0.9rem;
+    z-index: 40;
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bone-soft);
+    background: rgba(10, 8, 6, 0.82);
+    border: 1px solid var(--hairline);
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
+  }
+  #sound-toggle:hover,
+  #sound-toggle:focus-visible { color: var(--bone); border-color: var(--hairline-2); background: rgba(10, 8, 6, 0.82); }
+  #sound-toggle[aria-pressed="false"] { color: var(--muted); }
+
   /* ---------- rsvp ---------- */
   .card {
     border: 1px solid var(--hairline);
@@ -839,6 +863,8 @@
   <button class="gate-btn" id="gate-btn" type="button" aria-label="Break the seal to enter the site"></button>
   <p class="gate-hint">Break the seal</p>
 </div>
+
+<button id="sound-toggle" type="button" aria-pressed="false">Sound on</button>
 
 <canvas id="art" aria-hidden="true"></canvas>
 <div id="hatch" aria-hidden="true"></div>
@@ -1334,6 +1360,123 @@
 <script>
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var cfg = document.querySelector(".stack");
+
+  /* Sound for the break, synthesised rather than loaded.
+
+     No file is fetched. That is partly weight — an ambient bed would be several
+     hundred KB against nothing here — but mostly it is that a clip cannot follow
+     the gate. This is built from the same timeline the animation is: the impact
+     lands on the frame the seal gives way, and the drone opens its filter across
+     the eruption and closes as the paper dissolves, so the sound arrives at
+     silence exactly when the page does.
+
+     It only ever plays from the press, which is a real user gesture and the one
+     thing a browser will let start audio. There is no loop afterwards: a wedding
+     page that hums at you forever is a page people close. */
+  (function () {
+    var btn = document.getElementById("sound-toggle");
+    if (!btn) return;
+
+    var KEY = "mkf-sound";
+    var stored = null;
+    try { stored = localStorage.getItem(KEY); } catch (e) { stored = null; }
+    /* Anyone who has asked the system for less motion is not expecting a wedding
+       invitation to make a noise at them either. */
+    var on = stored === null ? !reduced : stored === "on";
+
+    function paint() {
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.textContent = on ? "Sound on" : "Sound off";
+    }
+    paint();
+
+    btn.addEventListener("click", function () {
+      on = !on;
+      try { localStorage.setItem(KEY, on ? "on" : "off"); } catch (e) {}
+      paint();
+    });
+
+    window.gateSound = function () {
+      if (!on) return;
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      var ctx, t;
+      try {
+        ctx = new AC();
+        t = ctx.currentTime;
+      } catch (e) { return; }
+
+      var out = ctx.createGain();
+      out.gain.value = 0.0001;
+      out.connect(ctx.destination);
+      /* Eased up rather than switched on, so the first thing heard is not a
+         click at the start of the impact. */
+      out.gain.setValueAtTime(0.0001, t);
+      out.gain.exponentialRampToValueAtTime(0.5, t + 0.04);
+
+      /* The blow: a pitch dropping through the floor, which is what gives a hit
+         its weight — a steady low tone just sounds like a hum. */
+      var hit = ctx.createOscillator();
+      var hitG = ctx.createGain();
+      hit.type = "triangle";
+      hit.frequency.setValueAtTime(150, t);
+      hit.frequency.exponentialRampToValueAtTime(32, t + 0.55);
+      hitG.gain.setValueAtTime(0.9, t);
+      hitG.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
+      hit.connect(hitG); hitG.connect(out);
+      hit.start(t); hit.stop(t + 1.6);
+
+      /* Its air: a short noise burst, rolled off so it reads as a room rather
+         than as static. */
+      var len = Math.floor(ctx.sampleRate * 1.4);
+      var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      var d = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) {
+        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6);
+      }
+      var noise = ctx.createBufferSource();
+      var nf = ctx.createBiquadFilter();
+      var ng = ctx.createGain();
+      noise.buffer = buf;
+      nf.type = "lowpass";
+      nf.frequency.setValueAtTime(1800, t);
+      nf.frequency.exponentialRampToValueAtTime(180, t + 1.2);
+      ng.gain.value = 0.5;
+      noise.connect(nf); nf.connect(ng); ng.connect(out);
+      noise.start(t); noise.stop(t + 1.4);
+
+      /* The drone underneath it, two voices a fifth apart and slightly detuned
+         so they beat against each other instead of sitting still. Its filter
+         opens as the eclipse does and shuts as the gate dissolves. */
+      var df = ctx.createBiquadFilter();
+      df.type = "lowpass";
+      df.frequency.setValueAtTime(120, t);
+      df.frequency.linearRampToValueAtTime(900, t + 2.6);
+      df.frequency.linearRampToValueAtTime(160, t + 5.2);
+      var dg = ctx.createGain();
+      dg.gain.setValueAtTime(0.0001, t);
+      dg.gain.exponentialRampToValueAtTime(0.34, t + 1.6);
+      dg.gain.setValueAtTime(0.34, t + 3.4);
+      dg.gain.exponentialRampToValueAtTime(0.0001, t + 5.4);
+      df.connect(dg); dg.connect(out);
+
+      [55, 55.6, 82.5].forEach(function (f) {
+        var o = ctx.createOscillator();
+        o.type = "sawtooth";
+        o.frequency.value = f;
+        o.connect(df);
+        o.start(t); o.stop(t + 5.5);
+      });
+
+      /* Close the context once it has finished, so a page left open is not
+         holding an audio device for nothing. */
+      out.gain.setValueAtTime(0.5, t + 4.9);
+      out.gain.exponentialRampToValueAtTime(0.0001, t + 5.5);
+      setTimeout(function () {
+        if (ctx.close) ctx.close();
+      }, 6200);
+    };
+  })();
 
   /* The gate, drawn as a manga page rather than a lit scene.
 
@@ -1974,6 +2117,7 @@
     function strike() {
       if (struck) return;
       struck = true;
+      if (window.gateSound) { try { window.gateSound(); } catch (e) {} }
       t0 = 0;
       gate.classList.add("struck");
       seed();
