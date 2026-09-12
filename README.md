@@ -50,15 +50,16 @@ Outstanding:
 
 - **The ceremony venue** — the invitation only names the reception
 - **Five of the six times** in the order of the day; only 5:00 is real
-- **Reply-by date** and **your email address**
+- **Reply-by date**
 - Parking, travel from the airport or pier, hotels
 - Children, plus-ones, gifts, photographs
 
-Two places hold the email and must match: the `.slot` in the RSVP note, and the
-`TO` variable near the bottom of the `<script>` block.
+The contact address is filled in — `marcarlinghaus@gmail.com`. It lives in three
+places that must agree, so change all three together: the RSVP note, the footer's
+`mailto:` link, and the `TO` variable near the bottom of the `<script>` block.
 
 ```js
-var TO = "your@email";
+var TO = "marcarlinghaus@gmail.com";
 ```
 
 The date lives in one place — the `data-` attributes on `.stack`. The countdown
