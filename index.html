@@ -1357,7 +1357,7 @@
     var w = 0, h = 0, cx = 0, cy = 0, EW = 0, EH = 0, unit = 0;
     var targetY = 0, targetR = 0;
     var t0 = 0, struck = false, raf = 0, done = false, fired = false;
-    var tone = {}, drips = [], cracks = [], tears = [], hands = [];
+    var tone = {}, drips = [], cracks = [], tears = [];
 
     var PAPER = "#E6D9BE";
     var INK = "#17120E";
@@ -1567,73 +1567,54 @@
       }
     }
 
-    /* The Eclipse is not the disc — it is the ground underneath it. A field of
-       arms comes up out of the dark reaching for the thing that has just opened,
-       and because they are pure black they only exist against the corona: drawn
-       last, over the light, so the light is what cuts them out. */
-    function seedHands() {
-      hands = [];
-      var n = w < 620 ? 16 : 30;
-      for (var i = 0; i < n; i++) {
-        var far = Math.random();
-        hands.push({
-          x: Math.random() * w,
-          far: far,
-          s: 0.3 + (1 - far) * 0.9,
-          delay: Math.random() * 0.44,
-          lean: (Math.random() - 0.5) * 1.05,
-          spread: 0.55 + Math.random() * 0.8,
-          twist: Math.random() * 0.9
-        });
+    /* The Eclipse is not the disc — it is the ground underneath it. This is that
+       ground, taken from the sequence itself rather than drawn: fourteen frames
+       of the field, cropped to the horizon and below so the gate keeps its own
+       sky, and stopped before the camera's push-in brings a character into it.
+
+       An earlier pass built this out of vector arms. They read as rakes until
+       the thumbs were separated out, and even fixed they were never going to be
+       a crowd. */
+    var FLD_COLS = 5, FLD_N = 14, FLD_W = 220, FLD_H = 84;
+    var fieldImg = null, fieldReady = false;
+    (function () {
+      var im = new Image();
+      im.onload = function () { fieldImg = im; fieldReady = true; };
+      im.src = "img/field.webp";
+    })();
+
+    /* The band is composed off-screen first so its top edge can be erased to
+       genuine transparency before it lands. Painting a dark wash over the top
+       instead only adds black, which is the wrong answer when what sits behind
+       it is crimson — the seam showed as a hard line exactly when the world was
+       reddest. Erasing lets whatever is behind come through instead. */
+    var fieldPad = null;
+
+    function drawField(k) {
+      if (!fieldReady || k <= 0) return;
+      var i = Math.max(0, Math.min(FLD_N - 1, Math.floor(k * FLD_N)));
+      var bw = Math.round(w), bh = Math.round(w * (FLD_H / FLD_W));
+      if (!fieldPad || fieldPad.width !== bw || fieldPad.height !== bh) {
+        fieldPad = document.createElement("canvas");
+        fieldPad.width = bw; fieldPad.height = bh;
       }
-      /* Far arms first, so the near ones overlap them rather than the reverse. */
-      hands.sort(function (a, b) { return b.far - a.far; });
-    }
+      var g2 = fieldPad.getContext("2d");
+      g2.clearRect(0, 0, bw, bh);
+      g2.globalCompositeOperation = "source-over";
+      g2.drawImage(fieldImg,
+        (i % FLD_COLS) * FLD_W, Math.floor(i / FLD_COLS) * FLD_H, FLD_W, FLD_H,
+        0, 0, bw, bh);
+      g2.globalCompositeOperation = "destination-out";
+      var fade = g2.createLinearGradient(0, 0, 0, bh * 0.5);
+      fade.addColorStop(0, "rgba(0,0,0,1)");
+      fade.addColorStop(1, "rgba(0,0,0,0)");
+      g2.fillStyle = fade;
+      g2.fillRect(0, 0, bw, bh * 0.5);
 
-    function drawHands(k) {
-      if (k <= 0 || !hands.length) return;
-      ctx.save();
-      ctx.fillStyle = "#000";
-      for (var i = 0; i < hands.length; i++) {
-        var d = hands[i];
-        /* Distant arms stand further up the frame as well as smaller, so the
-           field has depth instead of being one rank along the bottom edge. */
-        var base = h + unit * 0.4 - d.far * h * 0.11;
-        var t = (k - d.delay) / 0.52;
-        if (t <= 0) continue;
-        t = Math.min(1, t);
-        var rise = 1 - Math.pow(1 - t, 3);
-        var u = unit * d.s;
-        var reach = u * (2.2 + d.twist * 2.0) * rise;
-        var wx = d.x + d.lean * reach * 0.42;
-        var wy = base - reach;
-
-        /* Forearm, then the palm as its own mass above the wrist. An arm that
-           ends in a dot with spokes coming off it reads as a rake; the palm is
-           what makes the difference. */
-        var tilt = d.lean * 0.5;
-        brush(d.x, base, wx, wy, u * 0.25, u * 0.16, "#000");
-        var px = wx + Math.sin(tilt) * u * 0.3;
-        var py = wy - Math.cos(tilt) * u * 0.3;
-        brush(wx, wy, px, py, u * 0.3, u * 0.29, "#000");
-
-        /* Four fingers in a narrow fan — near enough parallel, middle longest,
-           little finger shortest — and a thumb thrown well off to one side.
-           Spreading five evenly around a point is what made these look like
-           forks; a hand is asymmetric, and the thumb is the asymmetry. */
-        var LEN = [0.62, 0.8, 0.74, 0.5];
-        for (var f = 0; f < 4; f++) {
-          var a = tilt + (f / 3 - 0.5) * 0.44 * d.spread;
-          var fl = u * LEN[f] * (0.72 + d.twist * 0.5);
-          brush(px, py, px + Math.sin(a) * fl, py - Math.cos(a) * fl,
-                u * 0.11, u * 0.06, "#000");
-        }
-        var ta = tilt + (d.twist > 0.5 ? 1 : -1) * (0.85 + d.twist * 0.3);
-        var tl = u * 0.44 * (0.72 + d.twist * 0.5);
-        brush(px, py, px + Math.sin(ta) * tl, py - Math.cos(ta) * tl,
-              u * 0.13, u * 0.07, "#000");
-      }
-      ctx.restore();
+      /* It rises into frame rather than fading in — the ground coming up. */
+      var r = Math.min(1, k / 0.6);
+      var y = h - bh * (1 - Math.pow(1 - r, 3));
+      ctx.drawImage(fieldPad, 0, y, bw, bh);
     }
 
     /* The Behelit, sealing the envelope in place of wax.
@@ -1707,7 +1688,6 @@
       for (var t = 0; t <= 26; t++) {
         tears.push((Math.random() - 0.5) * unit * 0.34);
       }
-      seedHands();
     }
 
     /* Ink running from the mark. Solid black, hard-edged, with a bead at the
@@ -1975,7 +1955,7 @@
 
           drawEclipseHint(e);
           /* Last, over the light: the field reaching for it. */
-          drawHands(Math.max(0, (e - 0.12) / 0.7));
+          drawField(Math.max(0, (e - 0.12) / 0.7));
           ctx.restore();
           if (e >= 1 && !done) {
             done = true;
