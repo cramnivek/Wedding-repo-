@@ -1500,7 +1500,7 @@
     var w = 0, h = 0, cx = 0, cy = 0, EW = 0, EH = 0, unit = 0;
     var targetY = 0, targetR = 0;
     var t0 = 0, struck = false, raf = 0, done = false, fired = false;
-    var tone = {}, drips = [], cracks = [], tears = [];
+    var tone = {}, cracks = [], tears = [];
 
     var PAPER = "#E6D9BE";
     var INK = "#17120E";
@@ -1796,25 +1796,6 @@
     /* ---------- seeded bits ---------- */
 
     function seed() {
-      /* Seeded on the seal's lower rim rather than inside it. Ink starting in
-         the middle of the wax is black on black and the whole bleed reads as
-         nothing happening until it clears the blot; starting at the edge, every
-         drip is on cream paper from its first frame. */
-      drips = [];
-      var R = unit * 1.22;
-      for (var i = 0; i < 10; i++) {
-        var a = Math.PI * (0.12 + (i / 12) * 0.76);   /* the lower arc only */
-        var jit = (Math.random() - 0.5) * 0.12;
-        drips.push({
-          x: cx + Math.cos(a + jit) * R * 0.92,
-          y: cy + Math.sin(a + jit) * R * 0.92,
-          len: 0,
-          max: unit * (1.1 + Math.random() * 3.4),
-          v: 0.9 + Math.random() * 3.0,
-          wid: unit * (0.035 + Math.random() * 0.06),
-          delay: Math.random() * 26
-        });
-      }
       cracks = [];
       for (var c = 0; c < 9; c++) {
         var a = Math.random() * Math.PI * 2;
@@ -1833,19 +1814,34 @@
       }
     }
 
-    /* Ink running from the mark. Solid black, hard-edged, with a bead at the
-       running end — blood in a Berserk panel is never a gradient. */
-    function drawDrips(age) {
-      for (var i = 0; i < drips.length; i++) {
-        var d = drips[i];
-        if (age < d.delay) continue;
-        if (d.len < d.max) d.len += d.v;
-        brush(d.x, d.y, d.x, d.y + d.len, d.wid, d.wid * 0.45, "#4E050B");
-        ctx.fillStyle = "#4E050B";
-        ctx.beginPath();
-        ctx.arc(d.x, d.y + d.len, d.wid * 0.85, 0, Math.PI * 2);
-        ctx.fill();
-      }
+    /* What comes out of it. Ten frames of the eruption itself, cut from the
+       sequence at the first hard cut — the shot runs clean to frame 9 and the
+       tenth is a different scene entirely.
+
+       Its ground could not be keyed on brightness: the whole clip tops out at
+       luma 83 and its median is 26, so the mass and the plain behind it are
+       equally dark. They separate on hue instead — the mass is orange, the
+       plain is a purple-grey — so the alpha comes from red minus blue, with the
+       threshold set between the sky at 28 and the mass at 41. Below that the
+       sky came through as a faint pink rectangle. */
+    var BLM_COLS = 5, BLM_N = 10, BLM_W = 220, BLM_H = 124;
+    var bloomImg = null, bloomReady = false;
+    (function () {
+      var im = new Image();
+      im.onload = function () { bloomImg = im; bloomReady = true; };
+      im.src = "img/bloom.webp";
+    })();
+
+    function drawBloom(k) {
+      if (!bloomReady || k <= 0) return;
+      var i = Math.max(0, Math.min(BLM_N - 1, Math.floor(k * BLM_N)));
+      /* Drawn at one fixed size: the mass grows inside its own frames, so
+         scaling it up as well would double the motion. */
+      var dw = Math.min(w * 0.98, h * 1.45);
+      var dh = dw * (BLM_H / BLM_W);
+      ctx.drawImage(bloomImg,
+        (i % BLM_COLS) * BLM_W, Math.floor(i / BLM_COLS) * BLM_H, BLM_W, BLM_H,
+        cx - dw / 2, cy - dh / 2, dw, dh);
     }
 
     /* The tear: a ragged black mouth opening along the flap's fold, widening
@@ -2041,7 +2037,7 @@
              in — the front of it here, the last of it as the paper tears. */
           drawBehelit(b * 25, 1);
           drawBrand(1, INK, 0.85, unit * 2.45);
-          drawDrips((ms - STRIKE) / 16);
+          drawBloom((b - 0.45) / 0.55);
         } else if (ms < STRIKE + BLEED + TEAR) {
           var tk = (ms - STRIKE - BLEED) / TEAR;
           /* The envelope coming open is what sets the eclipse off. The page's
@@ -2058,7 +2054,7 @@
              paper gives way under it. */
           drawBehelit(25 + tk * 13, 1);
           drawBrand(1, INK, 0.85, unit * 2.45);
-          drawDrips(999);
+          drawBloom(1);
           drawTear(tk);
         } else {
           var e = Math.min(1, (ms - STRIKE - BLEED - TEAR) / ERUPT);
