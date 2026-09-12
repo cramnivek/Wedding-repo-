@@ -1,7 +1,7 @@
 <title>Marc-Kevin &amp; Florence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Allura&family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Allura&family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Pirata+One&display=swap">
 
 <style>
   /* One committed visual world, painted explicitly rather than swapped per
@@ -212,22 +212,28 @@
   /* Set like a title card: wide-tracked inscriptional caps, lit from the
      eclipse behind them rather than filled flat. The script survives in the
      footer monogram, where it reads as the personal voice against all this. */
+  /* Blackletter is drawn for mixed case — its caps are the hard part to read,
+     and the tracking that suits Roman capitals pulls its strokes apart. So the
+     names lose the uppercase transform and nearly all the letter-spacing, and
+     grow a little to hold the same weight on the page. */
   .names {
-    font-family: "Cinzel", Georgia, serif;
-    font-size: clamp(1.9rem, 6.4vw, 3.4rem);
-    font-weight: 500;
-    line-height: 1.18;
-    letter-spacing: 0.13em;
-    text-transform: uppercase;
+    font-family: "Pirata One", "Cinzel", Georgia, serif;
+    font-size: clamp(2.3rem, 7.6vw, 4.2rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: 0.015em;
     color: var(--bone);
     text-shadow: 0 0 30px rgba(232, 162, 58, 0.45), 0 0 90px rgba(217, 140, 50, 0.3);
   }
+  /* The one glyph held back from the blackletter: Pirata One's ampersand reads
+     as a G at a glance, and this is the character joining their two names. */
   .names .amp {
     display: block;
-    font-size: 0.62em;
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 0.52em;
     letter-spacing: 0.2em;
     color: var(--ember);
-    margin-block: 0.18em;
+    margin-block: 0.1em;
   }
   .names .line { display: block; }
   .names .nb { white-space: nowrap; hyphens: none; }
@@ -290,11 +296,10 @@
   /* ---------- section headings ---------- */
   .sec-head { display: flex; flex-direction: column; gap: 0.5rem; }
   .sec-head h2 {
-    font-family: "Cinzel", Georgia, serif;
-    font-size: clamp(1.5rem, 5vw, 2rem);
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-family: "Pirata One", "Cinzel", Georgia, serif;
+    font-size: clamp(1.85rem, 5.8vw, 2.5rem);
+    font-weight: 400;
+    letter-spacing: 0.01em;
     color: var(--bone);
   }
   .lede { color: var(--bone-soft); }
@@ -403,24 +408,12 @@
   .block h3 { font-size: var(--s-1); }
   .block p, .block address { color: var(--bone-soft); font-style: normal; }
 
-  /* ---------- share / qr ---------- */
+  /* ---------- save the day ---------- */
   .share {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 1.75rem;
-    align-items: center;
     border: 1px solid var(--hairline);
     background: rgba(14, 10, 7, 0.62);
     padding: clamp(1.25rem, 4vw, 2rem);
   }
-  .qr-plate {
-    background: var(--bone);
-    padding: 0.7rem;
-    border: 1px solid var(--sage);
-    line-height: 0;
-    flex: none;
-  }
-  .qr-plate canvas { display: block; width: 132px; height: 132px; }
   .share-copy { display: flex; flex-direction: column; gap: 0.7rem; align-items: flex-start; }
   .share-copy p { color: var(--bone-soft); font-size: 0.9375rem; }
 
@@ -524,6 +517,9 @@
     color: var(--white);
   }
   .qa dd { margin: 0; color: var(--bone-soft); }
+  /* The one place the page raises its voice. Cormorant's bold is soft, so the
+     emphasis comes from stepping up to full bone rather than from weight. */
+  .qa dd strong { color: var(--bone); font-weight: 600; }
 
   /* ---------- footer ---------- */
   footer.band { padding-block: 4rem; text-align: center; }
@@ -569,9 +565,12 @@
 
   /* The opening sequence. Held to the header only, finishing on its own in
      under three seconds, so the page at rest is the finished page. */
+  /* Ends on the same tracking `.names` is set to, because `both` holds the
+     final frame — landing on the old Roman-capital value would quietly widen
+     the blackletter back out and undo the rule above. */
   @keyframes settle {
-    from { opacity: 0; letter-spacing: 0.34em; }
-    to   { opacity: 1; letter-spacing: 0.13em; }
+    from { opacity: 0; letter-spacing: 0.22em; }
+    to   { opacity: 1; letter-spacing: 0.015em; }
   }
   @keyframes surface {
     from { opacity: 0; transform: translateY(10px); }
@@ -1089,13 +1088,11 @@
       </div>
 
       <div class="share">
-        <div class="qr-plate"><canvas id="qr" width="132" height="132" role="img"
-             aria-label="QR code linking to this page"></canvas></div>
         <div class="share-copy">
           <p class="eyebrow">Save the day</p>
           <p>
-            Point a phone at the code to open this page — print it on the invitation,
-            a table card, or the order of service.
+            Put the sixth of October in your calendar now, and it will remind you
+            itself.
           </p>
           <a class="btn-link" id="cal" href="#" target="_blank" rel="noopener">Add to calendar</a>
         </div>
@@ -1156,7 +1153,7 @@
 
         <div class="row">
           <div class="field if-attending">
-            <label for="party-size">How many of you</label>
+            <label for="party-size">How many, of those named</label>
             <input type="number" id="party-size" name="party" min="1" max="12" value="1" inputmode="numeric">
           </div>
           <div class="field">
@@ -1211,19 +1208,32 @@
         </div>
         <div class="qa">
           <dt>Can I bring the children?</dt>
-          <dd><span class="slot">Say yes or no here. It is kinder to be direct than to let people guess.</span></dd>
+          <dd>
+            While we love the little ones, our reception will be limited to adults.
+          </dd>
         </div>
         <div class="qa">
           <dt>Can I bring someone?</dt>
-          <dd><span class="slot">Explain how plus-ones work — usually, whoever is named on the invitation.</span></dd>
+          <dd>
+            Due to limited space, our celebration is strictly for the
+            <strong>named</strong> guests on the invitation.
+          </dd>
         </div>
         <div class="qa">
           <dt>What about gifts?</dt>
-          <dd><span class="slot">A registry link, a honeymoon fund, or a sentence saying your presence is enough.</span></dd>
+          <dd>
+            Your presence is the greatest gift of all. Should you wish to honour us
+            with a gift, a contribution to our wishing well would be appreciated.
+          </dd>
         </div>
         <div class="qa">
           <dt>Can I take photographs?</dt>
-          <dd><span class="slot">Whether the ceremony is unplugged, and any shared album for the rest of the evening.</span></dd>
+          <dd>
+            We would love for you to capture memories during the day, but we kindly
+            ask that you refrain from posting any photos on social media. We want to
+            be the first to share our moments, and we would be happy to send you
+            copies afterward if you like.
+          </dd>
         </div>
       </dl>
     </div>
@@ -1250,7 +1260,6 @@
 
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var cfg = document.querySelector(".stack");
@@ -1797,20 +1806,6 @@
       "&dates=" + stamp(when) + "/" + stamp(isNaN(ends) ? when : ends) +
       "&location=" + encodeURIComponent(cfg.dataset.where) +
       "&details=" + encodeURIComponent(location.href);
-  })();
-
-  /* QR of whatever address this page is actually served from, so the printed
-     code keeps working after the site moves to its own domain. */
-  (function () {
-    var canvas = document.getElementById("qr");
-    if (!canvas || typeof QRious === "undefined") {
-      if (canvas) canvas.closest(".share").hidden = true;
-      return;
-    }
-    new QRious({
-      element: canvas, value: location.href, size: 264,
-      background: "#E6E2DC", foreground: "#0B0A0A", level: "M", padding: 0
-    });
   })();
 
   /* The artwork.

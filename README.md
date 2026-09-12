@@ -28,16 +28,18 @@ and almost no colour that isn't ember, bone or blood.
 Every text token clears WCAG AA on the ground it sits on. `--blood-lt` (`#C21F26`)
 is only ever a border or a list marker, never text.
 
-Typefaces, from Google Fonts: **Allura** for the monogram and the gate card,
-**Cinzel** for every heading and letterspaced cap, **Cormorant Garamond** for
-body text. If they fail to load the page falls back to system serif and sans and
-still reads correctly.
+Typefaces, from Google Fonts: **Pirata One** for the names and section headings,
+**Cinzel** for every letterspaced cap — the nav, labels, the date, the order of
+the day — **Cormorant Garamond** for body text, and **Allura** for the footer
+monogram. The blackletter is deliberately kept off anything small: it is drawn
+for mixed case at size, and at 11px it stops being readable. If the fonts fail to
+load the page falls back to system serif and still reads correctly.
 
-The eclipse, its corona, the light falling from it, the fog and the dead branches
-are all drawn on `<canvas>` at runtime. The twelve plates in `img/` are the only
-image files, and `place.py` is what grades them — it maps each one's luminance
-through the page's own palette ramp, so a render made in any light still belongs
-here.
+The eclipse, its corona, the light falling from it, the fog, the dead branches
+and the whole opening gate are all drawn on `<canvas>` at runtime. The fourteen
+plates in `img/` are the only image files, and `place.py` is what grades them —
+it maps each one's luminance through the page's own palette ramp, so a render
+made in any light still belongs here.
 
 ## What is still blank
 
@@ -52,7 +54,6 @@ Outstanding:
 - **Five of the six times** in the order of the day; only 5:00 is real
 - **Reply-by date**
 - Parking, travel from the airport or pier, hotels
-- Children, plus-ones, gifts, photographs
 
 The contact address is filled in — `marcarlinghaus@gmail.com`. It lives in three
 places that must agree, so change all three together: the RSVP note, the footer's
@@ -95,13 +96,16 @@ To collect them properly, pick one:
 - Live countdown to five o'clock on the sixth, ticking every second
 - Scroll-driven reveals using native `animation-timeline: view()`, wrapped in
   `@supports` so browsers without it render everything at rest
-- The invitation leans toward the pointer; the silk sways with it
-- QR code of whatever URL the page is served from — print it on stationery
+- The invitation leans toward the pointer
 - Add-to-calendar as a Google Calendar link, which opens on any device
 - The RSVP folds away party size, diet and song on a decline
 
-Everything motion-related switches off under `prefers-reduced-motion`. The silk
-is still drawn, just held still.
+Before any of that there is a gate: an invitation drawn as a manga page, inked
+in front of you, sealed in wax and branded. Pressing the brand breaks the seal,
+the ink runs, the envelope tears, and the tear opens into the eclipse.
+
+Everything motion-related switches off under `prefers-reduced-motion` — the gate
+removes itself outright rather than playing at a lower speed.
 
 ## Publishing it
 
