@@ -607,6 +607,26 @@
   #gate.struck .gate-hint { opacity: 0; transition: opacity 0.3s linear; animation: none; }
   @keyframes pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 
+  /* The ground under the invitation. Full-bleed across the bottom of the
+     header, masked so it rises out of black rather than starting at an edge,
+     and colour-treated to the page's own ramp so it reads as the same world
+     the eclipse above it belongs to. */
+  .ground {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 100vw;
+    height: 44%;
+    transform: translateX(-50%);
+    object-fit: cover;
+    object-position: 74% 42%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 58%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 58%, #000 80%, transparent 100%);
+  }
+
   /* ---------- the two of us ---------- */
   .plate-ink {
     margin: 0;
@@ -705,6 +725,7 @@
   </nav>
 
   <header class="invite">
+    <img class="ground" src="img/ground.jpg" width="1374" height="894" alt="">
     <div class="invite-inner">
       <p class="join">Join us for the wedding of</p>
       <h1 class="names">
