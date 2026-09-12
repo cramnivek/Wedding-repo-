@@ -159,11 +159,7 @@
     align-items: center;
     gap: 1.5rem;
     text-align: center;
-    transform: perspective(1400px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-    transform-style: preserve-3d;
-    transition: transform 0.6s cubic-bezier(0.22, 0.8, 0.3, 1);
   }
-  .invite-inner > * { transform: translateZ(20px); }
 
   .join {
     font-size: 0.9375rem;
@@ -297,9 +293,9 @@
     height: 62px;
     border-radius: 62% 8% 62% 8%;
     box-shadow: inset -6px -8px 14px rgba(0,0,0,0.55), inset 5px 6px 12px rgba(255,255,255,0.14);
-    transition: transform 0.4s cubic-bezier(0.22, 0.8, 0.3, 1);
+    transition: transform 0.5s var(--ease);
   }
-  .tone:hover .chip { transform: rotate(-8deg) scale(1.06); }
+  .tone:hover .chip { transform: translateY(-3px); }
   .tone .chip--black { background: linear-gradient(150deg, #3A3A3A, #0A0A0A 60%); }
   .tone .chip--burgundy { background: linear-gradient(150deg, var(--blood-lt), #5E1326 62%); }
   .tone .label {
@@ -531,122 +527,23 @@
     }
   }
 
-  /* ---------- the sealed envelope ---------- */
-  /* A real gate, because it was asked for: the page behind is fully built and a
-     press anywhere on the veil opens it. Reduced motion skips it entirely. */
-  body.sealed { overflow: hidden; }
-  #veil {
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    display: grid;
-    place-items: center;
-    padding: 1.25rem;
-    background:
-      radial-gradient(70% 55% at 50% 88%, rgba(232, 162, 58, 0.10) 0%, rgba(120, 50, 14, 0) 70%),
-      radial-gradient(130% 100% at 50% 40%, #11101A 0%, #07070A 66%);
-    cursor: pointer;
-    transition: opacity 0.8s var(--ease), visibility 0.8s;
+  /* The opening sequence. Held to the header only, finishing on its own in
+     under three seconds, so the page at rest is the finished page. */
+  @keyframes settle {
+    from { opacity: 0; letter-spacing: 0.34em; }
+    to   { opacity: 1; letter-spacing: 0.13em; }
   }
-  #veil.gone { opacity: 0; visibility: hidden; }
-  .veil-stack { display: flex; flex-direction: column; align-items: center; gap: 1.75rem; }
-
-  .envelope {
-    position: relative;
-    width: min(23rem, 84vw);
-    aspect-ratio: 1.5;
-    background: none;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-    perspective: 1200px;
-    transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  @keyframes surface {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
   }
-  .envelope:hover { transform: translateY(-5px); }
-  .env-back, .env-front, .env-flap, .env-letter { position: absolute; }
-
-  .env-back {
-    inset: 0;
-    background: linear-gradient(158deg, #14141C, #07070A);
-    border: 1px solid rgba(232, 162, 58, 0.34);
+  @media (prefers-reduced-motion: no-preference) {
+    .names { animation: settle 2.2s var(--ease) both 0.25s; }
+    .join { animation: surface 1.2s var(--ease) both 0.15s; }
+    .when { animation: surface 1.4s var(--ease) both 0.9s; }
+    .invite .hairline { animation: surface 1.4s var(--ease) both 1.25s; }
+    .countdown { animation: surface 1.4s var(--ease) both 1.5s; }
   }
-  /* The card rises out of the envelope once the flap has swung clear of it. */
-  .env-letter {
-    inset: 7% 8% auto 8%;
-    height: 76%;
-    z-index: 1;
-    background: linear-gradient(180deg, #E7DCC2, #CDBFA1);
-    display: grid;
-    place-items: start center;
-    padding-top: 13%;
-    transform: translateY(7%);
-    transition: transform 0.95s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s;
-  }
-  .env-letter span {
-    font-family: "Allura", cursive;
-    font-size: clamp(1.2rem, 5vw, 1.8rem);
-    line-height: 1.15;
-    color: #2A1A10;
-    text-align: center;
-    padding-inline: 1rem;
-  }
-  #veil.opened .env-letter { transform: translateY(-44%); }
-
-  .env-front {
-    inset: 0;
-    z-index: 2;
-    background: linear-gradient(168deg, #101018, #060609);
-    clip-path: polygon(0 0, 50% 41%, 100% 0, 100% 100%, 0 100%);
-  }
-  .env-flap {
-    inset: 0 0 auto 0;
-    height: 62%;
-    z-index: 3;
-    background: linear-gradient(180deg, #1C1C26, #0C0C12);
-    clip-path: polygon(0 0, 100% 0, 50% 100%);
-    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.85));
-    transform-origin: 50% 0;
-    transform: rotateX(0deg);
-    backface-visibility: hidden;
-    transition: transform 0.95s cubic-bezier(0.55, 0, 0.28, 1), z-index 0s 0.5s;
-  }
-  #veil.opened .env-flap { transform: rotateX(-172deg); z-index: 0; }
-
-  .env-seal {
-    position: absolute;
-    left: 50%;
-    top: 58%;
-    z-index: 4;
-    width: 78px;
-    height: 78px;
-    margin: -39px 0 0 -39px;
-    border-radius: 49% 51% 47% 53% / 52% 48% 52% 48%;
-    display: grid;
-    place-items: center;
-    font-family: "Allura", cursive;
-    font-size: 1.6rem;
-    color: #E6C9A4;
-    background:
-      radial-gradient(circle at 50% 78%, rgba(232, 162, 58, 0.30), transparent 58%),
-      radial-gradient(circle at 44% 40%, #8E1119, #5E0910 70%, #3A050A);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.75),
-                inset 0 0 0 1px rgba(232, 162, 58, 0.14),
-                inset 0 -4px 12px rgba(0,0,0,0.6),
-                inset 0 2px 5px rgba(255, 220, 180, 0.09);
-    animation: breathe 2.8s ease-in-out infinite;
-    transition: transform 0.5s var(--ease), opacity 0.5s var(--ease);
-  }
-  @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-  #veil.opened .env-seal { animation: none; transform: scale(1.6); opacity: 0; }
-
-  .veil-hint {
-    font-size: 0.75rem;
-    letter-spacing: 0.34em;
-    text-transform: uppercase;
-    color: var(--muted);
-    animation: breathe 2.8s ease-in-out infinite;
-  }
-  #veil.opened .veil-hint { opacity: 0; transition: opacity 0.4s var(--ease); animation: none; }
 
   .if-attending[hidden] { display: none; }
 
@@ -668,17 +565,6 @@
 <canvas id="art" aria-hidden="true"></canvas>
 <div id="grain" aria-hidden="true"></div>
 
-<div id="veil">
-  <div class="veil-stack">
-    <button class="envelope" id="envelope" type="button" aria-label="Open the invitation">
-      <span class="env-back"></span>
-      <span class="env-letter"><span>Marc-Kevin &amp; Florence</span></span>
-      <span class="env-front"></span>
-      <span class="env-flap"></span>
-      <span class="env-seal">M&amp;F</span>
-    </button>
-    <p class="veil-hint">Press to open</p>
-  </div>
 </div>
 
 <!-- The day, in one place. The countdown and the calendar link both read from
@@ -978,36 +864,6 @@
 <script>
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var cfg = document.querySelector(".stack");
-
-  /* The envelope. A press anywhere on the veil runs the sequence — seal lifts,
-     flap swings, card rises — then the veil fades and is removed from the DOM
-     so nothing is left sitting over the page. */
-  (function () {
-    var veil = document.getElementById("veil");
-    if (!veil) return;
-    if (reduced) { veil.remove(); return; }
-
-    document.body.classList.add("sealed");
-    var opened = false;
-
-    function open() {
-      if (opened) return;
-      opened = true;
-      veil.classList.add("opened");
-      setTimeout(function () {
-        veil.classList.add("gone");
-        document.body.classList.remove("sealed");
-      }, 1500);
-      setTimeout(function () { veil.remove(); }, 2400);
-    }
-
-    veil.addEventListener("click", open);
-    veil.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" || e.key === " " || e.key === "Escape") { e.preventDefault(); open(); }
-    });
-    var env = document.getElementById("envelope");
-    if (env) env.focus({ preventScroll: true });
-  })();
   var when = new Date(cfg.dataset.when);
   var ends = new Date(cfg.dataset.ends);
 
@@ -1090,6 +946,10 @@
     var tile = null, TW = 0, TH = 1150;
     var shade = null, spark = null;
     var eclipseY = 0, eclipseR = 0;
+    /* The opening: the corona catches over the first couple of seconds
+       instead of a panel sliding around. Nothing to click, nothing to wait
+       through — the page is already the page while it lights. */
+    var ignite = 0;
     var embers = [], fog = [];
 
     function mulberry32(a) {
@@ -1259,16 +1119,17 @@
       /* Slow swell, so the corona breathes rather than sits still. */
       var beat = 1 + Math.sin(t * 0.006) * 0.022;
       var r = eclipseR * beat;
+      if (ignite <= 0.001) return;
 
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
 
       /* Corona: a broad bleed of blood and ember behind the disc. */
       var halo = ctx.createRadialGradient(cx, cy, r * 0.94, cx, cy, r * 1.75);
-      halo.addColorStop(0.00, "rgba(248, 224, 172, 0.62)");
-      halo.addColorStop(0.05, "rgba(232, 162, 58, 0.26)");
-      halo.addColorStop(0.20, "rgba(150, 28, 26, 0.11)");
-      halo.addColorStop(0.55, "rgba(70, 10, 14, 0.035)");
+      halo.addColorStop(0.00, "rgba(248, 224, 172, " + (0.62 * ignite).toFixed(3) + ")");
+      halo.addColorStop(0.05, "rgba(232, 162, 58, " + (0.26 * ignite).toFixed(3) + ")");
+      halo.addColorStop(0.20, "rgba(150, 28, 26, " + (0.11 * ignite).toFixed(3) + ")");
+      halo.addColorStop(0.55, "rgba(70, 10, 14, " + (0.035 * ignite).toFixed(3) + ")");
       halo.addColorStop(1.00, "rgba(30, 4, 8, 0)");
       ctx.fillStyle = halo;
       ctx.beginPath();
@@ -1293,8 +1154,10 @@
         ctx.moveTo(cx + Math.cos(ang) * from, cy + Math.sin(ang) * from);
         ctx.lineTo(cx + Math.cos(ang) * (from + len), cy + Math.sin(ang) * (from + len));
         ctx.lineWidth = jitter > 0.9 ? 2.4 : (jitter > 0.5 ? 1.3 : 0.7);
+        /* Spokes catch in a ragged order rather than all at once. */
+        var lit = Math.max(0, Math.min(1, (ignite - jitter * 0.45) / 0.55));
         ctx.strokeStyle = "rgba(" + (jitter > 0.8 ? "248, 214, 150" : "226, 150, 52")
-          + ", " + (0.05 + jitter * 0.1 + Math.max(0, flick) * 0.05).toFixed(3) + ")";
+          + ", " + ((0.05 + jitter * 0.1 + Math.max(0, flick) * 0.05) * lit).toFixed(3) + ")";
         ctx.stroke();
       }
       ctx.restore();
@@ -1385,6 +1248,8 @@
 
     function frame() {
       t += 1;
+      /* ~2.4s to full, eased out, then it stops being computed. */
+      if (ignite < 1) ignite = Math.min(1, 1 - Math.pow(1 - t / 145, 3));
       scene(window.scrollY || window.pageYOffset || 0, false);
       requestAnimationFrame(frame);
     }
@@ -1392,6 +1257,7 @@
     size();
     seed();
     if (reduced) {
+      ignite = 1;
       scene(0, true);
       window.addEventListener("scroll", function () { scene(window.scrollY || 0, true); }, { passive: true });
       window.addEventListener("resize", function () { size(); scene(window.scrollY || 0, true); });
@@ -1399,27 +1265,6 @@
     }
     frame();
     window.addEventListener("resize", function () { size(); seed(); });
-  })();
-
-  /* The invitation leans toward the pointer. Fine pointers only — a touch
-     viewer gets the static card rather than a tilt stuck where a finger left it. */
-  (function () {
-    var card = document.querySelector(".invite-inner");
-    var host = document.querySelector(".invite");
-    if (!card || !host || reduced) return;
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-
-    host.addEventListener("pointermove", function (e) {
-      var r = host.getBoundingClientRect();
-      var x = (e.clientX - r.left) / r.width - 0.5;
-      var y = (e.clientY - r.top) / r.height - 0.5;
-      card.style.setProperty("--tilt-y", (x * 4.5).toFixed(2) + "deg");
-      card.style.setProperty("--tilt-x", (-y * 3.5).toFixed(2) + "deg");
-    });
-    host.addEventListener("pointerleave", function () {
-      card.style.setProperty("--tilt-y", "0deg");
-      card.style.setProperty("--tilt-x", "0deg");
-    });
   })();
 
   /* Party size, dietary notes and a song only apply to a guest who is coming;
