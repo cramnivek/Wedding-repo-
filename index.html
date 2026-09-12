@@ -1,4 +1,7 @@
 <title>Marc-Kevin &amp; Florence</title>
+<!-- The gate cannot play its centrepiece until this has arrived, and the gate is
+     the first thing anyone sees, so it is asked for before the fonts are. -->
+<link rel="preload" href="img/behelit.webp" as="image" type="image/webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Allura&family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap">
@@ -1635,199 +1638,35 @@
 
     /* The Behelit, sealing the envelope in place of wax.
 
-       Dormant, its features sit scattered across the shell at random. It wakes
-       when blood reaches it: the eyes, nose and mouth slide into a face, the
-       eyes open and weep, and the mouth goes wide. That is the object that sets
-       the Eclipse off, so it is the object under your thumb.
+       This is the real thing rather than a drawing of it: the 39 frames of the
+       original animation, laid out as one sprite sheet and blitted a frame at a
+       time so the gate keeps exact control of when it plays. Hand-drawn beats
+       anything that can be built out of ellipses here — an earlier pass did try,
+       and it read as a cartoon.
 
-       It is also the one thing on this page with colour in it. Everything else
-       here is ink on paper, which is what makes a crimson shell read as alive
-       rather than drawn. */
+       Its black ground is cut away by flooding in from the border rather than
+       keying the colour, because the egg's own shadows are the same near-black
+       and a colour key punched holes straight through them. What is left of the
+       dark edge reads as the ink outline every other object on this page has. */
+    var BEH_COLS = 8, BEH_FRAMES = 39, BEH_W = 220, BEH_H = 245;
+    var behSheet = null, behReady = false;
 
-    /* Where each feature lies dormant, and where it lands once aligned — both
-       in units of the shell's radius. The dormant set is deliberately wrong:
-       an eye below the mouth, the nose turned on its side. */
-    var FEAT = [
-      /* left eye  */ { sx: -0.10, sy: 0.52, sr: 1.9, ax: -0.33, ay: -0.20, ar: 0 },
-      /* right eye */ { sx: 0.47, sy: -0.48, sr: -2.4, ax: 0.33, ay: -0.24, ar: 0 },
-      /* nose      */ { sx: -0.46, sy: -0.06, sr: 1.4, ax: 0.02, ay: 0.08, ar: 0 },
-      /* mouth     */ { sx: -0.26, sy: -0.58, sr: 2.7, ax: 0.00, ay: 0.44, ar: 0 }
-    ];
+    (function () {
+      var im = new Image();
+      im.onload = function () { behSheet = im; behReady = true; };
+      im.src = "img/behelit.webp";
+    })();
 
-    function featAt(i, align) {
-      var f = FEAT[i];
-      var e = align * align * (3 - 2 * align);
-      return {
-        x: f.sx + (f.ax - f.sx) * e,
-        y: f.sy + (f.ay - f.sy) * e,
-        r: f.sr + (f.ar - f.sr) * e
-      };
-    }
-
-    function eye(x, y, rot, R, open) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(rot);
-      var ew = R * 0.3, eh = R * 0.17 * Math.max(0.06, open);
-      /* sclera */
-      ctx.fillStyle = "#F2E9D6";
-      ctx.beginPath();
-      ctx.ellipse(0, 0, ew, eh, 0, 0, Math.PI * 2);
-      ctx.fill();
-      if (open > 0.25) {
-        var ir = Math.min(eh * 0.95, ew * 0.46);
-        ctx.fillStyle = "#2E5A8C";
-        ctx.beginPath();
-        ctx.arc(0, 0, ir, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#08080A";
-        ctx.beginPath();
-        ctx.arc(0, 0, ir * 0.46, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      /* lid line, heavier above than below */
-      ctx.strokeStyle = "#140607";
-      ctx.lineWidth = Math.max(1, R * 0.022);
-      ctx.beginPath();
-      ctx.ellipse(0, 0, ew, eh, 0, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function mouth(x, y, rot, R, gape) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(rot);
-      var mw = R * 0.46, mh = R * (0.06 + gape * 0.34);
-      ctx.fillStyle = "#2A0408";
-      ctx.beginPath();
-      ctx.ellipse(0, 0, mw, mh, 0, 0, Math.PI * 2);
-      ctx.fill();
-      /* Teeth: a row top and bottom, clipped to the mouth so a wide gape shows
-         the gap between them rather than one solid band. */
-      ctx.save();
-      ctx.beginPath();
-      ctx.ellipse(0, 0, mw, mh, 0, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.fillStyle = "#F4EEDE";
-      var n = 7, tw = (mw * 2) / n;
-      for (var i = 0; i < n; i++) {
-        var tx = -mw + i * tw;
-        ctx.fillRect(tx + tw * 0.08, -mh, tw * 0.84, mh * 0.72);
-        ctx.fillRect(tx + tw * 0.08, mh * 0.28, tw * 0.84, mh * 0.72);
-      }
-      ctx.strokeStyle = "#2A0408";
-      ctx.lineWidth = Math.max(1, R * 0.018);
-      for (var j = 0; j <= n; j++) {
-        var lx = -mw + j * tw;
-        ctx.beginPath();
-        ctx.moveTo(lx, -mh);
-        ctx.lineTo(lx, mh);
-        ctx.stroke();
-      }
-      ctx.restore();
-      ctx.strokeStyle = "#140607";
-      ctx.lineWidth = Math.max(1, R * 0.026);
-      ctx.beginPath();
-      ctx.ellipse(0, 0, mw, mh, 0, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function nose(x, y, rot, R) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(rot);
-      ctx.strokeStyle = "#140607";
-      ctx.lineWidth = Math.max(1.2, R * 0.03);
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(0, -R * 0.16);
-      ctx.lineTo(-R * 0.07, R * 0.1);
-      ctx.lineTo(R * 0.06, R * 0.12);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    /* `k` is the drop-in, `align` slides the features home, `open` lifts the
-       lids, `gape` opens the mouth, `weep` runs the tears. */
-    function drawBehelit(k, align, open, gape, weep) {
-      if (k <= 0) return;
-      var R = unit * 1.3 * Math.min(1, k);
-      ctx.save();
-
-      /* The shell: an egg, narrower at the top, lit from the upper left. */
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, R * 0.82, R, 0, 0, Math.PI * 2);
-      var sh = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.42, R * 0.08,
-                                        cx, cy, R * 1.25);
-      sh.addColorStop(0.00, "#D4353A");
-      sh.addColorStop(0.42, "#A81A22");
-      sh.addColorStop(1.00, "#4C0409");
-      ctx.fillStyle = sh;
-      ctx.fill();
-      ctx.strokeStyle = "#120506";
-      ctx.lineWidth = Math.max(1.4, R * 0.035);
-      ctx.stroke();
-
-      /* Everything from here is confined to the shell. */
-      ctx.save();
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, R * 0.82, R, 0, 0, Math.PI * 2);
-      ctx.clip();
-
-      /* Surface veins, fixed for the life of the page. Seeded off the same
-         integer hash the rest of this gate uses — the artwork's mulberry32 is
-         in its own closure and is not reachable from here. */
-      var hash = function (n) { return ((n * 2654435761) % 1000) / 1000; };
-      ctx.strokeStyle = "rgba(20, 6, 7, 0.5)";
-      ctx.lineWidth = Math.max(1, R * 0.016);
-      for (var v = 0; v < 7; v++) {
-        var a0 = hash(v + 3) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(a0) * R * 0.9, cy + Math.sin(a0) * R * 0.9);
-        ctx.quadraticCurveTo(cx + (hash(v * 7 + 11) - 0.5) * R,
-                             cy + (hash(v * 13 + 5) - 0.5) * R,
-                             cx + Math.cos(a0 + 2.2) * R * 0.8,
-                             cy + Math.sin(a0 + 2.2) * R * 0.8);
-        ctx.stroke();
-      }
-
-      var le = featAt(0, align), re = featAt(1, align);
-      var no = featAt(2, align), mo = featAt(3, align);
-
-      /* Tears first, so they run under the eye rather than over it. */
-      if (weep > 0) {
-        ctx.strokeStyle = "#4A0207";
-        ctx.lineCap = "round";
-        [le, re].forEach(function (p, i) {
-          var ex = cx + p.x * R, ey = cy + p.y * R;
-          var run = Math.min(1, weep * (i ? 1.15 : 0.9)) * R * 2.2;
-          ctx.lineWidth = Math.max(1.5, R * (0.05 + i * 0.012));
-          ctx.beginPath();
-          ctx.moveTo(ex, ey);
-          ctx.quadraticCurveTo(ex + R * (i ? 0.08 : -0.07), ey + run * 0.6,
-                               ex + R * (i ? 0.02 : -0.02), ey + run);
-          ctx.stroke();
-        });
-      }
-
-      nose(cx + no.x * R, cy + no.y * R, no.r, R);
-      eye(cx + le.x * R, cy + le.y * R, le.r, R, open);
-      eye(cx + re.x * R, cy + re.y * R, re.r, R, open);
-      mouth(cx + mo.x * R, cy + mo.y * R, mo.r, R, gape);
-
-      ctx.restore();
-
-      /* A hard specular on the shell, over the features — it is stone, and the
-         highlight is what keeps it from reading as a flat sticker. */
-      ctx.globalAlpha = 0.3;
-      ctx.fillStyle = "#F6CDBE";
-      ctx.beginPath();
-      ctx.ellipse(cx - R * 0.34, cy - R * 0.58, R * 0.14, R * 0.07, -0.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      ctx.restore();
+    /* `f` is the frame, 0 dormant through 38 screaming. `k` is the drop-in. */
+    function drawBehelit(f, k) {
+      if (!behReady || k <= 0) return;
+      var i = Math.max(0, Math.min(BEH_FRAMES - 1, Math.round(f)));
+      var R = unit * 1.42 * Math.min(1, k);
+      var dh = R * 2;
+      var dw = dh * (BEH_W / BEH_H);
+      ctx.drawImage(behSheet,
+        (i % BEH_COLS) * BEH_W, Math.floor(i / BEH_COLS) * BEH_H, BEH_W, BEH_H,
+        cx - dw / 2, cy - dh / 2, dw, dh);
     }
 
     /* ---------- seeded bits ---------- */
@@ -1839,7 +1678,7 @@
          drip is on cream paper from its first frame. */
       drips = [];
       var R = unit * 1.22;
-      for (var i = 0; i < 13; i++) {
+      for (var i = 0; i < 10; i++) {
         var a = Math.PI * (0.12 + (i / 12) * 0.76);   /* the lower arc only */
         var jit = (Math.random() - 0.5) * 0.12;
         drips.push({
@@ -1848,7 +1687,7 @@
           len: 0,
           max: unit * (1.1 + Math.random() * 3.4),
           v: 0.9 + Math.random() * 3.0,
-          wid: unit * (0.05 + Math.random() * 0.09),
+          wid: unit * (0.035 + Math.random() * 0.06),
           delay: Math.random() * 26
         });
       }
@@ -1878,8 +1717,8 @@
         var d = drips[i];
         if (age < d.delay) continue;
         if (d.len < d.max) d.len += d.v;
-        brush(d.x, d.y, d.x, d.y + d.len, d.wid, d.wid * 0.45);
-        ctx.fillStyle = INK;
+        brush(d.x, d.y, d.x, d.y + d.len, d.wid, d.wid * 0.45, "#4E050B");
+        ctx.fillStyle = "#4E050B";
         ctx.beginPath();
         ctx.arc(d.x, d.y + d.len, d.wid * 0.85, 0, Math.PI * 2);
         ctx.fill();
@@ -2040,7 +1879,7 @@
              frame it hits. */
           var sk = Math.min(1, (ms - ENV) / SEAL);
           var over = 1 + Math.sin(Math.min(1, sk) * Math.PI) * 0.22;
-          drawBehelit(sk * over, 0, 0, 0, 0);
+          drawBehelit(0, sk * over);
           if (sk > 0.75 && sk < 1) {
             speedLines(cx, cy, unit * 1.5, unit * 4.2, 30, INK,
                        (sk - 0.75) / 0.25);
@@ -2058,14 +1897,14 @@
           }
         }
       } else {
-        var STRIKE = 150, BLEED = 1150, TEAR = 900, ERUPT = 1500;
+        var STRIKE = 150, BLEED = 1500, TEAR = 1100, ERUPT = 1500;
         var col = invert ? PAPER : INK;
         var seal = invert ? PAPER : INK;
 
         if (ms < STRIKE) {
           /* Impact frame: everything in reverse, speed lines at full force. */
           drawEnvelope(1, 0);
-          drawBehelit(1, 0, 0, 0, 0);
+          drawBehelit(0, 1);
           drawBrand(1, PAPER, 0.6, unit * 2.15);
           speedLines(cx, cy, unit * 1.6, Math.max(w, h) * 0.9, 54, PAPER, 1);
         } else if (ms < STRIKE + BLEED) {
@@ -2075,11 +1914,9 @@
              face over the first half, the lids come up once they have landed,
              and only then does it weep. Doing those three at once reads as a
              picture fading in; staggered, it reads as something coming round. */
-          drawBehelit(1,
-            Math.min(1, b / 0.55),
-            Math.max(0, Math.min(1, (b - 0.45) / 0.3)),
-            Math.max(0, Math.min(1, (b - 0.7) / 0.3)) * 0.45,
-            Math.max(0, (b - 0.6) / 0.4));
+          /* The sheet is played straight through across the two beats it wakes
+             in — the front of it here, the last of it as the paper tears. */
+          drawBehelit(b * 25, 1);
           drawBrand(1, INK, 0.6, unit * 2.15);
           drawDrips((ms - STRIKE) / 16);
         } else if (ms < STRIKE + BLEED + TEAR) {
@@ -2096,7 +1933,7 @@
           drawEnvelope(1, tk);
           /* Awake, weeping, and now screaming — the mouth goes wide as the
              paper gives way under it. */
-          drawBehelit(1, 1, 1, 0.45 + Math.min(1, tk / 0.6) * 0.55, 1 + tk);
+          drawBehelit(25 + tk * 13, 1);
           drawBrand(1, INK, 0.6, unit * 2.15);
           drawDrips(999);
           drawTear(tk);
