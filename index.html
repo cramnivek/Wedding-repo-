@@ -285,12 +285,17 @@
     color: var(--white);
     font-variant-numeric: tabular-nums;
   }
+  /* These four labels are the only 11px text sitting directly on the canvas,
+     and the canvas under them is not a fixed colour — the corona, the beam and
+     a passing ember all light that patch. Measured against the brightest ground
+     they actually get, `--muted` lands at 4.3:1, under the 4.5:1 AA floor for
+     text this size; `--bone-soft` clears it at 7.2:1 on the same pixels. */
   .unit .l {
     font-family: "Cinzel", Georgia, serif;
     font-size: 0.6875rem;
     letter-spacing: 0.26em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--bone-soft);
   }
 
   /* ---------- section headings ---------- */
@@ -1284,11 +1289,16 @@
     var ctx = cv.getContext("2d");
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var w = 0, h = 0, cx = 0, cy = 0, EW = 0, EH = 0, unit = 0;
+    var targetY = 0, targetR = 0;
     var t0 = 0, struck = false, raf = 0, done = false;
     var tone = {}, drips = [], cracks = [], tears = [];
 
     var PAPER = "#E6D9BE";
     var INK = "#17120E";
+    /* The page's own --ink. The gate's black is a warmer ink black, which is
+       right for a drawing on paper and wrong to end on — the final frame has to
+       be the exact ground the page is about to show. */
+    var PAGE_INK = "#0A0806";
 
     /* ---------- ink primitives ---------- */
 
@@ -1624,16 +1634,53 @@
       ctx.fill();
     }
 
-    /* The wound becomes the eclipse: a black disc with a torn corona, the one
-       moment the gate stops being paper and becomes the page behind it. */
-    function drawEruption(k) {
-      var R = Math.max(w, h) * 1.2 * k;
-      ctx.fillStyle = INK;
+    /* The hand-off, and the one beat that has to be invisible.
+
+       The gate used to end by growing a black disc over the cream page, which
+       cut hard — paper one frame, ink the next — and its corona was drawn in
+       ink, so it vanished the moment the disc reached it. Nothing about that
+       resembled the page waiting underneath.
+
+       Now the paper sinks to the page's own ground while a warm corona opens
+       where the eclipse will be, at the radius the page draws its own. The last
+       frame the gate paints is therefore already the first frame of the page
+       behind it, and the fade between them has nothing left to give away. */
+    function drawEclipseHint(e) {
+      /* It opens at the tear and travels to where the page actually draws its
+         eclipse — read off the header rather than assumed, because the two are
+         126px apart on a desktop and a different size again on a phone, and any
+         gap between them is exactly what the fade would expose. */
+      var k = Math.min(1, e / 0.62);
+      var ease = k * k * (3 - 2 * k);
+      var R = targetR * k;
+      if (R <= 0.5) return;
+      var ey = cy + (targetY - cy) * ease;
+
+      /* Corona first, black disc over it. A radial gradient paints everything
+         inside its inner circle with the first stop, so drawing the disc first
+         and the corona after floods the disc with light instead of ringing it —
+         which is the opposite of an eclipse. Laying the disc on top is also just
+         what is physically happening.
+
+         Brightest as the disc opens, settling back to a rim: the corona flares
+         on the break and then sits there burning, which is where the page picks
+         it up. */
+      var heat = Math.sin(Math.min(1, e / 0.88) * Math.PI) * 0.62 + 0.38;
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      var g = ctx.createRadialGradient(cx, ey, R * 0.9, cx, ey, R * 1.75);
+      g.addColorStop(0.00, "rgba(255, 238, 196, " + (0.5 * heat).toFixed(3) + ")");
+      g.addColorStop(0.14, "rgba(232, 162, 58, " + (0.26 * heat).toFixed(3) + ")");
+      g.addColorStop(0.48, "rgba(150, 70, 24, " + (0.09 * heat).toFixed(3) + ")");
+      g.addColorStop(1.00, "rgba(40, 10, 6, 0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+
+      ctx.fillStyle = PAGE_INK;
       ctx.beginPath();
-      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.arc(cx, ey, R, 0, Math.PI * 2);
       ctx.fill();
-      /* corona as ink spikes, fading out as the disc swallows the page */
-      speedLines(cx, cy, R * 0.99, R * 1.45, 96, INK, 1 - k * 0.5);
     }
 
     function size() {
@@ -1646,6 +1693,16 @@
       EW = Math.min(w * 0.86, h * 0.62, 560);
       EH = EW * 0.66;
       unit = EH * 0.20;
+
+      /* Where the page's own eclipse will be, by the same measurement the
+         artwork makes. Duplicated deliberately: the two run in separate scopes,
+         and the gate has to know the number before the artwork has drawn a
+         frame. If the artwork's formula changes, this has to change with it. */
+      var head = document.querySelector(".invite");
+      targetR = Math.max(110, Math.min(w, h) * 0.23);
+      targetY = head
+        ? head.offsetTop + head.offsetHeight * 0.36 - window.scrollY
+        : cy;
       tone.light = buildTone(0.75);
       tone.heavy = buildTone(1.5);
       seed();
@@ -1700,7 +1757,7 @@
           }
         }
       } else {
-        var STRIKE = 150, BLEED = 1150, TEAR = 900, ERUPT = 1100;
+        var STRIKE = 150, BLEED = 1150, TEAR = 900, ERUPT = 1500;
         var col = invert ? PAPER : INK;
         var seal = invert ? PAPER : INK;
 
@@ -1728,9 +1785,20 @@
           drawTear(tk);
         } else {
           var e = Math.min(1, (ms - STRIKE - BLEED - TEAR) / ERUPT);
+          /* The torn page is still there underneath — it is not covered over,
+             it is drowned. A veil of the page's own black rises to full over
+             the first two-thirds, smoothstepped so neither end of the fade has
+             a visible corner, and the paper, the envelope and the tear all sink
+             into it together instead of being clipped away by a growing disc. */
           drawEnvelope(1, 1);
           drawTear(1);
-          drawEruption(e * e);
+          var v = Math.min(1, e / 0.66);
+          ctx.save();
+          ctx.globalAlpha = v * v * (3 - 2 * v);
+          ctx.fillStyle = PAGE_INK;
+          ctx.fillRect(0, 0, w, h);
+          ctx.restore();
+          drawEclipseHint(e);
           if (e >= 1 && !done) {
             done = true;
             gate.classList.add("done");
@@ -1991,6 +2059,48 @@
 
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
+
+      /* The Eclipse sky. In the panels this moment is famous for, the red is not
+         a rim around the sun — it floods most of the frame, and the gold is only
+         the last inch before the disc. So a very wide, very weak crimson wash
+         goes down first, four times the disc's radius, under everything else.
+         It has to stay under about 6% alpha: past that the midtones go uniformly
+         brown and the shadows stop being black, which is the failure this page
+         has already been through once. */
+      var sky = ctx.createRadialGradient(cx, cy, r * 0.9, cx, cy, r * 2.8);
+      sky.addColorStop(0.00, "rgba(158, 28, 24, " + (0.1 * ignite).toFixed(3) + ")");
+      sky.addColorStop(0.30, "rgba(126, 19, 20, " + (0.058 * ignite).toFixed(3) + ")");
+      sky.addColorStop(0.68, "rgba(76, 10, 14, " + (0.022 * ignite).toFixed(3) + ")");
+      sky.addColorStop(1.00, "rgba(30, 4, 8, 0)");
+      ctx.fillStyle = sky;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * 2.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      /* The beam. Light falls out of the eclipse in a single column rather than
+         only radiating — drawn as five nested trapezoids at falling alpha and
+         rising width, because canvas has no cheap blur and stacking soft-edged
+         shapes costs nothing per frame. */
+      var beamN = 5;
+      for (var v = 0; v < beamN; v++) {
+        var spread = 1 + v * 0.9;
+        var bw = r * 0.1 * spread;
+        var bl = r * 3.4;
+        var bg = ctx.createLinearGradient(cx, cy, cx, cy + bl);
+        var ba = (0.13 / (1 + v * 1.5)) * ignite;
+        bg.addColorStop(0.00, "rgba(255, 236, 190, " + ba.toFixed(3) + ")");
+        bg.addColorStop(0.18, "rgba(238, 168, 62, " + (ba * 0.55).toFixed(3) + ")");
+        bg.addColorStop(0.58, "rgba(170, 50, 26, " + (ba * 0.2).toFixed(3) + ")");
+        bg.addColorStop(1.00, "rgba(60, 8, 10, 0)");
+        ctx.fillStyle = bg;
+        ctx.beginPath();
+        ctx.moveTo(cx - bw * 0.5, cy);
+        ctx.lineTo(cx + bw * 0.5, cy);
+        ctx.lineTo(cx + bw * 1.5, cy + bl);
+        ctx.lineTo(cx - bw * 1.5, cy + bl);
+        ctx.closePath();
+        ctx.fill();
+      }
 
       /* Corona: a broad bleed of blood and ember behind the disc. */
       var halo = ctx.createRadialGradient(cx, cy, r * 0.94, cx, cy, r * 1.75);
