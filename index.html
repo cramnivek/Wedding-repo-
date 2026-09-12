@@ -1448,42 +1448,34 @@
 
     /* ---------- the Brand ---------- */
 
-    /* A spine with four barbs — the mark's own proportions, drawn here rather
-       than traced. Ordered spine first, and every barb runs outward from the
-       spine, because that is the order a hand holding an iron would cut it. */
-    var MARK = [
-      [[0, -1.00], [0, 1.00]],
-      [[0, -0.30], [-0.60, -0.94]],
-      [[0, -0.30], [0.60, -0.94]],
-      [[0, 0.34], [-0.48, 0.88]],
-      [[0, 0.34], [0.48, 0.88]]
-    ];
-    var LENS = MARK.map(function (s) {
-      return Math.hypot(s[1][0] - s[0][0], s[1][1] - s[0][1]);
-    });
-    var SPAN = LENS.reduce(function (a, b) { return a + b; }, 0);
+    /* The Brand of Sacrifice — the real mark rather than an approximation of it.
+       Lifted off its own flat ground by how red each pixel is, so the glow's
+       falloff survives the cut, then re-tinted to the page's own blood so it
+       sits with the Behelit instead of beside it.
 
-    /* `oy` lifts the mark off the Behelit. The two are the Eclipse's objects
-       both, but stacked on one point the Brand simply covered the face, so it
-       is cut into the paper below the shell instead of across it. */
+       A drawn mark could be scored stroke by stroke. An image cannot, so it is
+       revealed by a wipe running down the sheet instead — near enough the same
+       read, the mark arriving top-down as though something were cutting it. */
+    var brandImg = null, brandReady = false;
+    (function () {
+      var im = new Image();
+      im.onload = function () { brandImg = im; brandReady = true; };
+      im.src = "img/brand.webp";
+    })();
+
     function drawBrand(drawn, col, scale, oy) {
-      var u = unit * (scale || 1);
-      var by = cy + (oy || 0);
-      var acc = 0, head = null;
-      for (var i = 0; i < MARK.length; i++) {
-        var from = acc / SPAN, to = (acc + LENS[i]) / SPAN;
-        acc += LENS[i];
-        if (drawn <= from) break;
-        var k = Math.min(1, (drawn - from) / (to - from));
-        var x1 = cx + MARK[i][0][0] * u, y1 = by + MARK[i][0][1] * u;
-        var x2 = cx + MARK[i][1][0] * u, y2 = by + MARK[i][1][1] * u;
-        /* barbs taper to a point; the spine stays heavy */
-        var w1 = u * (i === 0 ? 0.26 : 0.22);
-        var w2 = u * (i === 0 ? 0.20 : 0.05);
-        var hd = brushTo(x1, y1, x2, y2, w1, w2, k, col);
-        if (hd) head = hd;
-      }
-      return head;
+      if (!brandReady || drawn <= 0) return null;
+      var dh = unit * (scale || 1) * 3.2;
+      var dw = dh * (brandImg.width / brandImg.height);
+      var x = cx - dw / 2, y = cy + (oy || 0) - dh / 2;
+      var k = Math.min(1, drawn);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, dw, dh * k);
+      ctx.clip();
+      ctx.drawImage(brandImg, x, y, dw, dh);
+      ctx.restore();
+      return k < 1 ? [cx, y + dh * k] : null;
     }
 
     /* ---------- the envelope ---------- */
@@ -1887,7 +1879,7 @@
         }
         if (ms > ENV + SEAL) {
           var bk = (ms - ENV - SEAL) / BRAND;
-          var head = drawBrand(Math.min(1, bk), INK, 0.6, unit * 2.15);
+          var head = drawBrand(Math.min(1, bk), INK, 0.85, unit * 2.45);
           /* the point of the iron, as a bare notch of paper, not a glow */
           if (head) {
             ctx.fillStyle = INK;
@@ -1905,7 +1897,7 @@
           /* Impact frame: everything in reverse, speed lines at full force. */
           drawEnvelope(1, 0);
           drawBehelit(0, 1);
-          drawBrand(1, PAPER, 0.6, unit * 2.15);
+          drawBrand(1, PAPER, 0.85, unit * 2.45);
           speedLines(cx, cy, unit * 1.6, Math.max(w, h) * 0.9, 54, PAPER, 1);
         } else if (ms < STRIKE + BLEED) {
           var b = (ms - STRIKE) / BLEED;
@@ -1917,7 +1909,7 @@
           /* The sheet is played straight through across the two beats it wakes
              in — the front of it here, the last of it as the paper tears. */
           drawBehelit(b * 25, 1);
-          drawBrand(1, INK, 0.6, unit * 2.15);
+          drawBrand(1, INK, 0.85, unit * 2.45);
           drawDrips((ms - STRIKE) / 16);
         } else if (ms < STRIKE + BLEED + TEAR) {
           var tk = (ms - STRIKE - BLEED) / TEAR;
@@ -1934,7 +1926,7 @@
           /* Awake, weeping, and now screaming — the mouth goes wide as the
              paper gives way under it. */
           drawBehelit(25 + tk * 13, 1);
-          drawBrand(1, INK, 0.6, unit * 2.15);
+          drawBrand(1, INK, 0.85, unit * 2.45);
           drawDrips(999);
           drawTear(tk);
         } else {
