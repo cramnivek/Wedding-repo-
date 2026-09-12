@@ -9,25 +9,29 @@
      candlelight, tarnished gilt. One committed world — every colour painted
      explicitly rather than swapped per theme. */
   :root {
-    --ink:         #050406;
-    --panel:       #0A0709;
-    --panel-lift:  #100B0E;
+    /* Near-black with a cold cast, bone, blood, and one warm light source —
+       the common ground between Berserk's ink, Yharnam's fog, and the ember
+       gold the Souls games light everything with. */
+    --ink:         #07070A;
+    --ink-2:       #0B0B10;
+    --panel:       #0A0A0F;
+    --panel-lift:  #101017;
     --white:       #FFFFFF;
-    --bone:        #E9E2DA;
-    --bone-soft:   #BCB1A9;
-    --muted:       #7F7268;
+    --bone:        #DDD5C2;
+    --bone-soft:   #ADA593;
+    --muted:       #8B8474;
 
-    --blood:       #8E0E24;
-    --blood-lt:    #C4142E;
-    --oxblood:     #5A0E1C;
-    --rose:        #CE8592;
-    --gild:        #A8843E;
-    --gild-lt:     #D6B267;
-    --candle:      #E0A653;
-    --sage:        #6E7A45;
+    --blood:       #8E1119;
+    --blood-lt:    #C21F26;
+    --oxblood:     #57080E;
+    --rose:        #C98A86;
+    --ember:       #E8A23A;
+    --ember-lt:    #F5D79A;
+    --ember-deep:  #8A5A18;
+    --moon:        #7C8A98;
 
-    --hairline:    rgba(168, 132, 62, 0.22);
-    --hairline-2:  rgba(168, 132, 62, 0.42);
+    --hairline:    rgba(232, 162, 58, 0.20);
+    --hairline-2:  rgba(232, 162, 58, 0.40);
 
     /* One weighted curve for everything that moves, so the page has a single
        sense of mass rather than a different physics per component. */
@@ -81,7 +85,7 @@
     inset: 0;
     z-index: 2;
     pointer-events: none;
-    opacity: 0.055;
+    opacity: 0.10;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
@@ -104,7 +108,7 @@
     font-weight: 400;
     letter-spacing: 0.32em;
     text-transform: uppercase;
-    color: var(--gild);
+    color: var(--ember);
   }
 
   /* Details we do not have yet. A gilt hairline rather than a highlighter
@@ -130,7 +134,7 @@
   }
   .rail a {
     font-family: "Cinzel", Georgia, serif;
-    font-size: 0.625rem;
+    font-size: 0.75rem;
     letter-spacing: 0.26em;
     text-transform: uppercase;
     color: var(--muted);
@@ -164,22 +168,31 @@
   .join {
     font-size: 0.9375rem;
     font-weight: 300;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.03em;
     color: var(--bone-soft);
   }
 
+  /* Set like a title card: wide-tracked inscriptional caps, lit from the
+     eclipse behind them rather than filled flat. The script survives on the
+     envelope card and the monogram, where it reads as the personal voice
+     against all this. */
   .names {
-    font-family: "Allura", "Snell Roundhand", cursive;
-    font-size: var(--script);
-    font-weight: 400;
-    line-height: 0.92;
-    color: var(--white);
-    letter-spacing: 0.01em;
-    /* Allura's descenders are long; the extra padding keeps the F and the
-       ampersand from being clipped by the gradient box. */
-    padding-block: 0.12em 0.18em;
+    font-family: "Cinzel", Georgia, serif;
+    font-size: clamp(1.9rem, 6.4vw, 3.4rem);
+    font-weight: 500;
+    line-height: 1.18;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--bone);
+    text-shadow: 0 0 26px rgba(232, 162, 58, 0.32), 0 0 70px rgba(142, 17, 25, 0.3);
   }
-  .names .amp { font-size: 0.92em; }
+  .names .amp {
+    display: block;
+    font-size: 0.62em;
+    letter-spacing: 0.2em;
+    color: var(--ember);
+    margin-block: 0.18em;
+  }
   .names .line { display: block; }
   .names .nb { white-space: nowrap; hyphens: none; }
 
@@ -232,8 +245,8 @@
   }
   .unit .l {
     font-family: "Cinzel", Georgia, serif;
-    font-size: 0.5625rem;
-    letter-spacing: 0.3em;
+    font-size: 0.6875rem;
+    letter-spacing: 0.26em;
     text-transform: uppercase;
     color: var(--muted);
   }
@@ -291,7 +304,7 @@
   .tone .chip--burgundy { background: linear-gradient(150deg, var(--blood-lt), #5E1326 62%); }
   .tone .label {
     font-family: "Cinzel", Georgia, serif;
-    font-size: 0.625rem;
+    font-size: 0.75rem;
     letter-spacing: 0.26em;
     text-transform: uppercase;
     color: var(--bone-soft);
@@ -313,7 +326,7 @@
     font-size: 0.75rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--gild-lt);
+    color: var(--ember-lt);
     text-align: right;
     padding-top: 0.4rem;
   }
@@ -344,7 +357,6 @@
     flex: none;
     border-radius: 62% 8% 62% 8%;
     background: var(--blood-lt);
-    box-shadow: 0 0 8px rgba(196, 20, 46, 0.55);
   }
   .item h3 { font-size: var(--s-1); }
   .item p { color: var(--muted); font-size: 0.9375rem; margin-top: 0.25rem; }
@@ -388,7 +400,7 @@
   .field { display: flex; flex-direction: column; gap: 0.45rem; }
   .field > label, .choice-set > legend {
     font-family: "Cinzel", Georgia, serif;
-    font-size: 0.5875rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.24em;
     text-transform: uppercase;
     color: var(--muted);
@@ -433,9 +445,9 @@
 
   button, .btn-link {
     font-family: "Cinzel", Georgia, serif;
-    font-size: 0.625rem;
+    font-size: 0.75rem;
     font-weight: 400;
-    letter-spacing: 0.28em;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
     text-decoration: none;
     background: transparent;
@@ -530,7 +542,9 @@
     display: grid;
     place-items: center;
     padding: 1.25rem;
-    background: radial-gradient(130% 100% at 50% 42%, #1A1014 0%, #050406 68%);
+    background:
+      radial-gradient(70% 55% at 50% 88%, rgba(232, 162, 58, 0.10) 0%, rgba(120, 50, 14, 0) 70%),
+      radial-gradient(130% 100% at 50% 40%, #11101A 0%, #07070A 66%);
     cursor: pointer;
     transition: opacity 0.8s var(--ease), visibility 0.8s;
   }
@@ -553,15 +567,15 @@
 
   .env-back {
     inset: 0;
-    background: linear-gradient(158deg, #1A0E13, #0A0608);
-    border: 1px solid rgba(168, 132, 62, 0.38);
+    background: linear-gradient(158deg, #14141C, #07070A);
+    border: 1px solid rgba(232, 162, 58, 0.34);
   }
   /* The card rises out of the envelope once the flap has swung clear of it. */
   .env-letter {
     inset: 7% 8% auto 8%;
     height: 76%;
     z-index: 1;
-    background: linear-gradient(180deg, #EFE6D5, #D8CDB8);
+    background: linear-gradient(180deg, #E7DCC2, #CDBFA1);
     display: grid;
     place-items: start center;
     padding-top: 13%;
@@ -572,7 +586,7 @@
     font-family: "Allura", cursive;
     font-size: clamp(1.2rem, 5vw, 1.8rem);
     line-height: 1.15;
-    color: #2C1016;
+    color: #2A1A10;
     text-align: center;
     padding-inline: 1rem;
   }
@@ -581,14 +595,14 @@
   .env-front {
     inset: 0;
     z-index: 2;
-    background: linear-gradient(168deg, #150A0F, #080508);
+    background: linear-gradient(168deg, #101018, #060609);
     clip-path: polygon(0 0, 50% 41%, 100% 0, 100% 100%, 0 100%);
   }
   .env-flap {
     inset: 0 0 auto 0;
     height: 62%;
     z-index: 3;
-    background: linear-gradient(180deg, #2A1219, #130A0E);
+    background: linear-gradient(180deg, #1C1C26, #0C0C12);
     clip-path: polygon(0 0, 100% 0, 50% 100%);
     filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.85));
     transform-origin: 50% 0;
@@ -611,14 +625,14 @@
     place-items: center;
     font-family: "Allura", cursive;
     font-size: 1.6rem;
-    color: #F2DDE2;
+    color: #E6C9A4;
     background:
-      radial-gradient(circle at 38% 34%, rgba(255,255,255,0.10), transparent 52%),
-      radial-gradient(circle at 50% 55%, #8E2440, #6B1526 72%, #4A0F1B);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.7),
-                inset 0 0 0 1px rgba(255,255,255,0.07),
-                inset 0 -3px 10px rgba(0,0,0,0.55),
-                inset 0 2px 4px rgba(255,255,255,0.08);
+      radial-gradient(circle at 50% 78%, rgba(232, 162, 58, 0.30), transparent 58%),
+      radial-gradient(circle at 44% 40%, #8E1119, #5E0910 70%, #3A050A);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.75),
+                inset 0 0 0 1px rgba(232, 162, 58, 0.14),
+                inset 0 -4px 12px rgba(0,0,0,0.6),
+                inset 0 2px 5px rgba(255, 220, 180, 0.09);
     animation: breathe 2.8s ease-in-out infinite;
     transition: transform 0.5s var(--ease), opacity 0.5s var(--ease);
   }
@@ -626,8 +640,8 @@
   #veil.opened .env-seal { animation: none; transform: scale(1.6); opacity: 0; }
 
   .veil-hint {
-    font-size: 0.625rem;
-    letter-spacing: 0.38em;
+    font-size: 0.75rem;
+    letter-spacing: 0.34em;
     text-transform: uppercase;
     color: var(--muted);
     animation: breathe 2.8s ease-in-out infinite;
@@ -687,7 +701,8 @@
     <div class="invite-inner">
       <p class="join">Join us for the wedding of</p>
       <h1 class="names">
-        <span class="line"><span class="nb">Marc-Kevin</span> <span class="amp">&amp;</span></span>
+        <span class="line"><span class="nb">Marc-Kevin</span></span>
+        <span class="amp">&amp;</span>
         <span class="line">Florence</span>
       </h1>
       <div class="when">
@@ -1054,13 +1069,18 @@
     });
   })();
 
-  /* The artwork. Not a ribbon — the other half of the invitation: black
-     branches carrying blood blossoms, climbing the margins out of a plum mist,
-     lit from below by candlelight and sunk into a vignette at the edges.
+  /* The artwork.
 
-     Branches are grown once into an offscreen tile and blitted down the page at
-     a slower rate than the content, so they scroll as a continuous thicket at a
-     depth behind the text without regrowing a single branch per frame. */
+     An eclipse burns behind the names — a black disc with a ragged corona, the
+     one image Berserk is built on. Below it, gnarled boughs climb both margins
+     out of cold fog, and embers rise through the whole page the way they lift
+     off a bonfire. Everything is drawn; there are no image assets.
+
+     The canvas is viewport-sized and fixed, and every layer is positioned
+     against scrollY, so the page reads as one continuous world however long it
+     gets. Branches are grown once into an offscreen tile and blitted, and the
+     ember glow is one pre-rendered sprite, so the per-frame cost is a handful
+     of drawImage calls rather than a few hundred gradients. */
   (function () {
     var cv = document.getElementById("art");
     if (!cv) return;
@@ -1068,11 +1088,10 @@
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var w = 0, h = 0, t = 0;
     var tile = null, TW = 0, TH = 1150;
-    var shade = null;
-    var petals = [], mists = [];
-    var TONES = ["196, 20, 46", "142, 14, 36", "90, 14, 28"];
+    var shade = null, spark = null;
+    var eclipseY = 0, eclipseR = 0;
+    var embers = [], fog = [];
 
-    /* Seeded, so the thicket is the same growth on every load and resize. */
     function mulberry32(a) {
       return function () {
         a |= 0; a = a + 0x6D2B79F5 | 0;
@@ -1082,52 +1101,54 @@
       };
     }
 
+    /* ---------- branches ---------- */
+
     function bloom(g, b) {
       g.save();
       g.translate(b.x, b.y);
-      g.shadowColor = "rgba(196, 20, 46, 0.6)";
-      g.shadowBlur = 12;
+      g.shadowColor = "rgba(194, 31, 38, 0.5)";
+      g.shadowBlur = 10;
       for (var i = 0; i < 5; i++) {
         g.rotate(Math.PI * 2 / 5);
         g.beginPath();
-        g.ellipse(0, -b.r * 0.95, b.r * 0.48, b.r * 1.1, 0, 0, Math.PI * 2);
-        g.fillStyle = "rgba(150, 14, 36, 0.92)";
+        g.ellipse(0, -b.r * 0.95, b.r * 0.46, b.r * 1.1, 0, 0, Math.PI * 2);
+        g.fillStyle = "rgba(142, 17, 25, 0.94)";
         g.fill();
       }
       g.shadowBlur = 0;
       g.beginPath();
-      g.arc(0, 0, b.r * 0.32, 0, Math.PI * 2);
-      g.fillStyle = "rgba(224, 166, 83, 0.8)";
+      g.arc(0, 0, b.r * 0.3, 0, Math.PI * 2);
+      g.fillStyle = "rgba(232, 162, 58, 0.7)";
       g.fill();
       g.restore();
     }
 
     function grow(g, x, y, ang, len, wid, depth, rng, blooms) {
       if (depth <= 0 || len < 5) {
-        if (rng() < 0.20) blooms.push({ x: x, y: y, r: rng() * 2.6 + 2.4 });
+        if (rng() < 0.18) blooms.push({ x: x, y: y, r: rng() * 2.6 + 2.4 });
         return;
       }
-      if (depth <= 2 && rng() < 0.10) blooms.push({ x: x, y: y, r: rng() * 2.2 + 2.2 });
+      if (depth <= 2 && rng() < 0.08) blooms.push({ x: x, y: y, r: rng() * 2.2 + 2.2 });
       var x2 = x + Math.cos(ang) * len;
       var y2 = y + Math.sin(ang) * len;
-      var cx = (x + x2) / 2 + Math.cos(ang + 1.5708) * len * 0.24 * (rng() * 2 - 1);
-      var cy = (y + y2) / 2 + Math.sin(ang + 1.5708) * len * 0.24 * (rng() * 2 - 1);
+      var cx = (x + x2) / 2 + Math.cos(ang + 1.5708) * len * 0.26 * (rng() * 2 - 1);
+      var cy = (y + y2) / 2 + Math.sin(ang + 1.5708) * len * 0.26 * (rng() * 2 - 1);
 
       g.beginPath();
       g.moveTo(x, y);
       g.quadraticCurveTo(cx, cy, x2, y2);
       g.lineCap = "round";
       g.lineWidth = wid;
-      g.strokeStyle = "#08060A";
+      g.strokeStyle = "#030305";
       g.stroke();
-      /* A thin warm rim, or a black branch on a black ground is invisible. */
-      g.lineWidth = Math.max(0.7, wid * 0.34);
-      g.strokeStyle = "rgba(156, 122, 110, 0.8)";
+      /* Cold bone rim, not a warm one — the wood is lit by fog, not by fire. */
+      g.lineWidth = Math.max(0.7, wid * 0.3);
+      g.strokeStyle = "rgba(124, 138, 152, 0.62)";
       g.stroke();
 
-      var n = rng() < 0.3 ? 3 : 2;
+      var n = rng() < 0.32 ? 3 : 2;
       for (var i = 0; i < n; i++) {
-        grow(g, x2, y2, ang + (rng() - 0.5) * 1.2,
+        grow(g, x2, y2, ang + (rng() - 0.5) * 1.3,
              len * (0.6 + rng() * 0.22), wid * 0.64, depth - 1, rng, blooms);
       }
     }
@@ -1140,35 +1161,49 @@
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       var rng = mulberry32(20261006);
       var blooms = [];
-      /* Four boughs off the left edge, reaching in and up. */
       for (var i = 0; i < 4; i++) {
         grow(g, -14, TH * (0.08 + i * 0.26) + rng() * 60,
              -0.5 + rng() * 1.0, 44 + rng() * 26, 7, 5, rng, blooms);
       }
       for (var b = 0; b < blooms.length; b++) bloom(g, blooms[b]);
 
-      /* Dissolve the inner edge, so the thicket thins into the dark instead of
-         stopping at a line halfway across the page. */
       g.globalCompositeOperation = "destination-out";
       var fade = g.createLinearGradient(TW * 0.4, 0, TW, 0);
-      fade.addColorStop(0, "rgba(0, 0, 0, 0)");
-      fade.addColorStop(1, "rgba(0, 0, 0, 1)");
+      fade.addColorStop(0, "rgba(0,0,0,0)");
+      fade.addColorStop(1, "rgba(0,0,0,1)");
       g.fillStyle = fade;
       g.fillRect(0, 0, TW, TH);
       g.globalCompositeOperation = "source-over";
     }
 
-    /* Vignette baked once — it never changes until the viewport does. */
+    /* One ember sprite, blitted per particle — a pre-rendered glow costs one
+       drawImage where a per-particle radial gradient costs a full paint. */
+    function buildSpark() {
+      var S = 34;
+      spark = document.createElement("canvas");
+      spark.width = spark.height = S * dpr;
+      var g = spark.getContext("2d");
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var gr = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+      gr.addColorStop(0.00, "rgba(255, 240, 210, 1)");
+      gr.addColorStop(0.18, "rgba(245, 215, 154, 0.92)");
+      gr.addColorStop(0.42, "rgba(232, 162, 58, 0.42)");
+      gr.addColorStop(1.00, "rgba(180, 90, 20, 0)");
+      g.fillStyle = gr;
+      g.fillRect(0, 0, S, S);
+    }
+
+    /* Heavy vignette, the way these games frame everything. */
     function buildShade() {
       shade = document.createElement("canvas");
       shade.width = w * dpr; shade.height = h * dpr;
       var g = shade.getContext("2d");
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
-      var r = Math.max(w, h) * 0.78;
-      var v = g.createRadialGradient(w / 2, h * 0.46, r * 0.30, w / 2, h * 0.46, r);
-      v.addColorStop(0, "rgba(5, 4, 6, 0)");
-      v.addColorStop(0.62, "rgba(5, 4, 6, 0.42)");
-      v.addColorStop(1, "rgba(5, 4, 6, 0.92)");
+      var r = Math.max(w, h) * 0.8;
+      var v = g.createRadialGradient(w / 2, h * 0.46, r * 0.22, w / 2, h * 0.46, r);
+      v.addColorStop(0, "rgba(7, 7, 10, 0)");
+      v.addColorStop(0.55, "rgba(7, 7, 10, 0.45)");
+      v.addColorStop(1, "rgba(7, 7, 10, 0.97)");
       g.fillStyle = v;
       g.fillRect(0, 0, w, h);
     }
@@ -1178,51 +1213,117 @@
       cv.width = w * dpr; cv.height = h * dpr;
       cv.style.width = w + "px"; cv.style.height = h + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      buildTile();
-      buildShade();
+      /* Anchor the eclipse to the invitation block so it always burns behind
+         the names, whatever the header ends up measuring. */
+      var head = document.querySelector(".invite");
+      if (head) {
+        eclipseY = head.offsetTop + head.offsetHeight * 0.36;
+        eclipseR = Math.max(110, Math.min(w, h) * 0.23);
+      }
+      buildTile(); buildSpark(); buildShade();
     }
 
     function seed() {
-      petals = [];
-      var count = w < 600 ? 16 : 30;
+      embers = [];
+      var count = w < 600 ? 26 : 52;
       for (var i = 0; i < count; i++) {
-        petals.push({
-          x: Math.random() * w, y: Math.random() * h,
-          len: Math.random() * 12 + 8,
-          vy: Math.random() * 0.2 + 0.06,
-          drift: Math.random() * 0.5 + 0.2,
+        embers.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          s: Math.random() * 7 + 3,
+          vy: -(Math.random() * 0.32 + 0.11),
+          drift: Math.random() * 0.4 + 0.12,
           phase: Math.random() * Math.PI * 2,
-          spin: (Math.random() - 0.5) * 0.011,
-          rot: Math.random() * Math.PI,
-          tone: TONES[(Math.random() * TONES.length) | 0],
-          a: Math.random() * 0.45 + 0.25
+          a: Math.random() * 0.5 + 0.3,
+          /* a few falling flecks of blood among the rising embers */
+          blood: Math.random() < 0.18
         });
       }
-      mists = [];
+      fog = [];
       for (var m = 0; m < 5; m++) {
-        mists.push({
+        fog.push({
           x: Math.random() * w, y: Math.random() * h,
-          r: Math.max(w, h) * (0.26 + Math.random() * 0.22),
-          vx: (Math.random() - 0.5) * 0.09,
-          vy: (Math.random() - 0.5) * 0.05,
-          a: 0.10 + Math.random() * 0.07
+          r: Math.max(w, h) * (0.3 + Math.random() * 0.24),
+          vx: (Math.random() - 0.5) * 0.08,
+          vy: (Math.random() - 0.5) * 0.04,
+          a: 0.07 + Math.random() * 0.05
         });
       }
     }
 
-    function drawMist() {
+    /* ---------- the eclipse ---------- */
+    function drawEclipse(scroll) {
+      var cy = eclipseY - scroll;
+      if (cy < -eclipseR * 2.6 || cy > h + eclipseR * 2.6) return;
+      var cx = w / 2;
+      /* Slow swell, so the corona breathes rather than sits still. */
+      var beat = 1 + Math.sin(t * 0.006) * 0.022;
+      var r = eclipseR * beat;
+
+      ctx.save();
       ctx.globalCompositeOperation = "lighter";
-      for (var i = 0; i < mists.length; i++) {
-        var m = mists[i];
+
+      /* Corona: a broad bleed of blood and ember behind the disc. */
+      var halo = ctx.createRadialGradient(cx, cy, r * 0.94, cx, cy, r * 1.75);
+      halo.addColorStop(0.00, "rgba(248, 224, 172, 0.62)");
+      halo.addColorStop(0.05, "rgba(232, 162, 58, 0.26)");
+      halo.addColorStop(0.20, "rgba(150, 28, 26, 0.11)");
+      halo.addColorStop(0.55, "rgba(70, 10, 14, 0.035)");
+      halo.addColorStop(1.00, "rgba(30, 4, 8, 0)");
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * 1.75, 0, Math.PI * 2);
+      ctx.fill();
+
+      /* Ragged flare: spokes of varying length around the rim, so the edge
+         is torn rather than a clean ring. */
+      ctx.lineCap = "round";
+      var srng = mulberry32(77713);
+      for (var i = 0; i < 96; i++) {
+        /* Each spoke keeps its own length, offset and weight for the life of
+           the page; only the flicker term moves. */
+        var jitter = srng();
+        var ang = (i / 96) * Math.PI * 2 + (srng() - 0.5) * 0.055;
+        var flick = Math.sin(ang * 9 + t * 0.004) * 0.5
+                  + Math.sin(ang * 17 - t * 0.0031) * 0.3;
+        var long = jitter > 0.88 ? 3.1 : (jitter > 0.66 ? 1.5 : 1);
+        var len = r * (0.04 + jitter * 0.16 + Math.max(0, flick) * 0.05) * long;
+        var from = r * (0.97 + srng() * 0.05);
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(ang) * from, cy + Math.sin(ang) * from);
+        ctx.lineTo(cx + Math.cos(ang) * (from + len), cy + Math.sin(ang) * (from + len));
+        ctx.lineWidth = jitter > 0.9 ? 2.4 : (jitter > 0.5 ? 1.3 : 0.7);
+        ctx.strokeStyle = "rgba(" + (jitter > 0.8 ? "248, 214, 150" : "226, 150, 52")
+          + ", " + (0.05 + jitter * 0.1 + Math.max(0, flick) * 0.05).toFixed(3) + ")";
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      /* The disc itself: absolute black, punched over the corona. */
+      ctx.save();
+      var edge = ctx.createRadialGradient(cx, cy, r * 0.9, cx, cy, r);
+      edge.addColorStop(0, "#000000");
+      edge.addColorStop(1, "rgba(0, 0, 0, 0.985)");
+      ctx.fillStyle = edge;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawFog() {
+      ctx.globalCompositeOperation = "lighter";
+      for (var i = 0; i < fog.length; i++) {
+        var m = fog[i];
         m.x += m.vx; m.y += m.vy;
         if (m.x < -m.r) m.x = w + m.r;
         if (m.x > w + m.r) m.x = -m.r;
         if (m.y < -m.r) m.y = h + m.r;
         if (m.y > h + m.r) m.y = -m.r;
         var g = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r);
-        g.addColorStop(0, "rgba(74, 28, 44, " + m.a.toFixed(3) + ")");
-        g.addColorStop(0.55, "rgba(46, 18, 30, " + (m.a * 0.4).toFixed(3) + ")");
-        g.addColorStop(1, "rgba(30, 12, 20, 0)");
+        g.addColorStop(0, "rgba(48, 56, 68, " + m.a.toFixed(3) + ")");
+        g.addColorStop(0.5, "rgba(30, 34, 44, " + (m.a * 0.42).toFixed(3) + ")");
+        g.addColorStop(1, "rgba(16, 18, 26, 0)");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, w, h);
       }
@@ -1231,83 +1332,55 @@
 
     function drawBranches(scroll) {
       if (!tile) return;
-      /* Slower than the page, so the thicket sits behind it. */
       var off = -(scroll * 0.55) % TH;
       var sway = Math.sin(t * 0.0007) * 4;
       var y;
-      for (y = off - TH; y < h + TH; y += TH) {
-        ctx.drawImage(tile, -6 + sway, y, TW, TH);
-      }
-      /* The far margin is the same growth mirrored and out of phase, which
-         reads as a second thicket rather than a copy. */
+      for (y = off - TH; y < h + TH; y += TH) ctx.drawImage(tile, -6 + sway, y, TW, TH);
       ctx.save();
       ctx.translate(w, 0);
       ctx.scale(-1, 1);
       var off2 = -(scroll * 0.42 + TH * 0.47) % TH;
-      for (y = off2 - TH; y < h + TH; y += TH) {
-        ctx.drawImage(tile, -6 - sway, y, TW, TH);
-      }
+      for (y = off2 - TH; y < h + TH; y += TH) ctx.drawImage(tile, -6 - sway, y, TW, TH);
       ctx.restore();
     }
 
-    function drawCandles() {
-      /* Summed sines rather than random(), so the flicker breathes instead
-         of buzzing. */
-      var f = 0.062
-        + Math.sin(t * 0.011) * 0.012
-        + Math.sin(t * 0.027 + 1.3) * 0.008
-        + Math.sin(t * 0.053 + 2.1) * 0.005;
+    function drawEmbers() {
       ctx.globalCompositeOperation = "lighter";
-      var spots = [[w * 0.12, h * 1.02], [w * 0.88, h * 1.05], [w * 0.5, h * 1.15]];
-      for (var i = 0; i < spots.length; i++) {
-        var r = Math.max(w, h) * (i === 2 ? 0.7 : 0.5);
-        var g = ctx.createRadialGradient(spots[i][0], spots[i][1], 0, spots[i][0], spots[i][1], r);
-        var a = f * (i === 2 ? 0.7 : 1);
-        g.addColorStop(0, "rgba(224, 166, 83, " + a.toFixed(3) + ")");
-        g.addColorStop(0.5, "rgba(160, 92, 48, " + (a * 0.35).toFixed(3) + ")");
-        g.addColorStop(1, "rgba(120, 60, 40, 0)");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, w, h);
+      for (var i = 0; i < embers.length; i++) {
+        var e = embers[i];
+        e.phase += 0.013;
+        e.y += e.blood ? -e.vy * 0.55 : e.vy;
+        e.x += Math.sin(e.phase) * e.drift;
+        if (!e.blood && e.y < -20) { e.y = h + 20; e.x = Math.random() * w; }
+        if (e.blood && e.y > h + 20) { e.y = -20; e.x = Math.random() * w; }
+        if (e.x < -25) e.x = w + 25;
+        if (e.x > w + 25) e.x = -25;
+        /* Embers pulse as they climb; blood flecks do not glow. */
+        var flick = e.blood ? 1 : 0.55 + 0.45 * Math.abs(Math.sin(e.phase * 1.7));
+        var sz = e.s * (e.blood ? 0.5 : flick);
+        ctx.globalAlpha = e.a * flick;
+        if (e.blood) {
+          ctx.globalCompositeOperation = "source-over";
+          ctx.fillStyle = "rgba(150, 20, 28, " + (e.a * 0.85).toFixed(2) + ")";
+          ctx.beginPath();
+          ctx.ellipse(e.x, e.y, sz * 0.34, sz * 0.8, e.phase, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalCompositeOperation = "lighter";
+        } else if (spark) {
+          ctx.drawImage(spark, e.x - sz * 1.7, e.y - sz * 1.7, sz * 3.4, sz * 3.4);
+        }
       }
+      ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = "source-over";
-    }
-
-    function drawPetal(p) {
-      var l = p.len, k = l * 0.42;
-      ctx.beginPath();
-      ctx.moveTo(0, -l / 2);
-      ctx.quadraticCurveTo(k, 0, 0, l / 2);
-      ctx.quadraticCurveTo(-k, 0, 0, -l / 2);
-      ctx.closePath();
-      ctx.fillStyle = "rgba(" + p.tone + ", " + p.a + ")";
-      ctx.fill();
     }
 
     function scene(scroll, still) {
       ctx.clearRect(0, 0, w, h);
-      drawMist();
+      drawEclipse(scroll);
+      drawFog();
       drawBranches(scroll);
       if (shade) ctx.drawImage(shade, 0, 0, w, h);
-      drawCandles();
-      if (still) return;
-      for (var i = 0; i < petals.length; i++) {
-        var p = petals[i];
-        p.phase += 0.01;
-        p.y += p.vy;
-        p.x += Math.sin(p.phase) * p.drift;
-        p.rot += p.spin;
-        if (p.y > h + 20) { p.y = -20; p.x = Math.random() * w; }
-        if (p.x < -25) p.x = w + 25;
-        if (p.x > w + 25) p.x = -25;
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        /* Squashing horizontally as it turns reads as a petal tumbling
-           rather than a flat shape spinning in place. */
-        ctx.scale(0.6 + 0.4 * Math.abs(Math.cos(p.phase * 0.7)), 1);
-        drawPetal(p);
-        ctx.restore();
-      }
+      if (!still) drawEmbers();
     }
 
     function frame() {
