@@ -36,9 +36,15 @@ async function run(reduced) {
   await p.waitForTimeout(3000);
 
   const s = await p.evaluate(() => {
-    const fig = document.querySelector('[data-clip]');
+    /* The clip is switched on and off by the presence of data-clip on the
+       figure. Find the plate either way, so that with the clip off this
+       reports "off, still intact" rather than a row of nulls that reads as
+       a pass. */
+    const fig = document.querySelector('.plate-ink');
+    const on = !!(fig && fig.hasAttribute('data-clip'));
     const v = fig && fig.querySelector('video');
     return {
+      on: on,
       video: !!v,
       still: !!(fig && fig.querySelector('picture')),
       playing: v ? (!v.paused && v.currentTime > 0) : null,
@@ -47,6 +53,14 @@ async function run(reduced) {
       loops: v ? v.loop : null
     };
   });
+
+  if (!s.on) {
+    console.log((reduced ? 'reduced' : 'normal ') +
+      ' — clip OFF (no data-clip) | still in figure: ' + s.still +
+      ' | video files fetched: ' + asked.length);
+    await b.close();
+    return;
+  }
 
   console.log(
     (reduced ? 'reduced' : 'normal ') +

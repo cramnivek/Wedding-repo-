@@ -59,7 +59,8 @@ Everything else in `img/` is a file:
   ground by how red each pixel is.
 - **`og.jpg`** — the 1200×630 card a messaging app shows when the link is pasted.
 - **`rescue.mp4` and `rescue.webm`** — the same ten seconds twice, ~360 KB each.
-  Only one is ever fetched; the browser picks by codec. See below.
+  Currently not served by the page at all; see below. When switched on, only one
+  of the two is ever fetched — the browser picks by codec.
 - The two favicons and `icon-512.png`.
 
 Cold load is about **1.3 MB over 22 requests**; `check/weigh.cjs` measures it.
@@ -137,13 +138,29 @@ Before any of that there is a gate: an invitation drawn as a manga page, inked
 in front of you, sealed in wax and branded. Pressing the brand breaks the seal,
 the ink runs, the envelope tears, and the tear opens into the eclipse.
 
-## The rescue clip
+## The rescue clip — built, and currently off
 
-"Under a black sun" holds a ten-second shot rather than a still. The still is
-what is in the markup and it stays the truth: the video is built in script and
-only swapped in once it has decoded a frame, so script off, reduced motion, a
-missing file or a browser that won't decode it all leave exactly the page that
-was there before — never a black rectangle where a plate used to be.
+"Under a black sun" shows the still. The clip that was made for it is published
+alongside and the page will play it the moment the figure carries `data-clip`,
+but it doesn't, for a reason worth writing down:
+
+**The shot pushes in, and the likenesses do not survive the push.** At the
+opening framing the faces are small and match the still they were animated
+from. As the camera closes, the generator has to invent facial detail that the
+source still never contained — and it invents someone else. By the last few
+seconds it is a longer face, a narrower nose and a heavier brow than the man in
+the photographs. The still is the likeness that held, so the still is what is on
+the page.
+
+Any second attempt should hold the camera still and animate only the water, the
+embers and the cloud. A push-in is exactly the instruction that forces the
+invention.
+
+When it is switched on: the still stays in the markup and stays the fallback.
+The video is built in script and only swapped in once it has decoded a frame, so
+script off, reduced motion, a missing file or a browser that won't decode it all
+leave exactly the page that was there before — never a black rectangle where a
+plate used to be.
 
 Nothing downloads until the gate has been opened *and* the section is near, so
 it never competes with the gate and a guest who doesn't scroll that far never

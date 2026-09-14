@@ -961,9 +961,18 @@
         <p class="eyebrow">The two of us</p>
         <h2>Under a black sun</h2>
       </div>
-      <!-- Without an extension: the script appends one per source type, and the
-           browser fetches only the format it says it can decode. -->
-      <figure class="plate-ink" data-clip="img/rescue">
+      <!-- The clip is built and published, and the script below will play it in
+           place of this still the moment this figure carries a data-clip. It
+           does not, on purpose: the shot pushes in, and by the time the faces
+           are large enough to read they are not their faces any more. The
+           generator had to invent detail the source still never had, and it
+           invented someone else. The still is the likeness that survived, so
+           the still is what is here.
+
+           To switch it back on: data-clip="img/rescue" — no extension, the
+           script appends one per source type and the browser fetches only the
+           format it says it can decode. -->
+      <figure class="plate-ink">
         <picture>
           <source srcset="img/rescue.avif" type="image/avif">
           <source srcset="img/rescue.webp" type="image/webp">
