@@ -1,8 +1,29 @@
 <title>Marc-Kevin &amp; Florence</title>
-<!-- The gate cannot play its centrepiece until this has arrived, and the gate is
-     the first thing anyone sees, so it is asked for before the fonts are. -->
+<meta charset="utf-8">
+<!-- Without this a phone lays the page out at 980px and zooms out, and every
+     word on it becomes unreadable. The artifact host injects one of its own, so
+     this is only ever missing on the self-hosted copy — which is the copy guests
+     will actually open. -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Marc-Kevin and Florence are marrying on the sixth of October, 2026, at five o'clock in the evening — Smoque Bistro, Tagbilaran City, Bohol.">
+<meta name="theme-color" content="#0A0806">
+
+<!-- What a pasted link looks like in a message. og:image must be an absolute
+     URL once this has a real domain: relative paths resolve for some crawlers
+     and silently fail for others, Facebook's among them. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Marc-Kevin &amp; Florence">
+<meta property="og:description" content="The sixth of October, 2026, at five o'clock in the evening. Smoque Bistro, Tagbilaran City, Bohol.">
+<meta property="og:image" content="img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Marc-Kevin holding Florence in dark water under a ringed eclipse, with their names and the date.">
+<meta name="twitter:card" content="summary_large_image">
+
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+<!-- The gate cannot play its centrepiece until this has arrived, and the gate is
+     the first thing anyone sees, so it is asked for before the fonts are. -->
 <link rel="preload" href="img/behelit.webp" as="image" type="image/webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -894,7 +915,7 @@
     <picture>
       <source srcset="img/battlefield.avif" type="image/avif">
       <source srcset="img/battlefield.webp" type="image/webp">
-      <img class="ground" src="img/battlefield.jpg" width="1800" height="724" alt="">
+      <img class="ground" src="img/battlefield.jpg" width="1500" height="603" alt="">
     </picture>
     <div class="invite-inner">
       <p class="join">Join us for the wedding of</p>
@@ -923,7 +944,7 @@
         <picture>
           <source srcset="img/rescue.avif" type="image/avif">
           <source srcset="img/rescue.webp" type="image/webp">
-          <img src="img/rescue.jpg" width="1374" height="1145"
+          <img src="img/rescue.jpg" width="1000" height="833"
              alt="Marc-Kevin standing waist-deep in dark water in soaked armour and a heavy cloak, holding Florence against him with her eyes closed. A ringed eclipse hangs over a drowned city behind them.">
         </picture>
       </figure>
@@ -936,7 +957,7 @@
           <picture>
             <source srcset="img/us-1.avif" type="image/avif">
             <source srcset="img/us-1.webp" type="image/webp">
-            <img src="img/us-1.jpg" width="825" height="1100" loading="lazy"
+            <img src="img/us-1.jpg" width="585" height="780" loading="lazy"
                alt="Marc-Kevin and Florence in a clothing shop, both in black, taking a mirror photo.">
           </picture>
           <figcaption>In practice</figcaption>
@@ -945,7 +966,7 @@
           <picture>
             <source srcset="img/us-2.avif" type="image/avif">
             <source srcset="img/us-2.webp" type="image/webp">
-            <img src="img/us-2.jpg" width="1400" height="1050" loading="lazy"
+            <img src="img/us-2.jpg" width="780" height="585" loading="lazy"
                alt="Marc-Kevin and Florence leaning together on a boat, both wearing glasses.">
           </picture>
           <figcaption>Also in practice</figcaption>
@@ -965,7 +986,7 @@
           <picture>
             <source srcset="img/vow.avif" type="image/avif">
             <source srcset="img/vow.webp" type="image/webp">
-            <img src="img/vow.jpg" width="1300" height="1300" loading="lazy"
+            <img src="img/vow.jpg" width="860" height="860" loading="lazy"
                alt="Marc-Kevin and Florence in armour and black robes, foreheads touching, a ring of red light behind them and a torch burning to one side.">
           </picture>
         </figure>
@@ -977,7 +998,7 @@
           <picture>
             <source srcset="img/camp.avif" type="image/avif">
             <source srcset="img/camp.webp" type="image/webp">
-            <img src="img/camp.jpg" width="1500" height="1006" loading="lazy"
+            <img src="img/camp.jpg" width="1180" height="792" loading="lazy"
                alt="Night camp: Marc-Kevin sharpening a greatsword by firelight while Florence sleeps against his shoulder, wrapped in his cloak.">
           </picture>
         </figure>
@@ -986,7 +1007,7 @@
             <picture>
               <source srcset="img/ridge.avif" type="image/avif">
               <source srcset="img/ridge.webp" type="image/webp">
-              <img src="img/ridge.jpg" width="1500" height="837" loading="lazy"
+              <img src="img/ridge.jpg" width="780" height="435" loading="lazy"
                  alt="The two of them seen from behind on a ridge, looking out over a burned valley.">
             </picture>
           </figure>
@@ -994,7 +1015,7 @@
             <picture>
               <source srcset="img/knight.avif" type="image/avif">
               <source srcset="img/knight.webp" type="image/webp">
-              <img src="img/knight.jpg" width="967" height="1200" loading="lazy"
+              <img src="img/knight.jpg" width="628" height="780" loading="lazy"
                  alt="Marc-Kevin kneeling in rubble, greatsword across his knee, banners and a ruined citadel behind him.">
             </picture>
           </figure>
@@ -1003,7 +1024,7 @@
           <picture>
             <source srcset="img/sun.avif" type="image/avif">
             <source srcset="img/sun.webp" type="image/webp">
-            <img src="img/sun.jpg" width="1208" height="1500" loading="lazy"
+            <img src="img/sun.jpg" width="693" height="860" loading="lazy"
                alt="Marc-Kevin in armour with a greatsword, Florence beside him in a black hooded gown, standing on a broken road through a battlefield. An eclipse rings the sky above a ruined citadel.">
           </picture>
         </figure>
@@ -1012,7 +1033,7 @@
             <picture>
               <source srcset="img/them-ink.avif" type="image/avif">
               <source srcset="img/them-ink.webp" type="image/webp">
-              <img src="img/them-ink.jpg" width="1000" height="1500" loading="lazy"
+              <img src="img/them-ink.jpg" width="520" height="780" loading="lazy"
                  alt="The two of them seated on a ruined stair, Marc-Kevin in armour with a greatsword upright beside him, Florence resting against his shoulder.">
             </picture>
           </figure>
@@ -1020,7 +1041,7 @@
             <picture>
               <source srcset="img/chamber.avif" type="image/avif">
               <source srcset="img/chamber.webp" type="image/webp">
-              <img src="img/chamber.jpg" width="1200" height="1200" loading="lazy"
+              <img src="img/chamber.jpg" width="780" height="780" loading="lazy"
                  alt="Marc-Kevin and Florence close together in a stone chamber, hands clasped, lit by a shaft of light from a window out of frame.">
             </picture>
           </figure>
@@ -1048,7 +1069,7 @@
         <picture>
           <source srcset="img/hall.avif" type="image/avif">
           <source srcset="img/hall.webp" type="image/webp">
-          <img src="img/hall.jpg" width="1500" height="1006" loading="lazy"
+          <img src="img/hall.jpg" width="1180" height="791" loading="lazy"
              alt="A long candlelit hall in pen and ink, banners overhead, the table laid and mist at the far end.">
         </picture>
       </figure>
@@ -1081,7 +1102,7 @@
         <picture>
           <source srcset="img/garments.avif" type="image/avif">
           <source srcset="img/garments.webp" type="image/webp">
-          <img src="img/garments.jpg" width="1100" height="1100" loading="lazy"
+          <img src="img/garments.jpg" width="800" height="800" loading="lazy"
              alt="An engraving of two folded garments on stone: a black high-collared coat and a deep burgundy robe, lit by a single candle.">
         </picture>
       </figure>
@@ -1342,7 +1363,7 @@
         <picture>
           <source srcset="img/hands.avif" type="image/avif">
           <source srcset="img/hands.webp" type="image/webp">
-          <img src="img/hands.jpg" width="1100" height="1100" loading="lazy"
+          <img src="img/hands.jpg" width="640" height="640" loading="lazy"
              alt="Two clasped hands in pen and ink, one in a worn gauntlet and one bare with rings, inside a thin ring of red light.">
         </picture>
       </figure>

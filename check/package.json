@@ -1,0 +1,18 @@
+{
+  "name": "wedding-checks",
+  "private": true,
+  "description": "Regression checks for the wedding page. Run from this folder.",
+  "scripts": {
+    "all": "node final.cjs && node ovf2.cjs && node tz.cjs && node snd.cjs && node vp.cjs && node weigh.cjs",
+    "gate": "node final.cjs",
+    "overflow": "node ovf2.cjs",
+    "timezone": "node tz.cjs",
+    "sound": "node snd.cjs",
+    "viewport": "node vp.cjs",
+    "weight": "node weigh.cjs",
+    "contrast": "node contrast2.cjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.49.0"
+  }
+}

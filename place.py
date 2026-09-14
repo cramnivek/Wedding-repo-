@@ -71,40 +71,40 @@ def trim_border(im, frac):
 
 JOBS = [
     # name         border  crop_top  palette_keep  contrast  bright  longest
-    ("battlefield", 0.030, 0.28,     0.34,         1.24,     0.86,   1800),
-    ("hall",        0.010, 0.0,      0.30,         1.26,     0.80,   1500),
-    ("garments",    0.008, 0.0,      0.40,         1.22,     0.68,   1100),
-    ("hands",       0.0,   0.0,      0.45,         1.16,     0.96,   1100),
-    ("them-ink",    0.0,   0.0,      0.34,         1.22,     0.86,   1500),
+    ("battlefield", 0.030, 0.28,     0.34,         1.24,     0.86,  1800),
+    ("hall",        0.010, 0.0,      0.30,         1.26,     0.80,  1180),
+    ("garments",    0.008, 0.0,      0.40,         1.22,     0.68,   800),
+    ("hands",       0.0,   0.0,      0.45,         1.16,     0.96,   640),
+    ("them-ink",    0.0,   0.0,      0.34,         1.22,     0.86,   780),
 
     # The prenup set: same ramp, each pulled by however much its own light needs.
-    ("vow",         0.0,   0.0,      0.34,         1.26,     0.96,   1300),
-    ("camp",        0.0,   0.0,      0.32,         1.26,     0.92,   1500),
-    ("ridge",       0.0,   0.0,      0.24,         1.30,     0.80,   1500),
-    ("knight",      0.0,   0.0,      0.28,         1.30,     0.86,   1200),
-    ("walk",        0.0,   0.0,      0.28,         1.30,     0.84,   1800),
+    ("vow",         0.0,   0.0,      0.34,         1.26,     0.96,   860),
+    ("camp",        0.0,   0.0,      0.32,         1.26,     0.92,  1180),
+    ("ridge",       0.0,   0.0,      0.24,         1.30,     0.80,   780),
+    ("knight",      0.0,   0.0,      0.28,         1.30,     0.86,   780),
+    ("walk",        0.0,   0.0,      0.28,         1.30,     0.84,  1800),
 
     # The black-sun scene arrives with a red eclipse and a grey sky. Pulled hard
     # through the ramp so the corona lands on the page's gold instead of fighting
     # it, and darkened so the plate's mask can dissolve its edges into the page.
-    ("sun",         0.0,   0.0,      0.26,         1.28,     0.84,   1500),
+    ("sun",         0.0,   0.0,      0.26,         1.28,     0.84,   860),
 
     # Already crimson and near-black before it got here — it was generated into
     # the palette rather than corrected into it — so it keeps most of itself and
     # only gets nudged. Grading this one hard would flatten the wet armour, which
     # is most of why it works.
-    ("rescue",      0.0,   0.0,      0.55,         1.12,     0.9,    1500),
+    ("rescue",      0.0,   0.0,      0.55,         1.12,     0.9,  1000),
 
     # The chamber portrait is the one render where the faces read as themselves,
     # so it keeps most of its own light — grading it as hard as the rest would
     # cost the likeness, which is the only reason it is on the page.
-    ("chamber",     0.0,   0.0,      0.58,         1.10,     0.94,   1200),
+    ("chamber",     0.0,   0.0,      0.58,         1.10,     0.94,   780),
 
     # The two real photographs keep most of themselves — they are the one place
     # the page is not a painted world, and over-grading them loses the contrast
     # that section is built on.
-    ("us-1",        0.0,   0.0,      0.62,         1.12,     0.92,   1100),
-    ("us-2",        0.0,   0.0,      0.62,         1.12,     0.92,   1400),
+    ("us-1",        0.0,   0.0,      0.62,         1.12,     0.92,   780),
+    ("us-2",        0.0,   0.0,      0.62,         1.12,     0.92,   780),
 ]
 
 

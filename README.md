@@ -40,10 +40,28 @@ body text. If any font fails to load the page falls back to system serif and
 still reads correctly.
 
 The eclipse, its corona, the light falling from it, the fog, the dead branches
-and the whole opening gate are all drawn on `<canvas>` at runtime. The fourteen
-plates in `img/` are the only image files, and `place.py` is what grades them —
-it maps each one's luminance through the page's own palette ramp, so a render
-made in any light still belongs here.
+and the whole opening gate are all drawn on `<canvas>` at runtime.
+
+Everything else in `img/` is a file:
+
+- **Fifteen plates**, each in `.avif`, `.webp` and `.jpg` — the page offers all
+  three through `<picture>` and the browser takes the first it understands.
+  `place.py` grades them: it maps each one's luminance through the page's own
+  palette ramp, so a render made in any light still belongs here. The `longest`
+  column in its `JOBS` table is a *measured* number — twice the widest the page
+  ever renders that plate, read off the layout by `check/maxsize.cjs` — so
+  re-running the script after a layout change is what keeps the plates the right
+  size rather than three times too big.
+- **Four assets that are not plates.** `behelit.webp`, `field.webp` and
+  `bloom.webp` are sprite sheets, blitted frame by frame on canvas so the gate
+  owns their timing — a GIF plays on its own clock and cannot be told to wait
+  for the seal to break. `brand.webp` is the Brand of Sacrifice, cut off its own
+  ground by how red each pixel is.
+- **`og.jpg`** — the 1200×630 card a messaging app shows when the link is pasted.
+- The two favicons and `icon-512.png`.
+
+Cold load is about **1.3 MB over 22 requests**; `check/weigh.cjs` measures it.
+If that number climbs a long way, something went in at full size.
 
 ## What is still blank
 
@@ -115,8 +133,39 @@ Before any of that there is a gate: an invitation drawn as a manga page, inked
 in front of you, sealed in wax and branded. Pressing the brand breaks the seal,
 the ink runs, the envelope tears, and the tear opens into the eclipse.
 
+Breaking the seal also plays a sound, synthesised in the browser rather than
+loaded — a file cannot follow the gate, and this is built off the same timeline
+the animation is, so it arrives at silence exactly when the page does. The
+toggle in the corner remembers its setting, and it starts off for anyone who has
+asked their system for less motion.
+
 Everything motion-related switches off under `prefers-reduced-motion` — the gate
 removes itself outright rather than playing at a lower speed.
+
+## The printed card
+
+`card/` is a separate one-page file: a 5 × 7in save-the-date, front and back,
+laid out in millimetres with trim, bleed and safe margins. Open it, print to PDF
+from the browser, and read the notes underneath it before sending it anywhere —
+they cover the two things that ruin a dark card at a press. The site address on
+the back is still blank.
+
+## Checking it still works
+
+`check/` holds the regression scripts, one concern each. They drive a real
+browser over `../index.html`, so they catch things a glance at the page does not
+— a countdown that is right in your timezone and wrong in everyone else's, a
+phone laying the page out at 980px, a band 156px wider than the screen.
+
+```sh
+cd check
+npm install            # playwright-core only
+npm run all            # or: gate, overflow, timezone, sound, viewport, weight, contrast
+```
+
+Chromium comes from wherever Playwright finds it, or set `CHROME_PATH` to one
+you already have. `check/README.md` says what each script is for and what it
+caught.
 
 ## Publishing it
 
@@ -126,3 +175,12 @@ The site is static, so anything that serves files will do.
   Free, custom domain supported, done in a minute.
 - **GitHub Pages** — Settings → Pages → deploy from `main`, root folder.
   Note that Pages sites are public even when the repository is private.
+
+**One thing to change the day it gets a domain.** `og:image` in the `<head>` is
+a relative path, `img/og.jpg`. Some crawlers resolve that against the page URL
+and some silently ignore it — Facebook's among the latter — so the link preview
+will work in one app and come up blank in another. Make it absolute:
+
+```html
+<meta property="og:image" content="https://your-domain/img/og.jpg">
+```

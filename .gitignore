@@ -1,0 +1,6 @@
+# The checks install playwright-core locally; it is ~15 MB and reinstallable.
+check/node_modules/
+check/package-lock.json
+
+# place.py reads from here — the ungraded originals, kept out of the site.
+incoming/
