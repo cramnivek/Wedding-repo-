@@ -21,6 +21,7 @@ npm run all
 | `snd.cjs` | Sound builds one audio context and four oscillators when on, **zero** when off, and defaults off under reduced motion. |
 | `contrast2.cjs` | Contrast measured against the **composited canvas pixel**, not the CSS token. Found the countdown labels at 4.3:1, under the AA floor. |
 | `weigh.cjs` | Total delivered bytes and the ten largest files, over a local server so caching does not lie. |
+| `clip.cjs` | The rescue clip: nothing fetched while the gate is up, nothing fetched until the section is near, exactly **one** of the two encodings downloaded, the video swapped in only after it decodes a frame, and reduced motion left with the still and zero bytes. Caught `data-clip` producing `rescue.mp4.mp4`, and a bare `video/mp4` type causing **both** files to download. |
 | `maxsize.cjs` | Largest CSS width each image ever renders at, across seven viewports — what the files should actually be sized to. |
 | `seam.cjs` `beh2.cjs` `live.cjs` | Frame captures of the gate and the page sections, on a frozen clock so a screenshot's own latency cannot advance the animation. |
 
@@ -37,3 +38,7 @@ viewport meta entirely. `vp.cjs` uses `isMobile: true` for that reason.
 **The frozen-clock captures pump rAF by hand.** If you change a timeline in
 `index.html`, the frame marks in `seam.cjs` go stale and a working animation will
 look broken. Check the arithmetic before believing the pictures.
+
+**This Chromium has no H.264.** Playwright ships it without the proprietary
+codecs, so it always picks the WebM and `clip.cjs` passing does not prove the
+mp4 plays. Open the page in Safari for that.

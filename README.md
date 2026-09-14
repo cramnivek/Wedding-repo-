@@ -58,10 +58,14 @@ Everything else in `img/` is a file:
   for the seal to break. `brand.webp` is the Brand of Sacrifice, cut off its own
   ground by how red each pixel is.
 - **`og.jpg`** — the 1200×630 card a messaging app shows when the link is pasted.
+- **`rescue.mp4` and `rescue.webm`** — the same ten seconds twice, ~360 KB each.
+  Only one is ever fetched; the browser picks by codec. See below.
 - The two favicons and `icon-512.png`.
 
 Cold load is about **1.3 MB over 22 requests**; `check/weigh.cjs` measures it.
-If that number climbs a long way, something went in at full size.
+If that number climbs a long way, something went in at full size. The video is
+not in that figure — it is only fetched on scrolling to it, and adds ~360 KB
+for a guest who gets that far.
 
 ## What is still blank
 
@@ -133,6 +137,38 @@ Before any of that there is a gate: an invitation drawn as a manga page, inked
 in front of you, sealed in wax and branded. Pressing the brand breaks the seal,
 the ink runs, the envelope tears, and the tear opens into the eclipse.
 
+## The rescue clip
+
+"Under a black sun" holds a ten-second shot rather than a still. The still is
+what is in the markup and it stays the truth: the video is built in script and
+only swapped in once it has decoded a frame, so script off, reduced motion, a
+missing file or a browser that won't decode it all leave exactly the page that
+was there before — never a black rectangle where a plate used to be.
+
+Nothing downloads until the gate has been opened *and* the section is near, so
+it never competes with the gate and a guest who doesn't scroll that far never
+pays for it. It plays once and holds on the last frame — the shot ends closer
+than it starts, so a loop would snap back to a wide two-shot every ten seconds.
+Clicking it plays it again.
+
+Two encodings are published because "every browser plays mp4" is not true: a
+Chromium built without the proprietary codecs decodes neither H.264 nor the
+reason it failed. Each `<source>` names its codec, not just its container —
+given only `video/mp4` a browser answers "maybe" on the container alone, fetches
+the whole file, then discovers it can't play it and fetches the other one too.
+
+To replace the clip, encode to both formats at the same base name and keep the
+`avc1.…` string in the page matching what the mp4 actually contains:
+
+```sh
+ffmpeg -i in.mp4 -an -vf scale=960:-2 -c:v libx264 -crf 30 -pix_fmt yuv420p \
+  -movflags +faststart img/rescue.mp4
+ffmpeg -i in.mp4 -an -vf scale=960:-2 -c:v libvpx-vp9 -crf 38 -b:v 0 img/rescue.webm
+```
+
+`art-source/rescue-clip.mp4` is the full-size version with its sound, for
+sending to people rather than serving.
+
 Breaking the seal also plays a sound, synthesised in the browser rather than
 loaded — a file cannot follow the gate, and this is built off the same timeline
 the animation is, so it arrives at silence exactly when the page does. The
@@ -160,7 +196,7 @@ phone laying the page out at 980px, a band 156px wider than the screen.
 ```sh
 cd check
 npm install            # playwright-core only
-npm run all            # or: gate, overflow, timezone, sound, viewport, weight, contrast
+npm run all            # or: gate, overflow, timezone, sound, viewport, clip, weight, contrast
 ```
 
 Chromium comes from wherever Playwright finds it, or set `CHROME_PATH` to one

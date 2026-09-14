@@ -828,6 +828,27 @@
     -webkit-mask-image: radial-gradient(96% 88% at 50% 46%, #000 46%, transparent 99%);
     mask-image: radial-gradient(96% 88% at 50% 46%, #000 46%, transparent 99%);
   }
+  .plate-ink video {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* It plays once and stops on the last frame, so it has to say it can be
+       played again. */
+    cursor: pointer;
+  }
+  /* The same dissolve, moved onto the figure. A playing video sits in its own
+     composited layer and a mask set on the element itself is ignored there — it
+     rendered as a hard rectangle, which is the one thing every other plate on
+     this page avoids. Masking the box around it goes through the normal paint
+     path and holds.
+
+     The gradient is the still's, unchanged. Tightening the ellipse for the
+     wider frame was tried and traded soft corners for a hard top edge, which is
+     worse. The class is only present while the video is. */
+  .plate-ink.is-clip {
+    -webkit-mask-image: radial-gradient(96% 88% at 50% 46%, #000 46%, transparent 99%);
+    mask-image: radial-gradient(96% 88% at 50% 46%, #000 46%, transparent 99%);
+  }
 
   .pair {
     display: grid;
@@ -940,7 +961,9 @@
         <p class="eyebrow">The two of us</p>
         <h2>Under a black sun</h2>
       </div>
-      <figure class="plate-ink">
+      <!-- Without an extension: the script appends one per source type, and the
+           browser fetches only the format it says it can decode. -->
+      <figure class="plate-ink" data-clip="img/rescue">
         <picture>
           <source srcset="img/rescue.avif" type="image/avif">
           <source srcset="img/rescue.webp" type="image/webp">
@@ -1497,6 +1520,94 @@
         if (ctx.close) ctx.close();
       }, 6200);
     };
+  })();
+
+  /* The rescue, as it was actually made: a ten-second push-in rather than the
+     one frame of it the page had been standing in for.
+
+     The still stays in the markup and stays the truth. The video is built in
+     script and only swapped in once it has decoded a frame, so anything that
+     goes wrong — script off, reduced motion asked for, the file missing, a
+     browser that won't decode it — leaves exactly the page that was here
+     before rather than a black rectangle where a plate used to be.
+
+     Two things hold the download back. Nothing starts until the gate has been
+     opened, so the clip never competes with the one animation the visitor is
+     actually watching; and then nothing starts until the section is near, so a
+     guest who never scrolls this far never pays for it.
+
+     It is offered as both H.264 and VP9 because "every browser plays mp4" is
+     not true — a Chromium built without the proprietary codecs decodes neither
+     the file nor the reason it failed. Only one of the two is ever fetched:
+     the browser picks the first type it claims to handle.
+
+     It plays once and holds on the last frame — the shot ends closer than it
+     starts, so looping would snap back to a wide two-shot every ten seconds.
+     Clicking plays it again. */
+  (function () {
+    var fig = document.querySelector("[data-clip]");
+    if (!fig || reduced || !("IntersectionObserver" in window)) return;
+
+    var pic = fig.querySelector("picture");
+    var still = fig.querySelector("img");
+    if (!pic || !still) return;
+
+    var v = document.createElement("video");
+    v.muted = true;
+    v.defaultMuted = true;
+    v.playsInline = true;
+    v.setAttribute("playsinline", "");     /* older iOS reads the attribute, not the property */
+    v.preload = "none";
+    /* A video carries no alt text, so the still's description is what names it. */
+    v.setAttribute("aria-label", still.alt);
+
+    /* The codec has to be named, not just the container. Asked about a bare
+       "video/mp4" a browser answers "maybe" on the strength of the container
+       alone — so one without H.264 downloads the whole file before finding out
+       it cannot decode it, then downloads the WebM as well. Given the codec it
+       answers honestly up front and fetches exactly one of the two. */
+    var base = fig.getAttribute("data-clip");
+    [['video/mp4; codecs="avc1.64001F"', ".mp4"],
+     ['video/webm; codecs="vp9"', ".webm"]].forEach(function (pair) {
+      var s = document.createElement("source");
+      s.type = pair[0];
+      s.dataset.src = base + pair[1];
+      v.appendChild(s);
+    });
+
+    v.addEventListener("loadeddata", function () {
+      if (pic.parentNode !== fig) return;
+      fig.replaceChild(v, pic);
+      fig.classList.add("is-clip");
+      var p = v.play();
+      /* Some browsers refuse to autoplay regardless; the first frame is already
+         showing by then, so a refusal just leaves it paused on the opening shot. */
+      if (p && p.catch) p.catch(function () {});
+    }, { once: true });
+
+    v.addEventListener("click", function () {
+      v.currentTime = 0;
+      var p = v.play();
+      if (p && p.catch) p.catch(function () {});
+    });
+
+    function arm() {
+      var io = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        /* The sources carry their URLs in data- until now, so adding them to the
+           document earlier could not have started a fetch. */
+        [].forEach.call(v.children, function (s) { s.src = s.dataset.src; });
+        v.load();
+      }, { rootMargin: "400px 0px" });
+      io.observe(fig);
+    }
+
+    if (document.getElementById("gate")) {
+      document.addEventListener("eclipse:ignite", arm, { once: true });
+    } else {
+      arm();
+    }
   })();
 
   /* The gate, drawn as a manga page rather than a lit scene.
