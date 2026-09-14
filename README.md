@@ -58,9 +58,12 @@ Everything else in `img/` is a file:
   for the seal to break. `brand.webp` is the Brand of Sacrifice, cut off its own
   ground by how red each pixel is.
 - **`og.jpg`** — the 1200×630 card a messaging app shows when the link is pasted.
-- **`rescue.mp4` and `rescue.webm`** — the same ten seconds twice, ~360 KB each.
-  Currently not served by the page at all; see below. When switched on, only one
-  of the two is ever fetched — the browser picks by codec.
+- **`chamber.mp4` / `chamber.webm`** — the chamber portrait as a ten-second shot,
+  325 and 414 KB. The page plays it in place of that plate; only one of the two
+  is ever fetched, the browser picks by codec. See below.
+- **`rescue.mp4` / `rescue.webm`** — a second clip, ~360 KB each, **not served
+  by the page**: its likenesses didn't survive being animated. Kept because the
+  machinery to play it is still there and one attribute switches it on.
 - The two favicons and `icon-512.png`.
 
 Cold load is about **1.3 MB over 22 requests**; `check/weigh.cjs` measures it.
@@ -138,35 +141,22 @@ Before any of that there is a gate: an invitation drawn as a manga page, inked
 in front of you, sealed in wax and branded. Pressing the brand breaks the seal,
 the ink runs, the envelope tears, and the tear opens into the eclipse.
 
-## The rescue clip — built, and currently off
+## Plates that move
 
-"Under a black sun" shows the still. The clip that was made for it is published
-alongside and the page will play it the moment the figure carries `data-clip`,
-but it doesn't, for a reason worth writing down:
+Any `<figure>` carrying `data-clip` plays a clip in place of the still inside
+it. The attribute names the file **without an extension** — the script appends
+one per source type. One plate uses it today: the chamber portrait in the
+prenup pair.
 
-**The shot pushes in, and the likenesses do not survive the push.** At the
-opening framing the faces are small and match the still they were animated
-from. As the camera closes, the generator has to invent facial detail that the
-source still never contained — and it invents someone else. By the last few
-seconds it is a longer face, a narrower nose and a heavier brow than the man in
-the photographs. The still is the likeness that held, so the still is what is on
-the page.
+The still stays in the markup and stays the fallback. The video is built in
+script and only swapped in once it has decoded a frame, so script off, reduced
+motion, a missing file or a browser that won't decode it all leave exactly the
+page that was there before — never a black rectangle where a plate used to be.
 
-Any second attempt should hold the camera still and animate only the water, the
-embers and the cloud. A push-in is exactly the instruction that forces the
-invention.
-
-When it is switched on: the still stays in the markup and stays the fallback.
-The video is built in script and only swapped in once it has decoded a frame, so
-script off, reduced motion, a missing file or a browser that won't decode it all
-leave exactly the page that was there before — never a black rectangle where a
-plate used to be.
-
-Nothing downloads until the gate has been opened *and* the section is near, so
-it never competes with the gate and a guest who doesn't scroll that far never
-pays for it. It plays once and holds on the last frame — the shot ends closer
-than it starts, so a loop would snap back to a wide two-shot every ten seconds.
-Clicking it plays it again.
+Nothing downloads until the gate has been opened *and* the plate is near, so a
+clip never competes with the gate and a guest who doesn't scroll that far never
+pays for it. Cold load is unchanged at 1.33 MB. Each clip plays once and holds
+on its last frame rather than looping; clicking it plays it again.
 
 Two encodings are published because "every browser plays mp4" is not true: a
 Chromium built without the proprietary codecs decodes neither H.264 nor the
@@ -174,17 +164,52 @@ reason it failed. Each `<source>` names its codec, not just its container —
 given only `video/mp4` a browser answers "maybe" on the container alone, fetches
 the whole file, then discovers it can't play it and fetches the other one too.
 
-To replace the clip, encode to both formats at the same base name and keep the
-`avc1.…` string in the page matching what the mp4 actually contains:
+### Which stills survive being animated, and why
+
+Three attempts, and the thing that decided them was **how many pixels the faces
+occupy in the source**, not anything about the prompt.
+
+The rescue still was animated twice — once with a push-in, once with the camera
+locked off. Both came back with a stranger's face. In that plate their faces are
+about 70px across, which is not enough identity for the generator to preserve,
+so it invents the rest and invents someone else. Holding the camera still didn't
+help; it only made the wrong face consistent for ten seconds instead of
+drifting. Frame one is already re-rendered, before any camera move has happened.
+
+The chamber portrait works because the faces are around 250px, with glasses, a
+neck tattoo and a nose piercing to hold on to. That one is on the page.
+
+So: animate the tightest plate you have, not the best-composed one. And keep the
+motion small — breath, a blink, firelight, drifting dust. Asking for a camera
+move is asking the model to invent pixels it doesn't have.
+
+### Replacing or adding a clip
+
+Encode to both formats at the same base name, and keep the `avc1.…` string in
+the page matching what the mp4 actually contains (read it from the file's `avcC`
+box if you're unsure). Crop to the shape the plate renders at rather than
+letting the browser throw pixels away — the chamber cell is square and never
+wider than 374 CSS px, so the clip is 720×720:
 
 ```sh
-ffmpeg -i in.mp4 -an -vf scale=960:-2 -c:v libx264 -crf 30 -pix_fmt yuv420p \
-  -movflags +faststart img/rescue.mp4
-ffmpeg -i in.mp4 -an -vf scale=960:-2 -c:v libvpx-vp9 -crf 38 -b:v 0 img/rescue.webm
+ffmpeg -i in.mp4 -an -vf crop=720:720:230:0 -c:v libx264 -crf 30 \
+  -pix_fmt yuv420p -movflags +faststart img/chamber.mp4
+ffmpeg -i in.mp4 -an -vf crop=720:720:230:0 -c:v libvpx-vp9 -crf 48 -b:v 0 \
+  img/chamber.webm
 ```
 
-`art-source/rescue-clip.mp4` is the full-size version with its sound, for
-sending to people rather than serving.
+Grade it the same way `place.py` grades the still it replaces, or the colour
+visibly shifts at the moment it swaps in. `place.py` exposes `to_palette`, so
+the frames can go through the identical ramp:
+
+```py
+im = place.to_palette(im, KEEP)                      # chamber: 0.58
+im = ImageEnhance.Contrast(im).enhance(CONTRAST)     # 1.10
+im = ImageEnhance.Brightness(im).enhance(BRIGHT)     # 0.94
+```
+
+`art-source/` holds the full-size versions with their sound, watermark removed,
+for sending to people rather than serving.
 
 Breaking the seal also plays a sound, synthesised in the browser rather than
 loaded — a file cannot follow the gate, and this is built off the same timeline

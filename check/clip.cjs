@@ -1,9 +1,10 @@
-/* The rescue clip swaps in for the still, and only when it should.
+/* Every plate that carries data-clip swaps its still for a video, and only
+ * when it should.
  *
- * Four things worth proving: that nothing is fetched while the gate is still
- * up, that nothing is fetched until the section is near, that the video
+ * Four things worth proving per clip: that nothing is fetched while the gate is
+ * still up, that nothing is fetched until the section is near, that the video
  * actually replaces the picture once it has decoded a frame, and that someone
- * who asked for reduced motion is left with the still and no download at all.
+ * who asked for reduced motion is left with the stills and no download at all.
  *
  * Note this browser: Playwright's Chromium ships WITHOUT the proprietary
  * codecs, so it cannot decode H.264 and will always choose the WebM. That is
@@ -30,46 +31,50 @@ async function run(reduced) {
     await p.click('#gate-btn');
     await p.waitForTimeout(6200);
   }
-  const afterGate = asked.length;
 
-  await p.evaluate(() => document.getElementById('us').scrollIntoView());
-  await p.waitForTimeout(3000);
+  const clips = await p.evaluate(() =>
+    [].map.call(document.querySelectorAll('[data-clip]'), f => f.getAttribute('data-clip')));
 
-  const s = await p.evaluate(() => {
-    /* The clip is switched on and off by the presence of data-clip on the
-       figure. Find the plate either way, so that with the clip off this
-       reports "off, still intact" rather than a row of nulls that reads as
-       a pass. */
-    const fig = document.querySelector('.plate-ink');
-    const on = !!(fig && fig.hasAttribute('data-clip'));
-    const v = fig && fig.querySelector('video');
-    return {
-      on: on,
-      video: !!v,
-      still: !!(fig && fig.querySelector('picture')),
-      playing: v ? (!v.paused && v.currentTime > 0) : null,
-      muted: v ? v.muted : null,
-      labelled: v ? !!v.getAttribute('aria-label') : null,
-      loops: v ? v.loop : null
-    };
-  });
-
-  if (!s.on) {
+  if (!clips.length) {
     console.log((reduced ? 'reduced' : 'normal ') +
-      ' — clip OFF (no data-clip) | still in figure: ' + s.still +
-      ' | video files fetched: ' + asked.length);
+      ' — no clips on the page (no data-clip anywhere) | video files fetched: ' + asked.length);
     await b.close();
     return;
   }
 
-  console.log(
-    (reduced ? 'reduced' : 'normal ') +
-    ' — fetched during gate: ' + duringGate +
-    ' | after gate, before scroll: ' + afterGate +
-    ' | total: ' + asked.length + ' ' + JSON.stringify(asked) +
-    ' | video: ' + s.video + ' | still left: ' + s.still +
-    ' | playing: ' + s.playing + ' | muted: ' + s.muted +
-    ' | labelled: ' + s.labelled + ' | loops: ' + s.loops);
+  /* Scroll the whole page rather than to one section, so every clip gets its
+     chance to arm — and so a clip that arms too early shows up as a fetch that
+     happened before its own section was anywhere near. */
+  await p.evaluate(async () => {
+    for (let y = 0; y < document.body.scrollHeight; y += 400) {
+      window.scrollTo(0, y);
+      await new Promise(r => setTimeout(r, 120));
+    }
+  });
+  await p.waitForTimeout(3000);
+
+  const rows = await p.evaluate(() =>
+    [].map.call(document.querySelectorAll('[data-clip]'), f => {
+      const v = f.querySelector('video');
+      return {
+        base: f.getAttribute('data-clip'),
+        video: !!v,
+        still: !!f.querySelector('picture'),
+        playing: v ? (!v.paused && v.currentTime > 0) : null,
+        muted: v ? v.muted : null,
+        labelled: v ? !!v.getAttribute('aria-label') : null,
+        loops: v ? v.loop : null
+      };
+    }));
+
+  console.log((reduced ? 'reduced' : 'normal ') +
+    ' — clips: ' + clips.length +
+    ' | fetched during gate: ' + duringGate +
+    ' | fetched total: ' + asked.length + ' ' + JSON.stringify(asked));
+  rows.forEach(r => console.log('    ' + r.base +
+    ' — video: ' + r.video + ' | still left: ' + r.still +
+    ' | playing: ' + r.playing + ' | muted: ' + r.muted +
+    ' | labelled: ' + r.labelled + ' | loops: ' + r.loops));
 
   await b.close();
 }
