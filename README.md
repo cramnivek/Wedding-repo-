@@ -58,10 +58,10 @@ Everything else in `img/` is a file:
   for the seal to break. `brand.webp` is the Brand of Sacrifice, cut off its own
   ground by how red each pixel is.
 - **`og.jpg`** — the 1200×630 card a messaging app shows when the link is pasted.
-- **`chamber.mp4` / `chamber.webm`** — the chamber portrait as a ten-second shot,
-  325 and 414 KB. The page plays it in place of that plate; only one of the two
-  is ever fetched, the browser picks by codec. See below.
-- **`rescue.mp4` / `rescue.webm`** — a second clip, ~360 KB each, **not served
+- **Four plates that move**, each as an mp4 and a webm — `vow`, `camp`, `ridge`
+  and `chamber`. Only one of the two is ever fetched per clip; the browser picks
+  by codec. mp4 242/508/358/325 KB, webm 271/716/429/414 KB. See below.
+- **`rescue.mp4` / `rescue.webm`** — a fifth clip, ~360 KB each, **not served
   by the page**: its likenesses didn't survive being animated. Kept because the
   machinery to play it is still there and one attribute switches it on.
 - The two favicons and `icon-512.png`.
@@ -145,8 +145,8 @@ the ink runs, the envelope tears, and the tear opens into the eclipse.
 
 Any `<figure>` carrying `data-clip` plays a clip in place of the still inside
 it. The attribute names the file **without an extension** — the script appends
-one per source type. One plate uses it today: the chamber portrait in the
-prenup pair.
+one per source type. Four plates use it, all in the prenup: `vow`, `camp`,
+`ridge` and `chamber`.
 
 The still stays in the markup and stays the fallback. The video is built in
 script and only swapped in once it has decoded a frame, so script off, reduced
@@ -216,10 +216,14 @@ for sending to people rather than serving.
 
 ### How many clips is too many
 
-Each is 300–700 KB and none of it is in the cold load, but they add up for a
-guest who scrolls the whole page. Three or four is the sensible ceiling, and
-the ones worth spending it on are where motion tells you something a still
-can't: firelight moving, wind in a cloak, someone's eyes opening.
+Four is where it stands, and that is the ceiling. None of it is in the cold
+load, but a guest who scrolls the whole prenup now pulls **1.4 MB on Safari and
+1.8 MB on a browser that takes the WebM** — more than the rest of the page put
+together. A fifth would make the prenup the heaviest thing here by a distance.
+
+The ones worth spending it on are where motion says something a still can't:
+firelight moving across a face, wind in a cloak, someone's eyes opening. If
+another clip is added, take one of these off.
 
 Breaking the seal also plays a sound, synthesised in the browser rather than
 loaded — a file cannot follow the gate, and this is built off the same timeline

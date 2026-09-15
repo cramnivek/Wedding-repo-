@@ -1018,7 +1018,10 @@
         <h2>The prenup</h2>
       </div>
       <div class="prenup">
-        <figure class="lead">
+        <!-- Cropped square to the shape this plate is rendered in, which costs
+             the torch at the left edge. Its light is what actually moves, and
+             that survives the crop — it still plays across both their faces. -->
+        <figure class="lead" data-clip="img/vow">
           <picture>
             <source srcset="img/vow.avif" type="image/avif">
             <source srcset="img/vow.webp" type="image/webp">
@@ -1030,7 +1033,9 @@
           We are not, in real life, at war. We did want one photograph where it
           looks like we might be.
         </p>
-        <figure>
+        <!-- The fire moves and he draws the stone down the blade once. Cropped
+             to the still's own 3:2 rather than square, so nothing is lost. -->
+        <figure data-clip="img/camp">
           <picture>
             <source srcset="img/camp.avif" type="image/avif">
             <source srcset="img/camp.webp" type="image/webp">
@@ -1039,7 +1044,10 @@
           </picture>
         </figure>
         <div class="two">
-          <figure class="r">
+          <!-- The one clip with nothing to get wrong: both of them are seen
+               from behind, so there is no face for a generator to reinvent.
+               Wind in the cloaks, smoke crossing the valley. -->
+          <figure class="r" data-clip="img/ridge">
             <picture>
               <source srcset="img/ridge.avif" type="image/avif">
               <source srcset="img/ridge.webp" type="image/webp">
