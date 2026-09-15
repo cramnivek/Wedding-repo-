@@ -1579,8 +1579,15 @@
       bed.loop = true;
       bed.preload = "none";
       bed.volume = 0;
+      /* mp3 last and on purpose. It is the largest and the worst of the three,
+         and it is here because some hosts serve only the long-established audio
+         types — the artifact preview of this page among them, which serves mp3
+         and refuses m4a and ogg outright. A browser that fails to load a source
+         moves to the next, so on a host that has all three this costs nothing:
+         the first one still wins. */
       [['audio/mp4; codecs="mp4a.40.2"', ".m4a"],
-       ['audio/ogg; codecs="opus"', ".ogg"]].forEach(function (pair) {
+       ['audio/ogg; codecs="opus"', ".ogg"],
+       ['audio/mpeg', ".mp3"]].forEach(function (pair) {
         var s = document.createElement("source");
         s.type = pair[0];
         s.src = BED + pair[1];
