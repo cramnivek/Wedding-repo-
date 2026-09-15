@@ -71,6 +71,43 @@ def grading(plate):
     sys.exit("no row for %r in place.py's JOBS" % plate)
 
 
+def crossfade(frames, seconds, fps=24):
+    """Make the clip loop without a visible cut, in place.
+
+    These are locked-off shots, so the camera matches at both ends, but what is
+    moving does not: measured across the four on the page, the last frame and
+    the first differ by enough that a plain `loop` attribute shows a hard jump
+    every time round.
+
+    The fix is to dissolve the tail over the head. The output is the clip minus
+    its last `seconds`, where those opening seconds have had the discarded tail
+    faded out across them — so the frame after the last is the frame that
+    already followed it, and the join is continuous rather than blended away.
+
+    The alternative was a palindrome, which is seamless by construction and
+    needs no blending at all, but it plays the second half backwards: fire
+    un-flickers and embers fall back down into the flame. Motion here stays
+    physically forward, and the dissolve lands on smoke, flame and breath, which
+    are the most forgiving things to dissolve there are.
+    """
+    n = len(frames)
+    f = min(int(round(seconds * fps)), n // 3)
+    if f < 2:
+        return
+    print("looping   dissolving %d frames of tail over the head" % f)
+
+    tail = [Image.open(frames[n - f + i]).convert("RGB") for i in range(f)]
+    for i in range(f):
+        head = Image.open(frames[i]).convert("RGB")
+        # i/f, so the first output frame is pure tail — continuous with the
+        # frame that precedes it once the clip wraps — and the last is pure head.
+        Image.blend(tail[i], head, i / float(f)).save(frames[i])
+
+    for path in frames[n - f:]:
+        os.remove(path)
+    del frames[n - f:]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("plate", help="plate name, as it appears in place.py's JOBS")
@@ -81,6 +118,9 @@ def main():
                     help="paint out the watermark. Unnecessary when --crop "
                          "already excludes it, which is usually cheaper")
     ap.add_argument("--size", type=int, help="override the measured target width")
+    ap.add_argument("--loop", nargs="?", const=1.0, type=float, metavar="SECONDS",
+                    help="make it loop seamlessly by cross-dissolving the tail "
+                         "over the head (default 1s). Costs that much length")
     ap.add_argument("--out", default="img", help="where the encodes land")
     args = ap.parse_args()
 
@@ -126,6 +166,9 @@ def main():
         im = ImageEnhance.Brightness(im).enhance(bright)
         im.save(f)
     print("          %.1fs" % (time.time() - t0))
+
+    if args.loop:
+        crossfade(frames, args.loop)
 
     os.makedirs(args.out, exist_ok=True)
     mp4 = os.path.join(args.out, args.plate + ".mp4")

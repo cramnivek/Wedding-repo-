@@ -940,9 +940,7 @@
     width: 100%;
     height: auto;
   }
-  /* Every clip plays once and stops on its last frame, so wherever one lands it
-     has to say it can be played again. */
-  [data-clip] video { cursor: pointer; }
+  /* Nothing to click: they loop. */
   /* The same dissolve, moved onto the figure. A playing video sits in its own
      composited layer and a mask set on the element itself is ignored there — it
      rendered as a hard rectangle, which is the one thing every other plate on
@@ -1669,9 +1667,11 @@
      the file nor the reason it failed. Only one of the two is ever fetched:
      the browser picks the first type it claims to handle.
 
-     Each plays once and holds on its last frame rather than looping: these are
-     ten-second shots that end somewhere other than where they began, so a loop
-     would snap back on every wrap. Clicking one plays it again. */
+     Each loops. They can, because clip.py dissolves each one's tail over its
+     head before encoding: measured, every wrap is now within the frame-to-frame
+     motion the clip has anyway, so there is nothing to see at the join. Left
+     un-dissolved they could not — the first and last frames of the originals
+     differ enough to snap visibly every ten seconds. */
   (function () {
     if (reduced || !("IntersectionObserver" in window)) return;
 
@@ -1694,6 +1694,7 @@
       var v = document.createElement("video");
       v.muted = true;
       v.defaultMuted = true;
+      v.loop = true;
       v.playsInline = true;
       v.setAttribute("playsinline", "");     /* older iOS reads the attribute, not the property */
       v.preload = "none";
@@ -1723,12 +1724,6 @@
            showing by then, so a refusal just leaves it paused on the opening shot. */
         if (p && p.catch) p.catch(function () {});
       }, { once: true });
-
-      v.addEventListener("click", function () {
-        v.currentTime = 0;
-        var p = v.play();
-        if (p && p.catch) p.catch(function () {});
-      });
 
       function arm() {
         var io = new IntersectionObserver(function (entries) {
@@ -1908,10 +1903,18 @@
     }
 
     /* Outline, flap, hatching, tone. `k` inks it in front of you: the four
-       edges first, then the flap's two diagonals, then its shading. */
-    function drawEnvelope(k, tearK) {
+       edges first, then the flap's two diagonals, then its shading.
+
+       `alpha` takes it away again. Once the paper gives way the envelope has
+       done its job, and leaving its outline drawn means the eruption plays
+       inside a rectangle — a box sitting on top of the thing it was supposed to
+       release. Faded out across the tear, what is left is the opening. */
+    function drawEnvelope(k, tearK, alpha) {
+      if (alpha !== undefined && alpha <= 0.002) return;
       var e = envRect();
       var lw = Math.max(2, unit * 0.075);
+      var restore = alpha !== undefined && alpha < 1;
+      if (restore) { ctx.save(); ctx.globalAlpha = alpha; }
 
       /* Paper body, slightly off the ground so the envelope reads as a
          separate sheet lying on the page. */
@@ -1950,7 +1953,9 @@
         ctx.lineTo(e.x + e.w, e.y + e.h);
         ctx.closePath();
         ctx.clip();
-        ctx.globalAlpha = 0.55 * Math.min(1, sk);
+        /* Multiplied by the outer alpha rather than set from scratch: this is
+           inside its own save(), so assigning would discard the fade. */
+        ctx.globalAlpha = 0.55 * Math.min(1, sk) * (alpha === undefined ? 1 : alpha);
         ctx.fillStyle = tone.light;
         ctx.fillRect(e.x, e.y, e.w, e.h);
         ctx.restore();
@@ -1980,6 +1985,8 @@
               Math.max(1, unit * 0.014), hk);
         ctx.restore();
       }
+
+      if (restore) ctx.restore();
     }
 
     /* The Eclipse is not the disc — it is the ground underneath it. This is that
@@ -2321,7 +2328,11 @@
             fired = true;
             document.dispatchEvent(new CustomEvent("eclipse:ignite"));
           }
-          drawEnvelope(1, tk);
+          /* Going as it gives way. Held to full for the first third so the
+             paper is still visibly the thing being torn, then gone by the time
+             the tear is open — otherwise the eruption plays inside a drawn
+             rectangle, which is a box sitting on top of what it released. */
+          drawEnvelope(1, tk, 1 - Math.max(0, (tk - 0.34) / 0.66));
           /* Awake, weeping, and now screaming — the mouth goes wide as the
              paper gives way under it. */
           drawBehelit(25 + tk * 13, 1);
@@ -2349,7 +2360,7 @@
              blood before it drowns in black. Two veils: crimson rising fast,
              then the page's own ink rising behind it a beat later. That order is
              the whole difference between a light going out and an Eclipse. */
-          drawEnvelope(1, 1);
+          /* No envelope here at all — it finished going as the tear opened. */
           drawTear(1);
           var red = Math.min(1, e / 0.38);
           ctx.save();

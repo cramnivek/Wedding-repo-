@@ -28,10 +28,12 @@ and almost no colour that isn't ember, bone or blood.
 Every text token clears WCAG AA on the ground it sits on. `--blood-lt` (`#C21F26`)
 is only ever a border or a list marker, never text.
 
-Typefaces: **Diablo Heavy** for the names, self-hosted from `fonts/` (see the
-note in there — it is a 1997 fan face, not the games' own Exocet). From Google
-Fonts: **Cinzel** for every heading and letterspaced cap, **Cormorant Garamond**
-for body text, **Allura** for the footer monogram.
+Typefaces, all four self-hosted from `fonts/`: **Diablo Heavy** for the names
+(see the note in there — it is a 1997 fan face, not the games' own Exocet),
+**Cinzel** for every heading and letterspaced cap, **Cormorant Garamond** for
+body text, **Allura** for the footer monogram. The last three came from Google
+Fonts and are served from here rather than fetched from it — see *Putting it on
+a domain* for why.
 
 The display face is used for the names and nothing else. It has no true
 lowercase — lowercase input selects alternate capital forms, which is what puts
@@ -60,16 +62,17 @@ Everything else in `img/` is a file:
 - **`og.jpg`** — the 1200×630 card a messaging app shows when the link is pasted.
 - **Four plates that move**, each as an mp4 and a webm — `vow`, `camp`, `ridge`
   and `chamber`. Only one of the two is ever fetched per clip; the browser picks
-  by codec. mp4 242/508/358/325 KB, webm 271/716/429/414 KB. See below.
+  by codec. mp4 266/474/333/321 KB, webm 313/665/401/423 KB. See below.
 - **`rescue.mp4` / `rescue.webm`** — a fifth clip, ~360 KB each, **not served
   by the page**: its likenesses didn't survive being animated. Kept because the
   machinery to play it is still there and one attribute switches it on.
 - The two favicons and `icon-512.png`.
 
-Cold load is about **1.3 MB over 22 requests**; `check/weigh.cjs` measures it.
-If that number climbs a long way, something went in at full size. The video is
-not in that figure — it is only fetched on scrolling to it, and adds ~360 KB
-for a guest who gets that far.
+None of the video is in the cold load — each clip is fetched only on scrolling
+near its plate. `check/weigh.cjs` measures the desktop cold load and
+`check/phone.cjs` measures what a phone actually pays, which is the number that
+matters here; see *What it costs on a phone* below. If either climbs a long way,
+something went in at full size.
 
 ## What is still blank
 
@@ -139,7 +142,10 @@ To collect them properly, pick one:
 
 Before any of that there is a gate: an invitation drawn as a manga page, inked
 in front of you, sealed in wax and branded. Pressing the brand breaks the seal,
-the ink runs, the envelope tears, and the tear opens into the eclipse.
+the ink runs, and the envelope tears — and goes with the tear, fading out across
+it rather than staying drawn around the opening, which would leave the eruption
+playing inside a rectangle. What is left is the tear, and it opens into the
+eclipse.
 
 ## Plates that move
 
@@ -155,8 +161,19 @@ page that was there before — never a black rectangle where a plate used to be.
 
 Nothing downloads until the gate has been opened *and* the plate is near, so a
 clip never competes with the gate and a guest who doesn't scroll that far never
-pays for it. Cold load is unchanged at 1.33 MB. Each clip plays once and holds
-on its last frame rather than looping; clicking it plays it again.
+pays for it.
+
+**They loop.** `clip.py --loop` dissolves each clip's tail over its own head
+before encoding, which is what makes that possible: measured across the four,
+the last frame and the first of the raw clips differ by a mean of 9 to 26 levels
+and a worst-1% of 78 to 194, all of which snap visibly on every wrap. After the
+dissolve every wrap is *within the frame-to-frame motion the clip has anyway* —
+2.4 against 2.3 on `vow`, 6.1 against 5.3 on `camp` — so the join is no more
+visible than an ordinary frame advance. `camp` looks like the worst of them on
+paper and is not: its numbers are high at both ends because firelight moves that
+much every single frame.
+
+The cost is one second of length. Each is 9 seconds rather than 10.
 
 Two encodings are published because "every browser plays mp4" is not true: a
 Chromium built without the proprietary codecs decodes neither H.264 nor the
@@ -190,7 +207,7 @@ actually rendered at, grades every frame through `place.py`'s ramp using that
 plate's own row from `JOBS`, and writes both encodings:
 
 ```sh
-python3 clip.py chamber incoming/chamber.mp4 --crop 720:720:230:0
+python3 clip.py chamber art-source/chamber-clip.mp4 --crop 720:720:230:0 --loop
 ```
 
 Then add `data-clip="img/chamber"` to that plate's `<figure>` and run
