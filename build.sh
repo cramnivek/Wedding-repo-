@@ -30,6 +30,11 @@ mkdir -p dist
 cp index.html dist/
 cp -R img fonts card dist/
 
+# audio/ only exists once a music bed has been encoded into it. The page asks
+# for it either way and simply gets no music if it is not there, so its absence
+# is not an error.
+[ -d audio ] && cp -R audio dist/
+
 # Netlify and Cloudflare Pages read _headers from the root of the PUBLISHED
 # directory, not the repository, so it has to be copied in like any other file.
 cp _headers dist/

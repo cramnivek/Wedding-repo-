@@ -1560,14 +1560,94 @@
     }
     paint();
 
+    /* The music bed under the page, once there is one.
+
+       It cannot start on its own. No browser will play audible sound without a
+       real gesture, and there is exactly one on this page worth using: the press
+       that breaks the seal. So the bed starts there, under the gate's own impact
+       rather than against it — held back a couple of seconds and faded up over
+       four, so what you hear first is the blow and what you are left with is the
+       music.
+
+       Nothing is fetched until that press either. preload is "none" and the src
+       is not set until the moment it plays, so a guest who never opens the gate,
+       or who has the sound off, pays nothing for it. It streams, so it starts
+       long before it has all arrived.
+
+       Two encodings for the same reason the clips have two: only one is fetched,
+       and naming the codec in each type is what stops a browser downloading the
+       one it cannot decode to find out. */
+    var BED = "audio/theme";
+    var bed = null;
+
+    function makeBed() {
+      if (bed) return bed;
+      bed = document.createElement("audio");
+      bed.loop = true;
+      bed.preload = "none";
+      bed.volume = 0;
+      [['audio/mp4; codecs="mp4a.40.2"', ".m4a"],
+       ['audio/ogg; codecs="opus"', ".ogg"]].forEach(function (pair) {
+        var s = document.createElement("source");
+        s.type = pair[0];
+        s.src = BED + pair[1];
+        bed.appendChild(s);
+      });
+      document.body.appendChild(bed);
+      return bed;
+    }
+
+    /* Ramped in script rather than with a CSS transition, because volume is not
+       a CSS property and stepping it by hand is the only way to fade it. */
+    function fadeBed(to, ms) {
+      var a = makeBed();
+      var from = a.volume, t0 = performance.now();
+      (function step(now) {
+        /* Clamped at both ends. The first rAF timestamp can be a fraction of a
+           millisecond earlier than the performance.now() taken just above it —
+           same clock, but rAF reports the frame's time, and that frame may
+           already have been scheduled. Unclamped that makes the fraction
+           negative, and volume throws on anything outside 0..1. */
+        var k = Math.max(0, Math.min(1, (now - t0) / ms));
+        a.volume = Math.max(0, Math.min(1, from + (to - from) * k));
+        if (k < 1) requestAnimationFrame(step);
+        else if (to === 0) a.pause();
+      })(t0);
+    }
+
+    var BED_VOL = 0.42;
+
+    /* Whether the gate has opened at all. Taken from the same event the eclipse
+       waits on, not from the sound being on — so a guest who opened the gate
+       with the sound off and turns it on afterwards gets the music, and one who
+       has not opened it yet does not get it early from the toggle. */
+    var gateOpen = !document.getElementById("gate");
+    document.addEventListener("eclipse:ignite", function () { gateOpen = true; }, { once: true });
+
+    function startBed(ms) {
+      if (!on) return;
+      var a = makeBed();
+      var p = a.play();
+      /* A refusal is not worth recovering from: it means the browser did not
+         accept that as a gesture, and there is nothing else to offer. */
+      if (p && p.catch) p.catch(function () {});
+      fadeBed(BED_VOL, ms);
+    }
+
     btn.addEventListener("click", function () {
       on = !on;
       try { localStorage.setItem(KEY, on ? "on" : "off"); } catch (e) {}
       paint();
+      if (!gateOpen) return;
+      if (on) startBed(900);
+      else fadeBed(0, 600);
     });
 
     window.gateSound = function () {
       if (!on) return;
+      /* Held back two seconds so the blow lands in silence and the music comes
+         up underneath the drone rather than across it. */
+      setTimeout(function () { startBed(4000); }, 2000);
       var AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       var ctx, t;

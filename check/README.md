@@ -19,6 +19,7 @@ npm run all
 | `ovf2.cjs` | Horizontal scroll at five widths. Found the header scrim overflowing 156px, which `overflow-x: hidden` was hiding but not preventing. |
 | `final.cjs` | Gate completes, scroll unlocks, reduced-motion removes the gate outright, no JS errors. |
 | `snd.cjs` | Sound builds one audio context and four oscillators when on, **zero** when off, and defaults off under reduced motion. |
+| `music.cjs` | The music bed: nothing fetched before the seal is broken, exactly **one** encoding after, none at all with the sound off, and no audio element built in that case either. Runs with or without a file in `audio/` — the bed is optional, so its absence is a case to prove, not a gap. Caught a fade setting `volume` to -0.0009 and throwing. |
 | `contrast2.cjs` | Contrast measured against the **composited canvas pixel**, not the CSS token. Found the countdown labels at 4.3:1, under the AA floor. |
 | `weigh.cjs` | Total delivered bytes and the ten largest files, over a local server so caching does not lie. |
 | `clip.cjs` | Every `data-clip` plate: nothing fetched while the gate is up, nothing fetched until the plate is near, exactly **one** of the two encodings downloaded per clip, the video swapped in only after it decodes a frame, and reduced motion left with the stills and zero bytes. Caught `data-clip` producing `rescue.mp4.mp4`, and a bare `video/mp4` type causing **both** files to download. |

@@ -277,6 +277,39 @@ asked their system for less motion.
 Everything motion-related switches off under `prefers-reduced-motion` — the gate
 removes itself outright rather than playing at a lower speed.
 
+## The music bed
+
+There isn't one yet — the page asks for `audio/theme` and simply gets no music
+if the file is not there, which is the current state and not an error.
+
+To add one, put an audio file through `music.py`:
+
+```sh
+python3 music.py theme.mp3
+```
+
+It writes `audio/theme.m4a` and `audio/theme.ogg`; the page fetches whichever
+one the browser says it can decode and nothing else needs changing. What the
+script does that matters: normalises to **-18 LUFS**, which is quiet, because
+this plays under a page nobody opened for the music and a track at its mastered
+level arrives like a shout; trims silence off both ends, because a second of
+room tone is a second of nothing every time it loops; and fades 0.6s at each end
+so the wrap is a dip rather than a click. Audio is less forgiving than video
+here — a discontinuity in a waveform is an audible pop, not a soft cut. Mono
+unless you pass `--stereo`.
+
+**It cannot start on its own.** No browser plays audible sound without a real
+gesture, and there is exactly one on this page worth using: the press that
+breaks the seal. So the bed starts there, held back two seconds and faded up
+over four, so what you hear first is the blow and what you are left with is the
+music. Nothing is fetched until that press — a guest who never opens the gate,
+or has the sound off, pays nothing for it — and it streams, so it starts long
+before it has all arrived.
+
+The existing Sound toggle controls it, and remembers. Turning the sound on
+*after* the gate has opened starts the music then, because that click is itself
+a valid gesture; turning it on beforehand does not start anything early.
+
 ## The printed card
 
 `card/` is a separate one-page file: a 5 × 7in save-the-date, front and back,
