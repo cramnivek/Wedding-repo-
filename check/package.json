@@ -13,7 +13,8 @@
     "contrast": "node contrast2.cjs",
     "clip": "node clip.cjs",
     "phone": "node phone.cjs",
-    "music": "node music.cjs"
+    "music": "node music.cjs",
+    "fps": "node fps.cjs"
   },
   "devDependencies": {
     "playwright-core": "^1.49.0"

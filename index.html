@@ -2650,6 +2650,51 @@
       g.fillRect(0, 0, S, S);
     }
 
+    /* The fog banks, pre-rendered for the same reason the ember glow is.
+
+       They used to build a radial gradient per bank per frame and then fill the
+       whole canvas with it — seven full-canvas gradient fills every frame, and
+       almost all of that area is outside the bank's own radius and therefore
+       transparent. Profiled on a 4x-throttled phone it was two and a half times
+       the cost of everything else on this canvas put together.
+
+       A radial gradient is smooth, so a small sprite scaled up is
+       indistinguishable from one drawn at size: 160px carries a bank that
+       renders 900 wide. Only two exist, because only the two tints differ — the
+       per-bank alpha is applied at blit time, and the mid-stop's 0.42 is baked
+       in, which makes a scaled drawImage exactly equivalent to what the
+       gradient produced. */
+    var fogSprites = {}, fogBuf = null, fogCtx = null;
+    /* Half linear resolution, so a quarter of the pixels. Seven banks that each
+       cover most of the screen is a fill-rate problem before it is anything
+       else — pre-rendering the gradients alone only bought 9.9 to 11.7 fps,
+       because the cost was never building them, it was compositing them. Drawn
+       into a buffer at half size and blitted up, the same seven cover a quarter
+       of the area. Fog is the one thing on this canvas with no edge to soften,
+       so there is nothing in it for half resolution to lose. */
+    var FOG_SCALE = 0.5;
+
+    function buildFog() {
+      fogBuf = document.createElement("canvas");
+      fogBuf.width = Math.max(1, Math.round(w * FOG_SCALE));
+      fogBuf.height = Math.max(1, Math.round(h * FOG_SCALE));
+      fogCtx = fogBuf.getContext("2d");
+      fogSprites = {};
+      ["92, 74, 52", "104, 62, 32"].forEach(function (tint) {
+        var S = 160;
+        var c = document.createElement("canvas");
+        c.width = c.height = S;
+        var g = c.getContext("2d");
+        var gr = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+        gr.addColorStop(0, "rgba(" + tint + ", 1)");
+        gr.addColorStop(0.5, "rgba(" + tint + ", 0.42)");
+        gr.addColorStop(1, "rgba(24, 16, 10, 0)");
+        g.fillStyle = gr;
+        g.fillRect(0, 0, S, S);
+        fogSprites[tint] = c;
+      });
+    }
+
     /* Heavy vignette, the way these games frame everything. */
     function buildShade() {
       shade = document.createElement("canvas");
@@ -2678,7 +2723,7 @@
         eclipseY = head.offsetTop + head.offsetHeight * 0.36;
         eclipseR = Math.max(110, Math.min(w, h) * 0.23);
       }
-      buildTile(); buildSpark(); buildShade();
+      buildTile(); buildSpark(); buildShade(); buildFog();
     }
 
     function seed() {
@@ -2713,6 +2758,7 @@
           a: far ? 0.035 + Math.random() * 0.03 : 0.03 + Math.random() * 0.03
         });
       }
+      seedMotes();
     }
 
     /* ---------- the eclipse ---------- */
@@ -2821,7 +2867,14 @@
     }
 
     function drawFog(scroll) {
-      ctx.globalCompositeOperation = "lighter";
+      if (!fogCtx) return;
+      /* The banks add to each other in the buffer and the buffer adds to the
+         page. Additive blending is associative, so that is the same picture the
+         seven separate composites produced. */
+      var g = fogCtx, S = FOG_SCALE;
+      g.setTransform(S, 0, 0, S, 0, 0);
+      g.clearRect(0, 0, w, h);
+      g.globalCompositeOperation = "lighter";
       for (var i = 0; i < fog.length; i++) {
         var m = fog[i];
         m.x += m.vx; m.y += m.vy;
@@ -2831,13 +2884,16 @@
            plane never runs out however far you scroll. */
         var span = h + m.r * 2;
         var fy = (((m.y - scroll * m.depth) % span) + span) % span - m.r;
-        var g = ctx.createRadialGradient(m.x, fy, 0, m.x, fy, m.r);
-        g.addColorStop(0, "rgba(" + m.tint + ", " + m.a.toFixed(3) + ")");
-        g.addColorStop(0.5, "rgba(" + m.tint + ", " + (m.a * 0.42).toFixed(3) + ")");
-        g.addColorStop(1, "rgba(24, 16, 10, 0)");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, w, h);
+        var sp = fogSprites[m.tint];
+        if (!sp) continue;
+        g.globalAlpha = m.a;
+        g.drawImage(sp, m.x - m.r, fy - m.r, m.r * 2, m.r * 2);
       }
+      g.globalAlpha = 1;
+      g.globalCompositeOperation = "source-over";
+
+      ctx.globalCompositeOperation = "lighter";
+      ctx.drawImage(fogBuf, 0, 0, w, h);
       ctx.globalCompositeOperation = "source-over";
     }
 
@@ -2898,6 +2954,101 @@
       ctx.restore();
     }
 
+    /* ---------- ash, in actual depth ----------
+
+       The fog and the boughs fake depth by layering: each layer is assigned a
+       parallax rate and slid at it. This does not. Every fleck has a real z,
+       and everything about how it looks falls out of one perspective divide —
+       how large it is, how fast it crosses the screen as you scroll, how much
+       of the ground's darkness has eaten its colour.
+
+       The part that actually reads as three dimensions is the tumble. Each
+       fleck is a flat scrap with its own two rates of turn, and the second one
+       foreshortens it: a scrap edge-on collapses to a line and opens out again.
+       Layered sprites never do that, and it is the thing the eye uses to decide
+       whether something is in a space or on a pane of glass.
+
+       No library and no WebGL. It is four points, a multiply and a divide, per
+       fleck, per frame. Deleting the drawMotes call in scene() removes it. */
+    var motes = [];
+    var FOCAL = 900, Z_NEAR = 140, Z_FAR = 2300;
+
+    function seedMotes() {
+      motes = [];
+      /* Fewer on a phone, where the ground is smaller and the GPU is worse. */
+      var count = w < 600 ? 34 : 76;
+      var bandY = h * 3.2, bandX = w * 3.2;
+      for (var i = 0; i < count; i++) {
+        /* Squared so most sit far off and only a few come near — a uniform
+           spread in z puts too many large scraps in your face at once. */
+        var d = Math.random();
+        motes.push({
+          z: Z_NEAR + (Z_FAR - Z_NEAR) * (d * d),
+          wx: Math.random() * bandX,
+          wy: Math.random() * bandY,
+          s: 3 + Math.random() * 7,
+          a: 0.10 + Math.random() * 0.20,
+          vx: (Math.random() - 0.5) * 0.22,
+          vy: -(0.04 + Math.random() * 0.16),
+          turn: Math.random() * 6.283,
+          tilt: Math.random() * 6.283,
+          vturn: (Math.random() - 0.5) * 0.012,
+          vtilt: (Math.random() - 0.5) * 0.019,
+          /* A minority catch the eclipse rather than only the ambient warmth. */
+          lit: Math.random() < 0.22
+        });
+      }
+    }
+
+    function drawMotes(scroll) {
+      if (!motes.length) return;
+      var cxp = w / 2, cyp = h / 2;
+      var bandY = h * 3.2, bandX = w * 3.2;
+      /* The camera travels with the page. Depth does the rest: the divide below
+         moves a near scrap most of this distance and a far one almost none. */
+      var cam = scroll * 0.62;
+      var kNear = FOCAL / (FOCAL + Z_NEAR), kFar = FOCAL / (FOCAL + Z_FAR);
+
+      for (var i = 0; i < motes.length; i++) {
+        var m = motes[i];
+        m.wx += m.vx; m.wy += m.vy;
+        m.turn += m.vturn; m.tilt += m.vtilt;
+
+        var k = FOCAL / (FOCAL + m.z);
+        /* Wrapped in world space rather than screen space, so a scrap that
+           leaves the top returns at the bottom of its own depth's band and
+           keeps the size it had. */
+        var ry = ((m.wy - cam) % bandY + bandY) % bandY - bandY / 2;
+        var rx = ((m.wx) % bandX + bandX) % bandX - bandX / 2;
+        var sx = cxp + rx * k, sy = cyp + ry * k;
+        var sc = m.s * k;
+        if (sx < -40 || sx > w + 40 || sy < -40 || sy > h + 40) continue;
+
+        /* Near is solid, far is eaten by the air between. */
+        var depth = (k - kFar) / (kNear - kFar);
+        var alpha = m.a * (0.22 + depth * 0.78) * (0.55 + ignite * 0.45);
+        if (alpha < 0.004) continue;
+
+        /* The tilt is the whole trick: cos() takes one axis to zero and back,
+           so the scrap turns edge-on and opens out. */
+        var fore = Math.cos(m.tilt);
+        var ca = Math.cos(m.turn), sa = Math.sin(m.turn);
+        ctx.beginPath();
+        for (var c = 0; c < 4; c++) {
+          var lx = (c === 0 || c === 3 ? -sc : sc);
+          var ly = (c < 2 ? -sc * 0.62 : sc * 0.62) * fore;
+          var px = sx + lx * ca - ly * sa;
+          var py = sy + lx * sa + ly * ca;
+          if (c === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = m.lit ? "#C98A3C" : "#8A7458";
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
     function drawEmbers() {
       ctx.globalCompositeOperation = "lighter";
       for (var i = 0; i < embers.length; i++) {
@@ -2926,6 +3077,9 @@
       drawEclipse(scroll);
       drawFog(scroll);
       drawBranches(scroll);
+      /* Under the vignette, so the corners eat the ash the way they eat
+         everything else and it never reads as confetti on top of the page. */
+      drawMotes(scroll);
       if (shade) ctx.drawImage(shade, 0, 0, w, h);
       if (!still) drawEmbers();
     }

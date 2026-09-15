@@ -7,3 +7,6 @@ incoming/
 
 # build.sh output — assembled from tracked files, never edited by hand.
 dist/
+
+# fps.cjs writes a stripped copy beside index.html and removes it again.
+.fps-probe.html

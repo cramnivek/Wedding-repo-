@@ -41,8 +41,25 @@ the slashed `O` in FLORENCE — so it cannot set a heading, a label or a line of
 body text. If any font fails to load the page falls back to system serif and
 still reads correctly.
 
-The eclipse, its corona, the light falling from it, the fog, the dead branches
-and the whole opening gate are all drawn on `<canvas>` at runtime.
+The eclipse, its corona, the light falling from it, the fog, the dead branches,
+the ash and the whole opening gate are all drawn on `<canvas>` at runtime.
+
+The ash is the one thing on that canvas with real depth. Everything else fakes
+it by layering — each layer assigned a parallax rate and slid at it — but every
+fleck of ash has an actual z, and its size, its speed across the screen as you
+scroll, and how much of the dark has eaten its colour all fall out of one
+perspective divide. What sells it is the tumble: each fleck is a flat scrap with
+its own two rates of turn, and the second foreshortens it, so a scrap goes
+edge-on and opens out again. Layered sprites never do that. No library and no
+WebGL — four points, a multiply and a divide, per fleck, per frame, and
+`check/fps.cjs` measures it at **0.5 fps** of a 14 fps budget.
+
+That budget is the thing to watch, not the ash. `check/fps.cjs` runs the page at
+390px under 4× CPU throttling, roughly a mid-range Android, and it found the
+fog costing two and a half times everything else on the canvas put together:
+seven near-fullscreen additive composites every frame. It now draws into a
+half-resolution buffer and blits up — 9.7 to 14.9 fps — because the cost was
+fill rate, not the gradients. Pre-rendering those alone had only bought 1.8.
 
 Everything else in `img/` is a file:
 
