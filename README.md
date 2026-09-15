@@ -311,19 +311,29 @@ in Manila, so for guests in Bohol the files come from inside the country rather
 than from Singapore or the US. On a site nobody loads twice, that first visit is
 the whole experience.
 
-1. **Workers & Pages → Create → Pages → Connect to Git**, and pick
-   `cramnivek/wedding-repo-`.
-2. Set the build:
-   - framework preset: **None**
-   - build command: `sh build.sh`
-   - output directory: `dist`
-3. Deploy. It will come up on a `*.pages.dev` URL first — open that and check it
-   before pointing the domain at it.
-4. **Custom domains → Set up a domain → `marcandflo.com`.** Cloudflare adds the
-   DNS record itself and issues the certificate. Add `www` too if you want it to
-   work either way.
-5. **Paste the link into a message to yourself** and confirm the preview card
-   shows the eclipse and your names rather than a bare URL.
+There are two flows in the Cloudflare dashboard and they need different things.
+
+**Workers Builds** (build command plus a `npx wrangler deploy` deploy command)
+is what `wrangler.jsonc` here is for. It has no Worker script — the whole config
+is the assets directory, because this is a static site. Set:
+
+- build command: `sh build.sh`
+- deploy command: `npx wrangler deploy`
+- root directory: `/`
+
+**Classic Pages** wants no deploy command at all. If you use that instead,
+delete `wrangler.jsonc` and set build command `sh build.sh`, output directory
+`dist`.
+
+Either way:
+
+1. Deploy once and open the `*.workers.dev` or `*.pages.dev` URL it gives you.
+   Check it there before pointing the domain at it.
+2. **Add `marcandflo.com` as a custom domain** in the project's settings.
+   Cloudflare adds the DNS record itself and issues the certificate, because the
+   domain is registered in the same account. Add `www` if you want both to work.
+3. **Paste the link into a message to yourself** and confirm the preview shows
+   the eclipse and your names rather than a bare URL.
 
 After that every push to `main` redeploys on its own.
 

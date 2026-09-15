@@ -1,0 +1,25 @@
+{
+  // Cloudflare's Workers Builds flow deploys with `npx wrangler deploy`, which
+  // needs to be told what to ship. There is no Worker script here — this is a
+  // static site — so the whole config is the assets directory that build.sh
+  // produces. Without this file the clone and the build both succeed and the
+  // deploy step fails with nothing to deploy.
+  //
+  // To use the classic Pages flow instead: delete this file, create a Pages
+  // project, set the build command to `sh build.sh` and the output directory to
+  // `dist`, and leave the deploy command empty.
+  "name": "wedding-repo",
+  "compatibility_date": "2025-04-01",
+  "assets": {
+    "directory": "./dist",
+
+    // So that /card/ serves card/index.html rather than 404ing.
+    "html_handling": "auto-trailing-slash",
+
+    // A real 404 for anything missing. The friendlier-looking option here serves
+    // index.html with a 200 for every unmatched path, which would also mean a
+    // plate left out of build.sh silently returns HTML in place of the image and
+    // renders as a broken picture rather than as an error anyone would notice.
+    "not_found_handling": "none"
+  }
+}
