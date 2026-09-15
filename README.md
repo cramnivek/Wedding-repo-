@@ -211,8 +211,15 @@ Three things it is doing that are easy to skip and shouldn't be:
 `WATERMARK`. It is usually unnecessary: a crop that matches the plate's shape
 tends to exclude the corner it sits in anyway.
 
+**Check the result by eye, not by pixel count.** `delogo` interpolates from the
+edges of its box, which is invisible on smooth dark ground and leaves an obvious
+blurred rectangle on texture — it did exactly that on `ridge`, whose corner is
+burned rubble. A count of surviving bright pixels reported zero and was no help.
+Where it smears, clone instead: the camera is locked off, so one patch cloned
+from beside the mark, feathered, works on every frame.
+
 `art-source/` holds the full-size versions with their sound, watermark removed,
-for sending to people rather than serving.
+for sending to people rather than serving — one `<plate>-clip.mp4` per clip.
 
 ### How many clips is too many
 
