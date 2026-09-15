@@ -183,33 +183,43 @@ So: animate the tightest plate you have, not the best-composed one. And keep the
 motion small — breath, a blink, firelight, drifting dust. Asking for a camera
 move is asking the model to invent pixels it doesn't have.
 
-### Replacing or adding a clip
+### Adding a clip
 
-Encode to both formats at the same base name, and keep the `avc1.…` string in
-the page matching what the mp4 actually contains (read it from the file's `avcC`
-box if you're unsure). Crop to the shape the plate renders at rather than
-letting the browser throw pixels away — the chamber cell is square and never
-wider than 374 CSS px, so the clip is 720×720:
+`clip.py` does the whole thing. It crops and scales to the size that plate is
+actually rendered at, grades every frame through `place.py`'s ramp using that
+plate's own row from `JOBS`, and writes both encodings:
 
 ```sh
-ffmpeg -i in.mp4 -an -vf crop=720:720:230:0 -c:v libx264 -crf 30 \
-  -pix_fmt yuv420p -movflags +faststart img/chamber.mp4
-ffmpeg -i in.mp4 -an -vf crop=720:720:230:0 -c:v libvpx-vp9 -crf 48 -b:v 0 \
-  img/chamber.webm
+python3 clip.py chamber incoming/chamber.mp4 --crop 720:720:230:0
 ```
 
-Grade it the same way `place.py` grades the still it replaces, or the colour
-visibly shifts at the moment it swaps in. `place.py` exposes `to_palette`, so
-the frames can go through the identical ramp:
+Then add `data-clip="img/chamber"` to that plate's `<figure>` and run
+`check/clip.cjs`. The script prints the mp4's real `avc1.…` string; if it
+differs from the one in the page's `<source type>`, change the page.
 
-```py
-im = place.to_palette(im, KEEP)                      # chamber: 0.58
-im = ImageEnhance.Contrast(im).enhance(CONTRAST)     # 1.10
-im = ImageEnhance.Brightness(im).enhance(BRIGHT)     # 0.94
-```
+Three things it is doing that are easy to skip and shouldn't be:
+
+- **Cropping to the rendered shape**, not shipping the generator's framing. The
+  chamber cell is square and never wider than 374 CSS px, so its clip is
+  720×720 — the 44% the browser would have discarded is never encoded.
+- **Grading with the still's own settings.** An ungraded clip swapping in for a
+  graded picture shifts colour visibly at the moment of the swap.
+- **Never upscaling.** A crop smaller than the target is left alone; enlarging
+  it invents nothing and costs bytes.
+
+`--delogo` paints out the generator's watermark, at the fixed position in
+`WATERMARK`. It is usually unnecessary: a crop that matches the plate's shape
+tends to exclude the corner it sits in anyway.
 
 `art-source/` holds the full-size versions with their sound, watermark removed,
 for sending to people rather than serving.
+
+### How many clips is too many
+
+Each is 300–700 KB and none of it is in the cold load, but they add up for a
+guest who scrolls the whole page. Three or four is the sensible ceiling, and
+the ones worth spending it on are where motion tells you something a still
+can't: firelight moving, wind in a cloak, someone's eyes opening.
 
 Breaking the seal also plays a sound, synthesised in the browser rather than
 loaded — a file cannot follow the gate, and this is built off the same timeline
