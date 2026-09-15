@@ -4,3 +4,6 @@ check/package-lock.json
 
 # place.py reads from here — the ungraded originals, kept out of the site.
 incoming/
+
+# build.sh output — assembled from tracked files, never edited by hand.
+dist/

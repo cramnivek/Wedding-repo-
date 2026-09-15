@@ -1,0 +1,34 @@
+# Cache rules. Netlify and Cloudflare Pages both read this file from the root of
+# the published directory; Vercel does not — see vercel.json for the same rules
+# in its own format.
+#
+# Nothing here is content-hashed: img/chamber.mp4 keeps that name when it is
+# replaced. So the plates and clips are cached for a week rather than the year
+# an immutable asset would get, and stale-while-revalidate lets a repeat visitor
+# render instantly from cache while the newer copy is fetched behind them. A
+# guest who opens the link twice in one week pays for it once.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# The page itself must revalidate, or an edit to a date or a venue sits behind a
+# stale copy on every phone that has already opened it.
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/card/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/img/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/card/*.webp
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+# The display face is the one thing here that genuinely never changes.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/card/diablo.woff2
+  Cache-Control: public, max-age=31536000, immutable

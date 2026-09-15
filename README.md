@@ -228,13 +228,19 @@ configuration that tells the truth about this:
 
 | | |
 | --- | --- |
-| Cold, gate opened, before any scrolling | **778 KB** over 11 requests |
-| After scrolling the whole page | **3.2 MB** over 26 requests |
+| Cold, gate opened, before any scrolling | **1.01 MB** over 18 requests |
+| After scrolling the whole page | **3.4 MB** over 32 requests |
 | …of which video | **1.8 MB** (1.4 MB on Safari, which takes the mp4) |
+| …of which fonts | **214 KB** across 7 faces |
 
-The cold figure is low because every plate below the fold is `loading="lazy"` —
-a phone fetches almost nothing until it is scrolled. The other two are the real
-number for a guest who reads the whole thing, and video is more than half of it.
+Of that cold megabyte, **415 KB is the gate** — the Behelit, eruption and field
+sprites plus the Brand. That is what the opening costs, paid before anything
+else, and it is the largest single thing left if the number ever has to come
+down.
+
+Note the fonts are in the cold figure now that they are served from here. They
+were always being fetched; they used to come from Google and so never appeared
+in a local measurement.
 
 **Anyone with Data Saver on, or on a 2G-class connection, gets no video at
 all** — the stills stay and nothing is fetched, verified in `phone.cjs`. Safari
@@ -279,20 +285,57 @@ Chromium comes from wherever Playwright finds it, or set `CHROME_PATH` to one
 you already have. `check/README.md` says what each script is for and what it
 caught.
 
-## Publishing it
+## Putting it on a domain
 
-The site is static, so anything that serves files will do.
+**The repository is not the website.** `art-source/` alone is 70 MB of ungraded
+originals and full-size clips — nine times the size of the site — and `check/`,
+`place.py` and `clip.py` are tooling. `build.sh` assembles the 8.7 MB that
+guests actually need into `dist/`, and that is what gets published.
 
-- **Netlify / Vercel / Cloudflare Pages** — drag the folder onto their dashboard.
-  Free, custom domain supported, done in a minute.
-- **GitHub Pages** — Settings → Pages → deploy from `main`, root folder.
-  Note that Pages sites are public even when the repository is private.
-
-**One thing to change the day it gets a domain.** `og:image` in the `<head>` is
-a relative path, `img/og.jpg`. Some crawlers resolve that against the page URL
-and some silently ignore it — Facebook's among the latter — so the link preview
-will work in one app and come up blank in another. Make it absolute:
-
-```html
-<meta property="og:image" content="https://your-domain/img/og.jpg">
+```sh
+sh build.sh https://your-domain-here
 ```
+
+Give it the domain and it fills in the two things that cannot be relative: the
+`og:image` URL, without which a pasted link previews in some apps and comes up
+blank in others, and the site address on the back of the printed card. Neither
+is written into the repository, so the source never carries a domain it might
+outlive. Run it with no argument and both stay blank.
+
+### The steps
+
+1. **Buy the domain.** Cloudflare Registrar sells at cost with no renewal jump;
+   Porkbun and Namecheap are the usual alternatives. A `.com` is roughly $10–15
+   a year. Something short — people will type it off a printed card.
+2. **Connect the repository to a host.** Any of Cloudflare Pages, Netlify or
+   Vercel will do, all free at this size, all deploy on push:
+   - build command: `sh build.sh https://your-domain-here`
+   - output directory: `dist`
+3. **Point the domain at it** in the host's dashboard. HTTPS is issued
+   automatically; give it a few minutes.
+4. **Check the link preview** by pasting the URL into a message to yourself.
+
+I'd use **Cloudflare Pages**: it has a point of presence in Manila, so for
+guests in Bohol the files come from within the country rather than from
+Singapore or the US. On a wedding site that nobody is going to load twice a day,
+that first visit is the whole experience.
+
+**GitHub Pages works too**, but deploys the repository as-is with no build step,
+which would publish all 70 MB of `art-source/` — and Pages sites are public even
+when the repository is private.
+
+### What the host needs to do, and what it does for free
+
+`_headers` (Netlify, Cloudflare Pages) and `vercel.json` (Vercel) carry the
+cache rules, and `build.sh` copies `_headers` into `dist/` because both hosts
+read it from the published directory rather than the repository root.
+
+Nothing here is content-hashed — `img/chamber.mp4` keeps that name when it is
+replaced — so the plates and clips get a week rather than the year an immutable
+asset would, with `stale-while-revalidate` so a returning guest renders straight
+from cache. `index.html` must revalidate every time, or an edit to a venue or a
+time sits behind a stale copy on every phone that has already opened it.
+
+Compression you get for nothing: `index.html` is 119 KB and **gzips to 34 KB**,
+and every one of these hosts serves Brotli, which does better still. The images
+and video are already compressed and are not touched.
