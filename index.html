@@ -229,25 +229,19 @@
   #art { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
   .stack { position: relative; z-index: 1; }
 
-  /* Two texture layers over the whole page, both fixed and inert so neither
-     repaints with scrolling content.
+  /* There was a cross-hatch layer here — two repeating rules at opposing
+     angles, the pen texture Miura drew in. It is gone, and the reason is worth
+     keeping: it sat at z-index 2 and the text sits at 1, so the lattice was
+     painted over every word on the page rather than under it. Ruled lines
+     crossing letterforms at 62 and -31 degrees fight the shapes of the letters
+     directly, which is exactly the thing a reader notices and cannot name.
 
-     The hatch is the Berserk one: Miura drew in cross-hatched pen, and two
-     repeating rules at opposing angles put that engraving under everything.
-     Kept faint and off-axis from the type so it reads as tooth in the paper
-     rather than a pattern. */
-  #hatch {
-    position: fixed;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    opacity: 0.055;
-    background-image:
-      repeating-linear-gradient(62deg,  rgba(221, 213, 194, 0.9) 0 1px, transparent 1px 7px),
-      repeating-linear-gradient(-31deg, rgba(221, 213, 194, 0.55) 0 1px, transparent 1px 11px);
-  }
+     Moving it behind the type would have kept the texture and fixed the
+     reading. Taking it out entirely was the call: the page has grain, fog,
+     branches and an eclipse already doing that work.
 
-  /* Grain sits over the hatch and breaks its regularity. */
+     Grain stays. It is noise rather than a pattern, so it reads as tooth in the
+     paper instead of a mesh over the words. */
   #grain {
     position: fixed;
     inset: 0;
@@ -1014,7 +1008,6 @@
 <button id="sound-toggle" type="button" aria-pressed="false">Sound on</button>
 
 <canvas id="art" aria-hidden="true"></canvas>
-<div id="hatch" aria-hidden="true"></div>
 <div id="grain" aria-hidden="true"></div>
 
 </div>

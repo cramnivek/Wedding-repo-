@@ -279,17 +279,20 @@ removes itself outright rather than playing at a lower speed.
 
 ## The music bed
 
-There isn't one yet — the page asks for `audio/theme` and simply gets no music
-if the file is not there, which is the current state and not an error.
+`audio/theme.m4a` and `audio/theme.ogg` — *Shaman Village* from the Shadow of
+the Erdtree score, the same music the page's palette was built to sit with.
+1.49 MB and 1.20 MB; only one is fetched, and only once the seal is broken.
+`art-source/theme-source.mp3` is what it was made from.
 
-To add one, put an audio file through `music.py`:
+To replace it, put another audio file through `music.py`:
 
 ```sh
 python3 music.py theme.mp3
 ```
 
-It writes `audio/theme.m4a` and `audio/theme.ogg`; the page fetches whichever
-one the browser says it can decode and nothing else needs changing. What the
+It writes both encodings; the page fetches whichever one the browser says it can
+decode and nothing else needs changing. If `audio/` is empty the page asks, gets
+a 404 and carries on silent — the bed is optional, not required. What the
 script does that matters: normalises to **-18 LUFS**, which is quiet, because
 this plays under a page nobody opened for the music and a track at its mastered
 level arrives like a shout; trims silence off both ends, because a second of
