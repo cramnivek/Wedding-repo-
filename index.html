@@ -1571,6 +1571,16 @@
      would snap back on every wrap. Clicking one plays it again. */
   (function () {
     if (reduced || !("IntersectionObserver" in window)) return;
+
+    /* Four clips are around 1.4MB between them on a phone. That is fine on a
+       hotel wifi and rude on a metered connection in Bohol, which is where a
+       good share of these guests will open it. Anyone who has turned Data Saver
+       on, or is on a 2G-class connection, has already said so — they get the
+       stills, and the page still says everything it needs to. Safari exposes
+       none of this, so it is a courtesy where it works rather than a guarantee. */
+    var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ""))) return;
+
     [].forEach.call(document.querySelectorAll("[data-clip]"), setup);
 
     function setup(fig) {

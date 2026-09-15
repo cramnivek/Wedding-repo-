@@ -22,6 +22,7 @@ npm run all
 | `contrast2.cjs` | Contrast measured against the **composited canvas pixel**, not the CSS token. Found the countdown labels at 4.3:1, under the AA floor. |
 | `weigh.cjs` | Total delivered bytes and the ten largest files, over a local server so caching does not lie. |
 | `clip.cjs` | Every `data-clip` plate: nothing fetched while the gate is up, nothing fetched until the plate is near, exactly **one** of the two encodings downloaded per clip, the video swapped in only after it decodes a frame, and reduced motion left with the stills and zero bytes. Caught `data-clip` producing `rescue.mp4.mp4`, and a bare `video/mp4` type causing **both** files to download. |
+| `phone.cjs` | What a phone actually pays: cold bytes before scrolling, total after, and how much of it is video — at 390px with `isMobile`, which is the only setup that tells the truth. Also proves Data Saver gets **no** video and keeps all four stills. |
 | `maxsize.cjs` | Largest CSS width each image ever renders at, across seven viewports — what the files should actually be sized to. |
 | `seam.cjs` `beh2.cjs` `live.cjs` | Frame captures of the gate and the page sections, on a frozen clock so a screenshot's own latency cannot advance the animation. |
 

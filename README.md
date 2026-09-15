@@ -221,16 +221,29 @@ from beside the mark, feathered, works on every frame.
 `art-source/` holds the full-size versions with their sound, watermark removed,
 for sending to people rather than serving — one `<plate>-clip.mp4` per clip.
 
-### How many clips is too many
+### What it costs on a phone
 
-Four is where it stands, and that is the ceiling. None of it is in the cold
-load, but a guest who scrolls the whole prenup now pulls **1.4 MB on Safari and
-1.8 MB on a browser that takes the WebM** — more than the rest of the page put
-together. A fifth would make the prenup the heaviest thing here by a distance.
+Measured by `check/phone.cjs` at 390px with `isMobile` on, which is the only
+configuration that tells the truth about this:
 
-The ones worth spending it on are where motion says something a still can't:
-firelight moving across a face, wind in a cloak, someone's eyes opening. If
-another clip is added, take one of these off.
+| | |
+| --- | --- |
+| Cold, gate opened, before any scrolling | **778 KB** over 11 requests |
+| After scrolling the whole page | **3.2 MB** over 26 requests |
+| …of which video | **1.8 MB** (1.4 MB on Safari, which takes the mp4) |
+
+The cold figure is low because every plate below the fold is `loading="lazy"` —
+a phone fetches almost nothing until it is scrolled. The other two are the real
+number for a guest who reads the whole thing, and video is more than half of it.
+
+**Anyone with Data Saver on, or on a 2G-class connection, gets no video at
+all** — the stills stay and nothing is fetched, verified in `phone.cjs`. Safari
+exposes neither signal, so that is a courtesy where it works rather than a
+guarantee.
+
+Four clips is the ceiling. The ones worth spending it on are where motion says
+something a still can't: firelight moving across a face, wind in a cloak,
+someone's eyes opening. If another is added, take one of these off.
 
 Breaking the seal also plays a sound, synthesised in the browser rather than
 loaded — a file cannot follow the gate, and this is built off the same timeline

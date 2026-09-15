@@ -3,7 +3,7 @@
   "private": true,
   "description": "Regression checks for the wedding page. Run from this folder.",
   "scripts": {
-    "all": "node final.cjs && node ovf2.cjs && node tz.cjs && node snd.cjs && node vp.cjs && node clip.cjs && node weigh.cjs",
+    "all": "node final.cjs && node ovf2.cjs && node tz.cjs && node snd.cjs && node vp.cjs && node clip.cjs && node phone.cjs && node weigh.cjs",
     "gate": "node final.cjs",
     "overflow": "node ovf2.cjs",
     "timezone": "node tz.cjs",
@@ -11,7 +11,8 @@
     "viewport": "node vp.cjs",
     "weight": "node weigh.cjs",
     "contrast": "node contrast2.cjs",
-    "clip": "node clip.cjs"
+    "clip": "node clip.cjs",
+    "phone": "node phone.cjs"
   },
   "devDependencies": {
     "playwright-core": "^1.49.0"
