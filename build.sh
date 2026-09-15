@@ -6,21 +6,21 @@
 # check/, place.py and clip.py are tooling. Pointing a host at the repository
 # root publishes all of it. Point it at dist/ instead.
 #
-#   sh build.sh                            then publish dist/
-#   sh build.sh https://your-domain        same, and fills in the two places
-#                                          that need the real address
+#   sh build.sh                            publish dist/ at the real address
+#   sh build.sh https://somewhere-else     same, pointed somewhere else
+#   sh build.sh ""                         leave the address blank
 #
-# Those two places cannot be relative. og:image has to be an absolute URL or the
-# link preview resolves in some apps and comes up blank in others, Facebook's
-# among them; and the printed card carries the site address as text. Both are
-# left blank in the repository and written here, so the source never has to
-# carry a domain it might outlive.
+# Two things on the page cannot be relative: og:image has to be an absolute URL
+# or the link preview resolves in some apps and comes up blank in others,
+# Facebook's among them, and the printed card carries the address as text. Both
+# are blank in the source and written here, in one place, so a change of address
+# is one line rather than a hunt through the markup.
 #
 # Everything here is a copy, so the repository is never modified and this can be
 # re-run at any time.
 set -e
 
-SITE="${1:-}"
+SITE="${1-https://marcandflo.com}"
 SITE="${SITE%/}"          # a trailing slash would double up in every URL below
 
 cd "$(dirname "$0")"

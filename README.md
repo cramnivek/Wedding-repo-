@@ -293,36 +293,43 @@ originals and full-size clips — nine times the size of the site — and `check
 guests actually need into `dist/`, and that is what gets published.
 
 ```sh
-sh build.sh https://your-domain-here
+sh build.sh
 ```
 
-Give it the domain and it fills in the two things that cannot be relative: the
+The address is **marcandflo.com**, registered through Cloudflare. `build.sh`
+defaults to it and writes it into the two places that cannot be relative: the
 `og:image` URL, without which a pasted link previews in some apps and comes up
-blank in others, and the site address on the back of the printed card. Neither
-is written into the repository, so the source never carries a domain it might
-outlive. Run it with no argument and both stay blank.
+blank in others, and the site address on the back of the printed card. Pass a
+different URL to point it elsewhere, or `""` to leave both blank.
 
 ### The steps
 
-1. **Buy the domain.** Cloudflare Registrar sells at cost with no renewal jump;
-   Porkbun and Namecheap are the usual alternatives. A `.com` is roughly $10–15
-   a year. Something short — people will type it off a printed card.
-2. **Connect the repository to a host.** Any of Cloudflare Pages, Netlify or
-   Vercel will do, all free at this size, all deploy on push:
-   - build command: `sh build.sh https://your-domain-here`
+The domain is already at Cloudflare, so **Cloudflare Pages** is the path of
+least resistance — the DNS is in the same account and a custom domain is a
+couple of clicks with nothing to edit by hand. It also has a point of presence
+in Manila, so for guests in Bohol the files come from inside the country rather
+than from Singapore or the US. On a site nobody loads twice, that first visit is
+the whole experience.
+
+1. **Workers & Pages → Create → Pages → Connect to Git**, and pick
+   `cramnivek/wedding-repo-`.
+2. Set the build:
+   - framework preset: **None**
+   - build command: `sh build.sh`
    - output directory: `dist`
-3. **Point the domain at it** in the host's dashboard. HTTPS is issued
-   automatically; give it a few minutes.
-4. **Check the link preview** by pasting the URL into a message to yourself.
+3. Deploy. It will come up on a `*.pages.dev` URL first — open that and check it
+   before pointing the domain at it.
+4. **Custom domains → Set up a domain → `marcandflo.com`.** Cloudflare adds the
+   DNS record itself and issues the certificate. Add `www` too if you want it to
+   work either way.
+5. **Paste the link into a message to yourself** and confirm the preview card
+   shows the eclipse and your names rather than a bare URL.
 
-I'd use **Cloudflare Pages**: it has a point of presence in Manila, so for
-guests in Bohol the files come from within the country rather than from
-Singapore or the US. On a wedding site that nobody is going to load twice a day,
-that first visit is the whole experience.
+After that every push to `main` redeploys on its own.
 
-**GitHub Pages works too**, but deploys the repository as-is with no build step,
-which would publish all 70 MB of `art-source/` — and Pages sites are public even
-when the repository is private.
+**GitHub Pages would work too**, but it deploys the repository as-is with no
+build step, which would publish all 70 MB of `art-source/` — and Pages sites are
+public even when the repository is private.
 
 ### What the host needs to do, and what it does for free
 
