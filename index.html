@@ -2695,6 +2695,84 @@
       });
     }
 
+    /* ---------- distant fires ----------
+
+       All fifteen plates sit in the first half of the page, and measuring the
+       painted result section by section showed what that costs: the grounds are
+       identical throughout, rgb(19,16,14) give or take one level, but the
+       brightest five per cent of a section with a plate in it reaches 60 to 130,
+       and of one without it reaches 22. Four sections — the order of the day,
+       travel, the RSVP and the questions — have no tonal range at all. They read
+       as legible and dead.
+
+       So they get a light instead of a picture: a wide, low ember glow anchored
+       near the foot of each, as though something were burning off the bottom of
+       the frame. Low and soft, under the text rather than behind it, and
+       alternating sides so it does not become a rhythm.
+
+       Anchored in document space and measured from the sections themselves, so
+       adding or reordering a section moves its fire with it. */
+    var fires = [], fireSprite = null, fireDocH = -1;
+
+    function buildFires() {
+      /* Remember the height these positions were measured against. size() runs
+         before the lazy plates have loaded, so the document is still short then
+         and everything below the fold is anchored too high — measured, the last
+         four screenfuls kept the 22 to 29 they had before any of this. drawFires
+         re-measures whenever the height moves. */
+      fireDocH = document.body.scrollHeight;
+      var S = 180;
+      fireSprite = document.createElement("canvas");
+      fireSprite.width = fireSprite.height = S;
+      var g = fireSprite.getContext("2d");
+      var gr = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+      gr.addColorStop(0, "rgba(190, 116, 46, 1)");
+      gr.addColorStop(0.42, "rgba(150, 82, 30, 0.40)");
+      gr.addColorStop(1, "rgba(60, 26, 8, 0)");
+      g.fillStyle = gr;
+      g.fillRect(0, 0, S, S);
+
+      fires = [];
+      var side = 0;
+      [].forEach.call(document.querySelectorAll("section[id]"), function (sec) {
+        /* A section that already has a plate has its own light. */
+        if (sec.querySelector("picture, video")) return;
+        /* One fire per screenful rather than one per section. A single glow in
+           a section two thousand pixels tall lights the end of it and leaves the
+           rest as dead as it was — the questions and the RSVP are exactly that
+           shape, and one each moved them 23 to 25 where the short sections moved
+           22 to 41. Spread evenly and alternating sides, so scrolling a long
+           section passes through light more than once. */
+        var top = sec.offsetTop, hh = sec.offsetHeight;
+        var n = Math.max(1, Math.round(hh / (h * 0.9)));
+        for (var k = 0; k < n; k++) {
+          fires.push({
+            y: top + hh * ((k + 0.72) / n),
+            x: (side++ % 2 ? 0.76 : 0.24) * w,
+            r: Math.max(w, h) * 0.62
+          });
+        }
+      });
+    }
+
+    function drawFires(scroll) {
+      if (!fireSprite) return;
+      if (document.body.scrollHeight !== fireDocH) buildFires();
+      ctx.globalCompositeOperation = "lighter";
+      for (var i = 0; i < fires.length; i++) {
+        var f = fires[i];
+        var y = f.y - scroll;
+        if (y < -f.r || y > h + f.r) continue;
+        /* Breathing, out of phase with its neighbours, so it reads as a fire
+           rather than as a gradient someone left on. */
+        var pulse = 0.86 + 0.14 * Math.sin(t * 0.006 + i * 2.1);
+        ctx.globalAlpha = 0.5 * pulse * (0.4 + ignite * 0.6);
+        ctx.drawImage(fireSprite, f.x - f.r, y - f.r, f.r * 2, f.r * 2);
+      }
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
+    }
+
     /* Heavy vignette, the way these games frame everything. */
     function buildShade() {
       shade = document.createElement("canvas");
@@ -2723,7 +2801,7 @@
         eclipseY = head.offsetTop + head.offsetHeight * 0.36;
         eclipseR = Math.max(110, Math.min(w, h) * 0.23);
       }
-      buildTile(); buildSpark(); buildShade(); buildFog();
+      buildTile(); buildSpark(); buildShade(); buildFog(); buildFires();
     }
 
     function seed() {
@@ -3076,6 +3154,7 @@
       drawRays(scroll);
       drawEclipse(scroll);
       drawFog(scroll);
+      drawFires(scroll);
       drawBranches(scroll);
       /* Under the vignette, so the corners eat the ash the way they eat
          everything else and it never reads as confetti on top of the page. */

@@ -54,6 +54,24 @@ edge-on and opens out again. Layered sprites never do that. No library and no
 WebGL — four points, a multiply and a divide, per fleck, per frame, and
 `check/fps.cjs` measures it at **0.5 fps** of a 14 fps budget.
 
+The **distant fires** are there for a measured reason. All fifteen plates sit in
+the first half of the page, and sampling the painted result section by section
+showed what that cost: the grounds are identical throughout, rgb(19,16,14) give
+or take a level, but the brightest 5% of a section with a plate reaches 60–130
+and of one without reaches 22. The order of the day, travel, the RSVP and the
+questions had no tonal range at all — legible and dead.
+
+So they get a light instead of a picture: a wide, low ember glow anchored near
+the foot of each, as though something were burning off the bottom of the frame,
+one per screenful so a long section passes through light more than once. The
+flattest screenful went from **22.7 to 34.0** with the image-rich sections
+untouched, and body-text contrast held at 8.8–9.2:1 against the lifted ground,
+well clear of the 4.5 floor. They cost nothing measurable in frame time.
+
+They are anchored in document space and re-measured whenever the height changes,
+which is not optional: `size()` runs before the lazy plates have loaded, and
+anchoring once left the last four screenfuls exactly as dead as they started.
+
 That budget is the thing to watch, not the ash. `check/fps.cjs` runs the page at
 390px under 4× CPU throttling, roughly a mid-range Android, and it found the
 fog costing two and a half times everything else on the canvas put together:
