@@ -119,9 +119,18 @@ so the dashed underline goes away.
 Outstanding:
 
 - **The ceremony venue** — the invitation only names the reception
-- **Five of the six times** in the order of the day; only 5:00 is real
 - **Reply-by date**
 - Parking at the venue, and whether a room block is held anywhere
+
+The order of the day is filled in. It is the couple's own programme and it is a
+*sequence*, not a timetable — so the rows carry their position, 01 to 08, and the
+ceremony's five o'clock is the only clock time on the page. If hours get pinned
+to the reception later they can go in the same column; the styling for a real
+time is still there and still lit, which is what makes it read as the one fixed
+point.
+
+Not shown on the page but worth adding if it becomes known: whether **dinner is
+seated or buffet**. Guests plan around that one.
 
 Travel is filled in from public sources: the airport transfer, the Cebu ferry,
 named hotels in Tagbilaran and what October weather does. Fares and schedules

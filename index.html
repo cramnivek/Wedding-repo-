@@ -513,7 +513,8 @@
     padding-block: 1.4rem;
     align-items: start;
   }
-  .item time {
+  .item time,
+  .item .step {
     font-variant-numeric: tabular-nums;
     font-size: 0.75rem;
     letter-spacing: 0.14em;
@@ -522,6 +523,11 @@
     text-align: right;
     padding-top: 0.4rem;
   }
+  /* The reception runs as an order, not a timetable — the couple gave a
+     sequence and no clock, so the rows carry their position instead of a time
+     nobody has committed to. Held back to muted so the one real hour on the
+     page, the ceremony's, stays the only thing in this column that is lit. */
+  .item .step { color: var(--muted); font-size: 0.7rem; }
   /* Drawn per row but bleeding into both paddings, so consecutive rows join
      into one unbroken line; the ends stop at the first and last marker. */
   .tick {
@@ -1273,51 +1279,67 @@
       </div>
       <div class="order">
         <div class="item">
-          <time datetime="16:30"><span class="slot">4:30</span></time>
-          <div class="tick"><span></span></div>
-          <div>
-            <h3>Guests arrive</h3>
-            <p>Come half an hour before the ceremony so nobody is seated in a hurry.</p>
-          </div>
-        </div>
-        <div class="item">
           <time datetime="17:00">5:00</time>
           <div class="tick"><span></span></div>
           <div>
             <h3>Ceremony</h3>
-            <p>Five o'clock in the evening, as printed on the invitation.</p>
+            <p>Five o&rsquo;clock in the evening, as printed on the invitation.</p>
           </div>
         </div>
         <div class="item">
-          <time datetime="18:00"><span class="slot">6:00</span></time>
+          <span class="step">01</span>
           <div class="tick"><span></span></div>
           <div>
-            <h3>Drinks and photographs</h3>
-            <p>At Smoque Bistro.</p>
+            <h3>Welcome Remarks</h3>
           </div>
         </div>
         <div class="item">
-          <time datetime="19:00"><span class="slot">7:00</span></time>
+          <span class="step">02</span>
           <div class="tick"><span></span></div>
           <div>
-            <h3>Dinner and speeches</h3>
-            <p><span class="slot">Seated or buffet — say which, and guests will know what to expect.</span></p>
+            <h3>Dinner</h3>
           </div>
         </div>
         <div class="item">
-          <time datetime="21:00"><span class="slot">9:00</span></time>
+          <span class="step">03</span>
           <div class="tick"><span></span></div>
           <div>
-            <h3>First dance</h3>
-            <p><span class="slot">And whatever follows it.</span></p>
+            <h3>Messages from Family and Friends</h3>
           </div>
         </div>
         <div class="item">
-          <time datetime="23:00"><span class="slot">11:00</span></time>
+          <span class="step">04</span>
           <div class="tick"><span></span></div>
           <div>
-            <h3>Last song</h3>
-            <p><span class="slot">How guests are getting home.</span></p>
+            <h3>Couple&rsquo;s Message</h3>
+          </div>
+        </div>
+        <div class="item">
+          <span class="step">05</span>
+          <div class="tick"><span></span></div>
+          <div>
+            <h3>Cake Cutting</h3>
+          </div>
+        </div>
+        <div class="item">
+          <span class="step">06</span>
+          <div class="tick"><span></span></div>
+          <div>
+            <h3>Toast to the Newlyweds</h3>
+          </div>
+        </div>
+        <div class="item">
+          <span class="step">07</span>
+          <div class="tick"><span></span></div>
+          <div>
+            <h3>Photos and Conversations</h3>
+          </div>
+        </div>
+        <div class="item">
+          <span class="step">08</span>
+          <div class="tick"><span></span></div>
+          <div>
+            <h3>Closing Remarks</h3>
           </div>
         </div>
       </div>
