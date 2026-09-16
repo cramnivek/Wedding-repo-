@@ -262,10 +262,18 @@ configuration that tells the truth about this:
 
 | | |
 | --- | --- |
-| Cold, gate opened, before any scrolling | **1.01 MB** over 18 requests |
-| After scrolling the whole page | **3.4 MB** over 32 requests |
+| Before the seal is broken | **1.03 MB** over 20 requests |
+| Gate opened, before any scrolling | **2.21 MB** over 21 requests |
+| After scrolling the whole page | **4.51 MB** over 35 requests |
 | …of which video | **1.8 MB** (1.4 MB on Safari, which takes the mp4) |
+| …of which music | **1.18 MB**, all of it at the press |
 | …of which fonts | **214 KB** across 7 faces |
+
+Measured against the live site, not a local build. The jump at the press is the
+music: on a fast connection the browser pulls the whole track at once, and on
+real mobile data it streams, so 1.18 MB is the ceiling rather than the typical
+case. It is still the single largest thing here and the first place to look if
+this number has to come down — 64k stereo would roughly halve it.
 
 Of that cold megabyte, **415 KB is the gate** — the Behelit, eruption and field
 sprites plus the Brand. That is what the opening costs, paid before anything
