@@ -208,7 +208,7 @@ clip never competes with the gate and a guest who doesn't scroll that far never
 pays for it.
 
 **They loop.** `clip.py --loop` dissolves each clip's tail over its own head
-before encoding, which is what makes that possible: measured across the four,
+before encoding, which is what makes that possible: measured across the first four,
 the last frame and the first of the raw clips differ by a mean of 9 to 26 levels
 and a worst-1% of 78 to 194, all of which snap visibly on every wrap. After the
 dissolve every wrap is *within the frame-to-frame motion the clip has anyway* —
@@ -244,6 +244,12 @@ So: animate the tightest plate you have, not the best-composed one. And keep the
 motion small — breath, a blink, firelight, drifting dust. Asking for a camera
 move is asking the model to invent pixels it doesn't have.
 
+A later batch confirmed the threshold from the other side. Two generations that
+push from a wide shot into a close two-shot measure 50–70px of face at the start
+and 260–275px at the end — the same clip failing and succeeding depending only
+on where you cut it. The banquet one is on the page as `hall`, cut from the wide
+end, where the faces are small enough that nobody is reading them.
+
 ### Adding a clip
 
 `clip.py` does the whole thing. It crops and scales to the size that plate is
@@ -271,6 +277,35 @@ Three things it is doing that are easy to skip and shouldn't be:
 `--delogo` paints out the generator's watermark, at the fixed position in
 `WATERMARK`. It is usually unnecessary: a crop that matches the plate's shape
 tends to exclude the corner it sits in anyway.
+
+**`--trim` and `--unpush`, for a generation that isn't one shot.** A ten-second
+clip is rarely ten seconds of the same thing. The banquet generation behind
+`hall` pushes in continuously for its first seven seconds and only then settles;
+measured frame by frame, it travels ×1.05 in the first second, ×1.20 by three
+and ×2.35 by five, then stops dead.
+
+That breaks the loop. The crossfade assumes the camera matches at both ends —
+every earlier plate was locked off, so it did — and dissolving a wide frame over
+a close one reads as a double exposure rather than a join. `--unpush` measures
+each frame's zoom against the last by brute-force centre-crop matching, then
+crops every frame by exactly that much so all of them land on the last frame's
+framing. It can only ever tighten: a push is cancelled by throwing resolution
+away at the wide end, never by zooming out past the edge of the frame.
+
+So feed it a short enough span that the push hasn't travelled far. `--trim 0:3`
+holds it to ×1.196, which costs the opening frame 16% of its width. Past about
+×1.25 the first frames are being enlarged enough to see. Afterwards the finished
+clip measures ×1.000 end to end and its wrap is *quieter* than its own motion —
+3.9 against 10.0 — where the raw clip's first and last frames differed by 34.
+
+**`--still` writes the plate's `.jpg`/`.webp`/`.avif` from the clip's own first
+frame.** Grading a separate render with the same numbers gets the colour close;
+taking the still out of the clip makes them the same picture, so the swap is
+invisible by construction. It is also the only way to put a clip somewhere no
+matching still exists — `hall` used to be a pen-and-ink hall, which no amount of
+grading would have reconciled with photographed footage. The script prints the
+new dimensions, which have to go on that plate's `<img>` or the page reserves
+the wrong box and the section jumps when the picture lands.
 
 **Check the result by eye, not by pixel count.** `delogo` interpolates from the
 edges of its box, which is invisible on smooth dark ground and leaves an obvious
@@ -316,9 +351,15 @@ all** — the stills stay and nothing is fetched, verified in `phone.cjs`. Safar
 exposes neither signal, so that is a courtesy where it works rather than a
 guarantee.
 
-Four clips is the ceiling. The ones worth spending it on are where motion says
-something a still can't: firelight moving across a face, wind in a cloak,
-someone's eyes opening. If another is added, take one of these off.
+The table above predates `hall`, the fifth clip, and was measured live. Against
+the file sizes, that one adds **436 KB** of deferred video (274 KB on Safari,
+which takes the mp4) and *subtracts* 57 KB from the cold load, because the still
+it replaced was a 1180px drawing and the new one is a 1070px frame of the clip:
+115 KB of AVIF down to 58 KB. A local run puts the full scroll at 4.98 MB.
+
+Five clips is the ceiling, and it is a soft one — the next addition should take
+one off. The ones worth spending it on are where motion says something a still
+can't: firelight moving across a face, wind in a cloak, someone's eyes opening.
 
 Breaking the seal also plays a sound, synthesised in the browser rather than
 loaded — a file cannot follow the gate, and this is built off the same timeline
@@ -392,10 +433,16 @@ caught.
 
 ## Putting it on a domain
 
-**The repository is not the website.** `art-source/` alone is 70 MB of ungraded
-originals and full-size clips — nine times the size of the site — and `check/`,
-`place.py` and `clip.py` are tooling. `build.sh` assembles the 8.7 MB that
-guests actually need into `dist/`, and that is what gets published.
+**The repository is not the website.** `art-source/` alone is 78 MB of ungraded
+originals and full-size clips — five times the size of the site — and `check/`,
+`place.py` and `clip.py` are tooling. `build.sh` assembles the 14 MB that guests
+actually need into `dist/`, and that is what gets published: 8.7 MB of plates,
+4.1 MB of music in three encodings, 600 KB of card and 488 KB of fonts.
+
+No guest pays all of it. The three music encodings are one download, the two
+video encodings per clip are one each, and `rescue.mp4`/`.webm` are published
+but unreferenced — that plate's `data-clip` is off, so nothing fetches them.
+What a phone actually pays is the table further up.
 
 ```sh
 sh build.sh

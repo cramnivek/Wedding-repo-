@@ -10,3 +10,6 @@ dist/
 
 # fps.cjs writes a stripped copy beside index.html and removes it again.
 .fps-probe.html
+
+# clip.py imports place.py, so running it leaves bytecode behind.
+__pycache__/

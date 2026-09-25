@@ -72,6 +72,11 @@ def trim_border(im, frac):
 JOBS = [
     # name         border  crop_top  palette_keep  contrast  bright  longest
     ("battlefield", 0.030, 0.28,     0.34,         1.24,     0.86,  1800),
+    # hall's row still grades the ink drawing in art-source/, but the plate the
+    # page ships is no longer that drawing: clip.py --still now writes hall.jpg
+    # out of the banquet clip's own first frame, using these same numbers, so
+    # the still and the video are the same picture. Running place.py would put
+    # the drawing back and the clip would swap in over a different scene.
     ("hall",        0.010, 0.0,      0.30,         1.26,     0.80,  1180),
     ("garments",    0.008, 0.0,      0.40,         1.22,     0.68,   800),
     ("hands",       0.0,   0.0,      0.45,         1.16,     0.96,   640),

@@ -104,10 +104,13 @@ const PAGE = 'file://' + __dirname + '/../index.html';
     }
   });
   await p2.waitForTimeout(3000);
-  const stillsLeft = await p2.evaluate(() =>
-    document.querySelectorAll('[data-clip] picture').length);
+  // Counted from the page rather than written down here, so adding a clip does
+  // not quietly turn this line into a lie about how many were checked.
+  const [stillsLeft, clipCount] = await p2.evaluate(() => [
+    document.querySelectorAll('[data-clip] picture').length,
+    document.querySelectorAll('[data-clip]').length]);
   console.log('data saver — video files fetched:', saverVideo,
-              '| stills left in place:', stillsLeft, 'of 4');
+              '| stills left in place:', stillsLeft, 'of', clipCount);
 
   await b.close();
 })();

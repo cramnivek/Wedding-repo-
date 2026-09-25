@@ -857,7 +857,14 @@
   /* Commissioned plates. A hairline frame where the drawing sits on its own
      ground, none where it already bleeds to black. */
   .plate { margin: 0; }
-  .plate img {
+  /* The video is here as well as the image because a clip that swaps into a
+     plain .plate has nothing else holding it: the other four clips on the page
+     sit on .plate-ink or inside .prenup, which style their own video, so until
+     the reception got one no rule had ever had to. An unstyled <video> takes
+     its intrinsic size — 1070px wide inside a 358px figure on a phone, which
+     the band then clips down to a tall slice of the left-hand side. */
+  .plate img,
+  .plate video {
     display: block;
     width: 100%;
     height: auto;
@@ -1213,12 +1220,12 @@
         <p class="eyebrow">The reception will be at</p>
         <h2>Smoque Bistro</h2>
       </div>
-      <figure class="plate">
+      <figure class="plate" data-clip="img/hall">
         <picture>
           <source srcset="img/hall.avif" type="image/avif">
           <source srcset="img/hall.webp" type="image/webp">
-          <img src="img/hall.jpg" width="1180" height="791" loading="lazy"
-             alt="A long candlelit hall in pen and ink, banners overhead, the table laid and mist at the far end.">
+          <img src="img/hall.jpg" width="1070" height="602" loading="lazy"
+             alt="The two of them seated together at the head of a long table laid for a feast, under hanging lanterns and old trees, candles burning down the middle of it.">
         </picture>
       </figure>
       <div class="venue-card">
