@@ -136,8 +136,11 @@ so the dashed underline goes away.
 Outstanding:
 
 - **The ceremony venue** — the invitation only names the reception
-- **Reply-by date**
-- Parking at the venue, and whether a room block is held anywhere
+- Whether a room block is held anywhere
+
+Filled in since: the reply-by date is October 04, 2026, two days before the
+wedding, which is what a headcount collected this close to the day looks like.
+Parking is on the premises.
 
 The order of the day is filled in. It is the couple's own programme and it is a
 *sequence*, not a timetable — so the rows carry their position, 01 to 08, and the
