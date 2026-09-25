@@ -513,8 +513,7 @@
     padding-block: 1.4rem;
     align-items: start;
   }
-  .item time,
-  .item .step {
+  .item time {
     font-variant-numeric: tabular-nums;
     font-size: 0.75rem;
     letter-spacing: 0.14em;
@@ -523,11 +522,12 @@
     text-align: right;
     padding-top: 0.4rem;
   }
-  /* The reception runs as an order, not a timetable — the couple gave a
-     sequence and no clock, so the rows carry their position instead of a time
-     nobody has committed to. Held back to muted so the one real hour on the
-     page, the ceremony's, stays the only thing in this column that is lit. */
-  .item .step { color: var(--muted); font-size: 0.7rem; }
+  /* Every row carries a clock time now. It began as a bare sequence, because a
+     sequence was all there was; the couple later put a three o'clock on the
+     civil ceremony and estimated the rest, so .step is gone and .item time does
+     the whole column. Keeping one row lit and the others muted was the old way
+     of saying which was real — the page says that in words underneath now,
+     since after five they are all estimates together. */
   /* Drawn per row but bleeding into both paddings, so consecutive rows join
      into one unbroken line; the ends stop at the first and last marker. */
   .tick {
@@ -1039,8 +1039,8 @@
     <a href="#reception">Reception</a>
     <a href="#dress">What to wear</a>
     <a href="#day">The day</a>
-    <a href="#rsvp">RSVP</a>
     <a href="#faq">Questions</a>
+    <a href="#rsvp">RSVP</a>
   </nav>
 
   <header class="invite">
@@ -1238,8 +1238,8 @@
            target="_blank" rel="noopener">Open in maps</a>
       </div>
       <p class="hand">
-        The ceremony venue and its hour will be added here as soon as they are
-        confirmed.
+        The ceremony is at three o'clock, and its venue will be added here as
+        soon as it is confirmed.
       </p>
     </div>
   </section>
@@ -1294,14 +1294,11 @@
       </figure>
       <div class="order">
         <div class="item">
-          <span class="slot">time</span>
+          <time datetime="15:00">3:00</time>
           <div class="tick"><span></span></div>
           <div>
             <h3>Ceremony</h3>
-            <p>
-              Earlier in the day. The hour isn&rsquo;t set yet &mdash; it will
-              sit here when it is.
-            </p>
+            <p>A civil ceremony, for family and witnesses. Most guests join us at the reception.</p>
           </div>
         </div>
         <div class="item">
@@ -1313,61 +1310,67 @@
           </div>
         </div>
         <div class="item">
-          <span class="step">01</span>
+          <time datetime="17:30">5:30</time>
           <div class="tick"><span></span></div>
           <div>
             <h3>Welcome Remarks</h3>
           </div>
         </div>
         <div class="item">
-          <span class="step">02</span>
+          <time datetime="17:45">5:45</time>
           <div class="tick"><span></span></div>
           <div>
             <h3>Dinner</h3>
           </div>
         </div>
         <div class="item">
-          <span class="step">03</span>
+          <time datetime="18:45">6:45</time>
           <div class="tick"><span></span></div>
           <div>
             <h3>Messages from Family and Friends</h3>
           </div>
         </div>
         <div class="item">
-          <span class="step">04</span>
+          <time datetime="19:15">7:15</time>
           <div class="tick"><span></span></div>
           <div>
             <h3>Couple&rsquo;s Message</h3>
           </div>
         </div>
         <div class="item">
-          <span class="step">05</span>
+          <time datetime="19:30">7:30</time>
           <div class="tick"><span></span></div>
           <div>
             <h3>Cake Cutting</h3>
           </div>
         </div>
         <div class="item">
-          <span class="step">06</span>
+          <time datetime="19:45">7:45</time>
           <div class="tick"><span></span></div>
           <div>
             <h3>Toast to the Newlyweds</h3>
           </div>
         </div>
         <div class="item">
-          <span class="step">07</span>
+          <time datetime="20:00">8:00</time>
           <div class="tick"><span></span></div>
           <div>
             <h3>Photos and Conversations</h3>
           </div>
         </div>
         <div class="item">
-          <span class="step">08</span>
+          <time datetime="21:30">9:30</time>
           <div class="tick"><span></span></div>
           <div>
             <h3>Closing Remarks</h3>
           </div>
         </div>
+      </div>
+
+      <p class="hand">
+        Three o&rsquo;clock and five o&rsquo;clock are the fixed points. Everything
+        after five is an estimate, so the evening has room to move.
+      </p>
       </div>
 
       <div class="share">
@@ -1386,8 +1389,8 @@
   <section class="band" id="travel">
     <div class="inner reveal">
       <div class="sec-head">
-        <p class="eyebrow">Getting there and staying</p>
-        <h2>Travel and rooms</h2>
+        <p class="eyebrow">Getting there</p>
+        <h2>Finding the place</h2>
       </div>
       <div class="blocks">
         <div class="block">
@@ -1405,43 +1408,58 @@
             the restaurant directs you.
           </p>
         </div>
-        <div class="block">
-          <h3>Flying in</h3>
-          <p>
-            Bohol&ndash;Panglao International Airport (TAG) is about 15&nbsp;km away,
-            roughly half an hour by road. Grab works on the island, and metered taxis
-            run about ₱400&ndash;600 into the city.
-          </p>
-        </div>
-        <div class="block">
-          <h3>Coming by sea</h3>
-          <p>
-            OceanJet sails Cebu City Pier&nbsp;1 to Tagbilaran in about two hours,
-            roughly hourly from early morning to early evening. The pier is in
-            Tagbilaran itself, a short ride from the restaurant.
-          </p>
-        </div>
-        <div class="block">
-          <h3>Somewhere to sleep</h3>
-          <p>
-            Kew Hotel, Ocean Suites Bohol, Travelbee Seaside Inn and 7 Meadows Inn are
-            all in Tagbilaran and close enough to the venue. Book direct; no
-            block of rooms is held.
-          </p>
-        </div>
-        <div class="block">
-          <h3>What October is like</h3>
-          <p>
-            Rainy season. Expect around 30°C, heavy humidity, and a good chance of
-            rain at some point in the day. Bring an umbrella, and do not count on the
-            weather for anything that has to happen outdoors.
-          </p>
-        </div>
       </div>
     </div>
   </section>
 
-  <section class="band band--panel" id="rsvp">
+  <section class="band band--panel" id="faq">
+    <div class="inner reveal">
+      <div class="sec-head">
+        <p class="eyebrow">Good to know</p>
+        <h2>The questions we keep getting</h2>
+      </div>
+      <dl class="faq">
+        <div class="qa">
+          <dt>Does the dress code mean head to toe?</dt>
+          <dd>
+            No — black or burgundy as the main tone is plenty. There is no need to
+            match anyone else.
+          </dd>
+        </div>
+        <div class="qa">
+          <dt>Can I bring the children?</dt>
+          <dd>
+            While we love the little ones, our reception will be limited to adults.
+          </dd>
+        </div>
+        <div class="qa">
+          <dt>Can I bring someone?</dt>
+          <dd>
+            Due to limited space, our celebration is strictly for the
+            <strong>named</strong> guests on the invitation.
+          </dd>
+        </div>
+        <div class="qa">
+          <dt>What about gifts?</dt>
+          <dd>
+            Your presence is the greatest gift of all. Should you wish to honour us
+            with a gift, a contribution to our wishing well would be appreciated.
+          </dd>
+        </div>
+        <div class="qa">
+          <dt>Can I take photographs?</dt>
+          <dd>
+            We would love for you to capture memories during the day, but we kindly
+            ask that you refrain from posting any photos on social media. We want to
+            be the first to share our moments, and we would be happy to send you
+            copies afterward if you like.
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="band" id="rsvp">
     <div class="inner reveal">
       <div class="sec-head">
         <p class="eyebrow">Kindly reply by <time datetime="2026-10-04">October 04, 2026</time></p>
@@ -1511,52 +1529,6 @@
     </div>
   </section>
 
-  <section class="band" id="faq">
-    <div class="inner reveal">
-      <div class="sec-head">
-        <p class="eyebrow">Good to know</p>
-        <h2>The questions we keep getting</h2>
-      </div>
-      <dl class="faq">
-        <div class="qa">
-          <dt>Does the dress code mean head to toe?</dt>
-          <dd>
-            No — black or burgundy as the main tone is plenty. There is no need to
-            match anyone else.
-          </dd>
-        </div>
-        <div class="qa">
-          <dt>Can I bring the children?</dt>
-          <dd>
-            While we love the little ones, our reception will be limited to adults.
-          </dd>
-        </div>
-        <div class="qa">
-          <dt>Can I bring someone?</dt>
-          <dd>
-            Due to limited space, our celebration is strictly for the
-            <strong>named</strong> guests on the invitation.
-          </dd>
-        </div>
-        <div class="qa">
-          <dt>What about gifts?</dt>
-          <dd>
-            Your presence is the greatest gift of all. Should you wish to honour us
-            with a gift, a contribution to our wishing well would be appreciated.
-          </dd>
-        </div>
-        <div class="qa">
-          <dt>Can I take photographs?</dt>
-          <dd>
-            We would love for you to capture memories during the day, but we kindly
-            ask that you refrain from posting any photos on social media. We want to
-            be the first to share our moments, and we would be happy to send you
-            copies afterward if you like.
-          </dd>
-        </div>
-      </dl>
-    </div>
-  </section>
 
   <footer class="band band--panel">
     <div class="inner reveal">
@@ -1572,7 +1544,7 @@
       <hr class="hairline">
       <p>
         Questions to <a href="mailto:marcarlinghaus@gmail.com">marcarlinghaus@gmail.com</a>
-        · 6 October 2026 · Tagbilaran City, Bohol
+        · 7 October 2026 · Tagbilaran City, Bohol
       </p>
     </div>
   </footer>

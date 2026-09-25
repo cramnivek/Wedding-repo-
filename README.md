@@ -135,9 +135,9 @@ so the dashed underline goes away.
 
 Outstanding:
 
-- **The ceremony venue and its hour** — the invitation names neither; the
-  reception is the only part of the day with a place and a time. This is the
-  last `slot` on the page.
+- **The ceremony venue.** Its hour is known — three o'clock, a civil ceremony
+  for family and witnesses — but not where. There are no `slot`s left on the
+  page; this one is a sentence in the reception section instead.
 
 No room block is held, so that prompt is gone rather than blank — it was
 addressed to the couple and was sitting on a live page in rose with a dashed
@@ -156,14 +156,16 @@ meta descriptions, the programme, the calendar prompt, the printed card, and two
 beats of the reel. `check/tz.cjs` is what proves the countdown and the calendar
 entry agree after a change like that.
 
-The order of the day is filled in. It is the couple's own programme and it is a
-*sequence*, not a timetable — so the rows carry their position, 01 to 08, and the
-only clock time on the page is the reception's five o'clock. The ceremony is
-earlier and its hour is not set, so that row carries a `slot` where its time
-will go: two anchors, one known and one not, and then the eight steps. If more
-hours get pinned later they go in the same column, and the styling for a real
-time is still there and still lit, which is what makes one read as fixed and the
-other as pending.
+The order of the day is a timetable now. It began as a bare sequence, because a
+sequence was all the couple had — the rows carried their position, 01 to 08, and
+the page said so in as many words. Then the ceremony got a three o'clock and the
+rest were estimated, so `.step` is gone and every row carries a `<time>`.
+
+Two of those times are real and eight are guesses, which the page says out loud
+underneath rather than encoding in the styling: *three o'clock and five o'clock
+are the fixed points; everything after five is an estimate.* That is the honest
+version. Lighting the true ones and muting the rest would have been prettier and
+would have made a reader work out the distinction from a colour.
 
 Not shown on the page but worth adding if it becomes known: whether **dinner is
 seated or buffet**. Guests plan around that one.
