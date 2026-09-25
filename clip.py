@@ -47,10 +47,10 @@ import place
 # Twice the widest CSS width the page ever renders each plate at, measured by
 # check/maxsize.cjs. Re-run it after a layout change rather than trusting these.
 TARGETS = {
-    "battlefield": 3200, "camp": 1152, "chamber": 748, "garments": 768,
-    "hall": 1152, "hands": 608, "knight": 748, "rescue": 960, "ridge": 748,
-    "sun": 832, "them-ink": 748, "us-1": 748, "us-2": 748, "vow": 832,
-    "walk": 3200,
+    "battlefield": 3200, "camp": 1152, "candles": 1152, "chamber": 748,
+    "garments": 768, "hall": 1152, "hands": 608, "knight": 748, "rescue": 960,
+    "ridge": 748, "sun": 832, "them-ink": 748, "us-1": 748, "us-2": 748,
+    "vow": 832, "walk": 3200,
 }
 
 # Where the generator burns its sparkle, in source pixels. Same spot in every
@@ -194,6 +194,42 @@ def crossfade(frames, seconds, fps=24):
     for path in frames[n - f:]:
         os.remove(path)
     del frames[n - f:]
+    report_seam(frames)
+
+
+def report_seam(frames, size=(320, 180)):
+    """Say how the wrap compares with the clip's own frame-to-frame motion.
+
+    The dissolve makes the join continuous by construction — the output's first
+    frame is the one that already followed its last — so it is easy to assume
+    the seam is therefore fine. It is only as good as that pair of source
+    frames, and a generation is not uniformly busy: the candle clip sits almost
+    still for seconds at a time and then gutters hard, and the wrap happened to
+    land in the middle of one of those bursts. Nothing about the dissolve was
+    wrong and the loop still snapped, because the two frames it joined were 5.5x
+    the clip's own median apart before anything was blended.
+
+    So measure it. Every clip on the page lands between 1.3x and 1.8x; past
+    about 2.5x, move the wrap by changing --trim or --loop until it sits in a
+    quiet stretch. The median is sampled rather than exhaustive — it only has to
+    be the right order of magnitude to put the wrap in context.
+    """
+    def px(path):
+        return np.asarray(Image.open(path).convert("RGB").resize(size, Image.BILINEAR),
+                          dtype=np.float32)
+
+    step = max(1, len(frames) // 40)
+    motion = [np.abs(px(frames[i + 1]) - px(frames[i])).mean()
+              for i in range(0, len(frames) - 1, step)]
+    med = float(np.median(motion)) or 1e-6
+    wrap = np.abs(px(frames[0]) - px(frames[-1])).mean()
+    print("          wrap %.2f against a median frame of %.2f — x%.1f"
+          % (wrap, med, wrap / med))
+    if wrap / med > 2.5:
+        print("          that will snap. Move the wrap: it falls between the "
+              "frames at %.2fs and %.2fs of the trimmed span, so shift --trim "
+              "or --loop until it sits somewhere quieter."
+              % ((len(frames) - 1) / 24.0, len(frames) / 24.0))
 
 
 def main():

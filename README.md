@@ -54,8 +54,8 @@ edge-on and opens out again. Layered sprites never do that. No library and no
 WebGL — four points, a multiply and a divide, per fleck, per frame, and
 `check/fps.cjs` measures it at **0.5 fps** of a 14 fps budget.
 
-The **distant fires** are there for a measured reason. All fifteen plates sit in
-the first half of the page, and sampling the painted result section by section
+The **distant fires** are there for a measured reason. Every plate but one sat
+in the first half of the page, and sampling the painted result section by section
 showed what that cost: the grounds are identical throughout, rgb(19,16,14) give
 or take a level, but the brightest 5% of a section with a plate reaches 60–130
 and of one without reaches 22. The order of the day, travel, the RSVP and the
@@ -72,6 +72,21 @@ They are anchored in document space and re-measured whenever the height changes,
 which is not optional: `size()` runs before the lazy plates have loaded, and
 anchoring once left the last four screenfuls exactly as dead as they started.
 
+**A plate suppresses the fires near it, not across its whole section.** The rule
+used to be per section — one plate anywhere and the section lit itself. Adding
+the candles to the order of the day broke that: a 200px plate at the top of a
+1400px list took the light off the other 1200, and everything from the cake
+downwards went flat. Now each screenful is checked against where the plates
+actually are, within half a screen either side, which is how wide the glow is.
+Measured at 414px, `day` goes **18.0 → 23.0** at two thirds down while every
+other section holds within a level or two — including `us` and `prenup`, whose
+plates do cover their screenfuls, so they gain nothing and lose nothing.
+
+Both the sections and the plates are measured with `getBoundingClientRect`. They
+used to be read different ways, which agreed to within eight pixels here and
+would have stopped agreeing the moment anything upstream got `position:
+relative`.
+
 That budget is the thing to watch, not the ash. `check/fps.cjs` runs the page at
 390px under 4× CPU throttling, roughly a mid-range Android, and it found the
 fog costing two and a half times everything else on the canvas put together:
@@ -81,8 +96,10 @@ fill rate, not the gradients. Pre-rendering those alone had only bought 1.8.
 
 Everything else in `img/` is a file:
 
-- **Fifteen plates**, each in `.avif`, `.webp` and `.jpg` — the page offers all
-  three through `<picture>` and the browser takes the first it understands.
+- **Sixteen plates**, each in `.avif`, `.webp` and `.jpg` — the page offers all
+  three through `<picture>` and the browser takes the first it understands. Two
+  of them, `hall` and `candles`, are written by `clip.py --still` out of their
+  own clip's first frame rather than by `place.py` out of a render.
   `place.py` grades them: it maps each one's luminance through the page's own
   palette ramp, so a render made in any light still belongs here. The `longest`
   column in its `JOBS` table is a *measured* number — twice the widest the page
@@ -219,6 +236,21 @@ much every single frame.
 
 The cost is one second of length. Each is 9 seconds rather than 10.
 
+**The dissolve makes the join continuous; it does not make it quiet.** The
+output's first frame is the one that already followed its last, so the wrap is
+always between two adjacent source frames — which is easy to mistake for a
+guarantee. It is only as good as that pair, and a generation is not uniformly
+busy. The candle clip sits nearly still for seconds and then gutters hard, and a
+six-second cut put the wrap in the middle of one of those bursts: the two frames
+it joined were **5.5× the clip's own median apart** before anything was blended,
+and it snapped every time round.
+
+So `crossfade` now measures its own seam and prints it. Everything here lands
+between 1.3× and 1.8× the median frame; past about 2.5× the fix is to move the
+wrap, not to fade harder. Cutting the candles at 6.67s instead of 6.00s put the
+join in a quiet stretch and took it from 5.4× to 1.4×, keeping the guttering in
+the body of the loop where it belongs.
+
 Two encodings are published because "every browser plays mp4" is not true: a
 Chromium built without the proprietary codecs decodes neither H.264 nor the
 reason it failed. Each `<source>` names its codec, not just its container —
@@ -351,13 +383,15 @@ all** — the stills stay and nothing is fetched, verified in `phone.cjs`. Safar
 exposes neither signal, so that is a courtesy where it works rather than a
 guarantee.
 
-The table above predates `hall`, the fifth clip, and was measured live. Against
-the file sizes, that one adds **436 KB** of deferred video (274 KB on Safari,
-which takes the mp4) and *subtracts* 57 KB from the cold load, because the still
-it replaced was a 1180px drawing and the new one is a 1070px frame of the clip:
-115 KB of AVIF down to 58 KB. A local run puts the full scroll at 4.98 MB.
+The table above predates the last two clips and was measured live. Against the
+file sizes, `hall` adds **436 KB** of deferred video (274 KB on Safari, which
+takes the mp4) and *subtracts* 57 KB from the cold load, because the still it
+replaced was a 1180px drawing and the new one is a 1070px frame of the clip:
+115 KB of AVIF down to 58 KB. `candles` adds **163 KB** of video (113 KB on
+Safari) and 13 KB of still to a section that had no picture at all. A local run
+puts the full scroll at **5.16 MB**.
 
-Five clips is the ceiling, and it is a soft one — the next addition should take
+Six clips is the ceiling, and it is a soft one — the next addition should take
 one off. The ones worth spending it on are where motion says something a still
 can't: firelight moving across a face, wind in a cloak, someone's eyes opening.
 
@@ -435,8 +469,8 @@ caught.
 
 **The repository is not the website.** `art-source/` alone is 78 MB of ungraded
 originals and full-size clips — five times the size of the site — and `check/`,
-`place.py` and `clip.py` are tooling. `build.sh` assembles the 14 MB that guests
-actually need into `dist/`, and that is what gets published: 8.7 MB of plates,
+`place.py` and `clip.py` are tooling. `build.sh` assembles the 15 MB that guests
+actually need into `dist/`, and that is what gets published: 9.1 MB of plates,
 4.1 MB of music in three encodings, 600 KB of card and 488 KB of fonts.
 
 No guest pays all of it. The three music encodings are one download, the two

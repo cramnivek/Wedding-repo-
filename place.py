@@ -100,6 +100,13 @@ JOBS = [
     # is most of why it works.
     ("rescue",      0.0,   0.0,      0.55,         1.12,     0.9,  1000),
 
+    # Candles on a dark table: warm gold on near-black before it got here, which
+    # is most of the way to the page already. Graded as hard as the drawings it
+    # would lose the flames — they are the brightest thing in the frame and the
+    # ramp's top end is nowhere near white. Like rescue, it mostly keeps itself.
+    # There is no still in art-source/ for this one; clip.py --still writes it.
+    ("candles",     0.0,   0.0,      0.50,         1.15,     0.92,  1152),
+
     # The chamber portrait is the one render where the faces read as themselves,
     # so it keeps most of its own light — grading it as hard as the rest would
     # cost the likeness, which is the only reason it is on the page.

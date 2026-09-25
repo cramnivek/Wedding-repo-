@@ -1284,6 +1284,14 @@
         <p class="eyebrow">Order of the day</p>
         <h2>How the evening runs</h2>
       </div>
+      <figure class="plate" data-clip="img/candles">
+        <picture>
+          <source srcset="img/candles.avif" type="image/avif">
+          <source srcset="img/candles.webp" type="image/webp">
+          <img src="img/candles.jpg" width="1152" height="648" loading="lazy"
+             alt="Six candles burning on a dark table, five tall and one burned almost to the wood, its flame guttering.">
+        </picture>
+      </figure>
       <div class="order">
         <div class="item">
           <time datetime="17:00">5:00</time>
@@ -2763,20 +2771,51 @@
 
       fires = [];
       var side = 0;
+
+      /* Where the plates are, in document coordinates. A plate is a light
+         source, so the page needs no invented one beside it — but it lights
+         what is next to it, not a whole section. The rule used to be per
+         section, and adding the candles to the programme took the fires off a
+         list twelve hundred pixels long to light two hundred of it: everything
+         from the cake downwards went flat. Measured per screenful instead, the
+         plate keeps its own stretch dark-free and the rest of the section gets
+         lit as it did before. */
+      var scrolled = window.pageYOffset || document.documentElement.scrollTop || 0;
+      var lit = [];
+      [].forEach.call(document.querySelectorAll("picture, video"), function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.height) lit.push([r.top + scrolled, r.bottom + scrolled]);
+      });
+
       [].forEach.call(document.querySelectorAll("section[id]"), function (sec) {
-        /* A section that already has a plate has its own light. */
-        if (sec.querySelector("picture, video")) return;
         /* One fire per screenful rather than one per section. A single glow in
            a section two thousand pixels tall lights the end of it and leaves the
            rest as dead as it was — the questions and the RSVP are exactly that
            shape, and one each moved them 23 to 25 where the short sections moved
            22 to 41. Spread evenly and alternating sides, so scrolling a long
            section passes through light more than once. */
-        var top = sec.offsetTop, hh = sec.offsetHeight;
+        /* Measured the same way the plates above were, rather than by
+           offsetTop: the two numbers have to be in one coordinate system for
+           the comparison below to mean anything, and offsetTop is relative to
+           whatever the nearest positioned ancestor happens to be. Here that is
+           a wrapper eight pixels down, so the old reading was close enough to
+           look right — which is the kind of agreement that stops being true the
+           first time something upstream gets `position: relative`. */
+        var top = sec.getBoundingClientRect().top + scrolled;
+        var hh = sec.offsetHeight;
         var n = Math.max(1, Math.round(hh / (h * 0.9)));
         for (var k = 0; k < n; k++) {
+          var y = top + hh * ((k + 0.72) / n);
+          /* Half a screen either side, because the glow is that wide: a fire
+             this close to a plate is competing with it rather than filling in
+             for it. */
+          var near = false;
+          for (var j = 0; j < lit.length; j++) {
+            if (lit[j][0] < y + h * 0.5 && lit[j][1] > y - h * 0.5) { near = true; break; }
+          }
+          if (near) continue;
           fires.push({
-            y: top + hh * ((k + 0.72) / n),
+            y: y,
             x: (side++ % 2 ? 0.76 : 0.24) * w,
             r: Math.max(w, h) * 0.62
           });
