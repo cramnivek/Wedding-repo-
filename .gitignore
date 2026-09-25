@@ -13,3 +13,6 @@ dist/
 
 # clip.py imports place.py, so running it leaves bytecode behind.
 __pycache__/
+
+# reel.py scratch — frames and unpacked fonts, rebuilt every run.
+_reelwork/

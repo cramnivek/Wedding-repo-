@@ -349,6 +349,51 @@ from beside the mark, feathered, works on every frame.
 `art-source/` holds the full-size versions with their sound, watermark removed,
 for sending to people rather than serving — one `<plate>-clip.mp4` per clip.
 
+### The invitation reel
+
+`reel.py` cuts a vertical 1080×1920 out of six of those clips: 18.9 seconds, six
+beats, `reel.mp4` with the page's music under it and `reel-silent.mp4` without.
+
+```sh
+python3 reel.py --stills     # one frame per beat, seconds
+python3 reel.py              # the whole thing, about five minutes
+```
+
+**Post the silent one and add music inside Instagram.** Their licence covers
+their library; a track uploaded in the file is what gets muted.
+
+The hard part is that every source is 16:9 and the target is 9:16. Filling the
+frame means keeping 405 of 1280 pixels across, and the two shots that matter
+most are two people side by side — the exact picture that crop destroys. So it
+does not fill. Each clip is a 3:2 plate at 1080 wide, which is the source's own
+pixels with nothing enlarged, its edges dissolved into the page's ground the way
+`.plate-ink` does, with the type in the space that leaves. The same shape in all
+six beats, because variety in the layout reads as a template; the variety is in
+the clips.
+
+Three things that are not obvious:
+
+- **A blurred, stretched copy of the frame sits behind the plate**, so each beat
+  carries its own colour across the whole frame — red under the eclipse, candle
+  gold under the candles — without inventing detail, since none of it is in
+  focus. It is built at an eighth resolution and blown back up: a 56px gaussian
+  over 1080×1920 is most of a second, five hundred times over, and after the
+  enlargement the two are the same picture. Same reasoning as the page's
+  half-resolution fog buffer.
+- **How much of that backdrop shows is set by its own brightness.** A fixed
+  blend suits the dark beats and fails the ridge, whose overcast sky came
+  through as a pale wash brighter than the plate it was meant to sit behind.
+- **Instagram covers the top ~250px and everything below ~1450** with its own
+  interface. Type is bottom-aligned above the plate inside that, and `type_layer`
+  says so out loud if a block would start above the line.
+
+The type is set in the site's own faces — `fonts/` ships woff2, which PIL cannot
+read, so the script unpacks what it needs into its work directory rather than
+keeping a second copy of every face in the repo.
+
+The text is only what is actually known. The ceremony venue is not on the
+invitation yet, so it is not in the reel either.
+
 ### What it costs on a phone
 
 Measured by `check/phone.cjs` at 390px with `isMobile` on, which is the only
@@ -467,8 +512,8 @@ caught.
 
 ## Putting it on a domain
 
-**The repository is not the website.** `art-source/` alone is 78 MB of ungraded
-originals and full-size clips — five times the size of the site — and `check/`,
+**The repository is not the website.** `art-source/` alone is 102 MB of ungraded
+originals, full-size clips and the reel — seven times the size of the site — and `check/`,
 `place.py` and `clip.py` are tooling. `build.sh` assembles the 15 MB that guests
 actually need into `dist/`, and that is what gets published: 9.1 MB of plates,
 4.1 MB of music in three encodings, 600 KB of card and 488 KB of fonts.
