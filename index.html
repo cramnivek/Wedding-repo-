@@ -5,7 +5,7 @@
      this is only ever missing on the self-hosted copy — which is the copy guests
      will actually open. -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Marc-Kevin and Florence are marrying on the sixth of October, 2026, at five o'clock in the evening — Smoque Bistro, Tagbilaran City, Bohol.">
+<meta name="description" content="Marc-Kevin and Florence are marrying on the seventh of October, 2026. Reception at five o'clock — Smoque Bistro, Tagbilaran City, Bohol.">
 <meta name="theme-color" content="#0A0806">
 
 <!-- What a pasted link looks like in a message. og:image must be an absolute
@@ -13,7 +13,7 @@
      and silently fail for others, Facebook's among them. -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Marc-Kevin &amp; Florence">
-<meta property="og:description" content="The sixth of October, 2026, at five o'clock in the evening. Smoque Bistro, Tagbilaran City, Bohol.">
+<meta property="og:description" content="The seventh of October, 2026. Reception at five o'clock, Smoque Bistro, Tagbilaran City, Bohol.">
 <meta property="og:image" content="img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -1028,8 +1028,8 @@
 <!-- The day, in one place. The countdown and the calendar link both read from
      here, so the two can never disagree. -->
 <div class="stack"
-     data-when="2026-10-06T17:00+08:00"
-     data-ends="2026-10-06T23:00+08:00"
+     data-when="2026-10-07T17:00+08:00"
+     data-ends="2026-10-07T23:00+08:00"
      data-title="Wedding of Marc-Kevin &amp; Florence"
      data-where="Smoque Bistro, Carlos P. Garcia East Avenue, Bool, Tagbilaran City, Bohol">
 
@@ -1057,9 +1057,9 @@
         <span class="line">Florence</span>
       </h1>
       <div class="when">
-        <p class="date">October 06, 2026</p>
-        <p class="weekday">a Tuesday</p>
-        <p class="hour">Five o'clock in the evening</p>
+        <p class="date">October 07, 2026</p>
+        <p class="weekday">a Wednesday</p>
+        <p class="hour">Reception at five o'clock</p>
       </div>
       <hr class="hairline">
       <div class="countdown" id="countdown" aria-live="off"></div>
@@ -1217,7 +1217,7 @@
   <section class="band band--panel" id="reception">
     <div class="inner reveal">
       <div class="sec-head">
-        <p class="eyebrow">The reception will be at</p>
+        <p class="eyebrow">Five o&rsquo;clock in the evening, at</p>
         <h2>Smoque Bistro</h2>
       </div>
       <figure class="plate" data-clip="img/hall">
@@ -1294,11 +1294,22 @@
       </figure>
       <div class="order">
         <div class="item">
-          <time datetime="17:00">5:00</time>
+          <span class="slot">time</span>
           <div class="tick"><span></span></div>
           <div>
             <h3>Ceremony</h3>
-            <p>Five o&rsquo;clock in the evening, as printed on the invitation.</p>
+            <p>
+              Earlier in the day. The hour isn&rsquo;t set yet &mdash; it will
+              sit here when it is.
+            </p>
+          </div>
+        </div>
+        <div class="item">
+          <time datetime="17:00">5:00</time>
+          <div class="tick"><span></span></div>
+          <div>
+            <h3>Reception</h3>
+            <p>Five o&rsquo;clock in the evening, at Smoque Bistro.</p>
           </div>
         </div>
         <div class="item">
@@ -1363,7 +1374,7 @@
         <div class="share-copy">
           <p class="eyebrow">Save the day</p>
           <p>
-            Put the sixth of October in your calendar now, and it will remind you
+            Put the seventh of October in your calendar now, and it will remind you
             itself.
           </p>
           <a class="btn-link" id="cal" href="#" target="_blank" rel="noopener">Add to calendar</a>
@@ -2533,7 +2544,7 @@
   var when = new Date(cfg.dataset.when);
   var ends = new Date(cfg.dataset.ends);
 
-  /* Live countdown to five o'clock on the sixth. Swaps to a past-tense line
+  /* Live countdown to five o'clock on the seventh. Swaps to a past-tense line
      once the date passes, so an old page never shows negative numbers. */
   (function () {
     var el = document.getElementById("countdown");

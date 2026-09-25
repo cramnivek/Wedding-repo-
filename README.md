@@ -1,7 +1,7 @@
 # wedding
 
-The wedding site for Marc-Kevin & Florence — 6 October 2026, five o'clock in the
-evening, reception at Smoque Bistro, Tagbilaran City, Bohol.
+The wedding site for Marc-Kevin & Florence — 7 October 2026, reception at five
+o'clock, Smoque Bistro, Tagbilaran City, Bohol.
 
 One file, no build step, no dependencies. `index.html` is the whole site. Open it
 in a browser to see it; edit it in any text editor to change it.
@@ -135,19 +135,29 @@ so the dashed underline goes away.
 
 Outstanding:
 
-- **The ceremony venue** — the invitation only names the reception
+- **The ceremony venue and its hour** — the invitation names neither; the
+  reception is the only part of the day with a place and a time
 - Whether a room block is held anywhere
 
-Filled in since: the reply-by date is October 04, 2026, two days before the
+Filled in since: the reply-by date is October 04, 2026, three days before the
 wedding, which is what a headcount collected this close to the day looks like.
 Parking is on the premises.
 
+The date moved from the 6th to the 7th late on, and five o'clock moved with it
+from the ceremony to the reception. Both live in more places than they look:
+`data-when`/`data-ends` on `.stack`, the header's three lines, the weekday, two
+meta descriptions, the programme, the calendar prompt, the printed card, and two
+beats of the reel. `check/tz.cjs` is what proves the countdown and the calendar
+entry agree after a change like that.
+
 The order of the day is filled in. It is the couple's own programme and it is a
 *sequence*, not a timetable — so the rows carry their position, 01 to 08, and the
-ceremony's five o'clock is the only clock time on the page. If hours get pinned
-to the reception later they can go in the same column; the styling for a real
-time is still there and still lit, which is what makes it read as the one fixed
-point.
+only clock time on the page is the reception's five o'clock. The ceremony is
+earlier and its hour is not set, so that row carries a `slot` where its time
+will go: two anchors, one known and one not, and then the eight steps. If more
+hours get pinned later they go in the same column, and the styling for a real
+time is still there and still lit, which is what makes one read as fixed and the
+other as pending.
 
 Not shown on the page but worth adding if it becomes known: whether **dinner is
 seated or buffet**. Guests plan around that one.
@@ -172,8 +182,8 @@ several hours out.
 
 ```html
 <div class="stack"
-     data-when="2026-10-06T17:00+08:00"
-     data-ends="2026-10-06T23:00+08:00"
+     data-when="2026-10-07T17:00+08:00"
+     data-ends="2026-10-07T23:00+08:00"
      data-title="Wedding of Marc-Kevin &amp; Florence"
      data-where="Smoque Bistro, Carlos P. Garcia East Avenue, Bool, Tagbilaran City, Bohol">
 ```

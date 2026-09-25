@@ -117,14 +117,17 @@ BEATS = [
 
     dict(clip="seal", at=2.2, secs=3.6,
          grade=(0.38, 1.20, 0.86), delay=0.5,
-         text=[("ON", "eyebrow"), ("October 06, 2026", "head"),
-               ("five o'clock in the evening", "hand")]),
+         text=[("ON", "eyebrow"), ("October 07, 2026", "head"),
+               ("a Wednesday", "hand")]),
 
     # Started late enough that the push has brought the table forward: at the
     # very top of that generation the two of them are fifty pixels across.
     dict(clip="hall", at=0.9, secs=3.6,
          grade=(0.34, 1.24, 0.84), delay=0.5,
-         text=[("THE RECEPTION", "eyebrow"), ("Smoque Bistro", "head"),
+         # Five o'clock is the reception's, not the ceremony's, so it is set
+         # here rather than on the date beat.
+         text=[("THE RECEPTION, FIVE O'CLOCK", "eyebrow"),
+               ("Smoque Bistro", "head"),
                ("Carlos P. Garcia East Avenue", "hand"),
                ("Tagbilaran City, Bohol", "hand")]),
 
