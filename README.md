@@ -397,6 +397,18 @@ keeping a second copy of every face in the repo.
 The text is only what is actually known. The ceremony venue is not on the
 invitation yet, so it is not in the reel either.
 
+**The rings beat is their actual rings**, which are custom made. It was very
+nearly left out of the cut on the grounds that it was the wrong story and
+somebody else's design — which was a reasonable-looking call and completely
+wrong, because it is a picture of the thing they are going to exchange.
+
+It is the one beat whose colour fights the page: the script glows ice blue
+against a palette that is entirely amber. So it keeps less of itself than the
+beats either side. At `keep` 0.42 the inscription lands gold against the band
+and only the arc above it stays cold, which is what it is meant to be; pulled to
+0.26 the energy goes out of it altogether and it reads as a still photograph of
+two rings.
+
 ### What it costs on a phone
 
 Measured by `check/phone.cjs` at 390px with `isMobile` on, which is the only

@@ -106,6 +106,15 @@ BEATS = [
          text=[("Join us for the wedding of", "join"),
                ("Marc-Kevin", "name"), ("&", "amp"), ("Florence", "name")]),
 
+    # Their actual rings, which are made. The blue the script glows is the one
+    # colour in the whole reel that fights the page, so this keeps less of
+    # itself than the beats either side: at keep 0.42 the inscription reads gold
+    # against the band and only the arc above it stays cold, which is what it is
+    # meant to be. Pulled further than that and the energy goes out of it.
+    dict(clip="rings", at=6.4, secs=3.5,
+         grade=(0.42, 1.16, 0.92), delay=0.8,
+         text=[("the rings are made", "hand")]),
+
     dict(clip="seal", at=2.2, secs=3.6,
          grade=(0.38, 1.20, 0.86), delay=0.5,
          text=[("ON", "eyebrow"), ("October 06, 2026", "head"),
