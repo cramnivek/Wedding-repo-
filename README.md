@@ -96,10 +96,10 @@ fill rate, not the gradients. Pre-rendering those alone had only bought 1.8.
 
 Everything else in `img/` is a file:
 
-- **Sixteen plates**, each in `.avif`, `.webp` and `.jpg` — the page offers all
-  three through `<picture>` and the browser takes the first it understands. Two
-  of them, `hall` and `candles`, are written by `clip.py --still` out of their
-  own clip's first frame rather than by `place.py` out of a render.
+- **Seventeen plates**, each in `.avif`, `.webp` and `.jpg` — the page offers
+  all three through `<picture>` and the browser takes the first it understands.
+  Three of them, `hall`, `candles` and `rings`, are written by `clip.py --still`
+  out of their own clip's first frame rather than by `place.py` out of a render.
   `place.py` grades them: it maps each one's luminance through the page's own
   palette ramp, so a render made in any light still belongs here. The `longest`
   column in its `JOBS` table is a *measured* number — twice the widest the page
@@ -136,8 +136,14 @@ so the dashed underline goes away.
 Outstanding:
 
 - **The ceremony venue and its hour** — the invitation names neither; the
-  reception is the only part of the day with a place and a time
-- Whether a room block is held anywhere
+  reception is the only part of the day with a place and a time. This is the
+  last `slot` on the page.
+
+No room block is held, so that prompt is gone rather than blank — it was
+addressed to the couple and was sitting on a live page in rose with a dashed
+underline. The ceremony note in the reception section was the same kind of
+thing, written to whoever was building the site rather than to a guest reading
+it, and now reads as the latter.
 
 Filled in since: the reply-by date is October 04, 2026, three days before the
 wedding, which is what a headcount collected this close to the day looks like.
@@ -461,9 +467,11 @@ replaced was a 1180px drawing and the new one is a 1070px frame of the clip:
 Safari) and 13 KB of still to a section that had no picture at all. A local run
 puts the full scroll at **5.16 MB**.
 
-Six clips is the ceiling, and it is a soft one — the next addition should take
-one off. The ones worth spending it on are where motion says something a still
-can't: firelight moving across a face, wind in a cloak, someone's eyes opening.
+Seven clips now, and `rings` was worth breaking the ceiling for: it is the only
+plate on the page that is a picture of a real object the couple own. Its wrap
+measures **x1.0** against its own median frame, the cleanest seam of any of
+them. The ones worth spending the bytes on are where motion says something a
+still can't: firelight moving across a face, wind in a cloak, gold catching.
 
 Breaking the seal also plays a sound, synthesised in the browser rather than
 loaded — a file cannot follow the gate, and this is built off the same timeline

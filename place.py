@@ -107,6 +107,13 @@ JOBS = [
     # There is no still in art-source/ for this one; clip.py --still writes it.
     ("candles",     0.0,   0.0,      0.50,         1.15,     0.92,  1152),
 
+    # Their own rings, custom made. The one plate whose source colour fights the
+    # page: the inscription glows ice blue against a palette that is all amber.
+    # At keep 0.42 the script lands gold on the band and only the arc above it
+    # stays cold, which is what it is meant to be. No still in art-source/ for
+    # this one either — clip.py --still writes it from the clip's first frame.
+    ("rings",       0.0,   0.0,      0.42,         1.16,     0.92,  1152),
+
     # The chamber portrait is the one render where the faces read as themselves,
     # so it keeps most of its own light — grading it as hard as the rest would
     # cost the likeness, which is the only reason it is on the page.

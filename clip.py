@@ -49,7 +49,7 @@ import place
 TARGETS = {
     "battlefield": 3200, "camp": 1152, "candles": 1152, "chamber": 748,
     "garments": 768, "hall": 1152, "hands": 608, "knight": 748, "rescue": 960,
-    "ridge": 748, "sun": 832, "them-ink": 748, "us-1": 748, "us-2": 748,
+    "ridge": 748, "rings": 1152, "sun": 832, "them-ink": 748, "us-1": 748, "us-2": 748,
     "vow": 832, "walk": 3200,
 }
 
