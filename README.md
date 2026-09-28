@@ -96,7 +96,7 @@ fill rate, not the gradients. Pre-rendering those alone had only bought 1.8.
 
 Everything else in `img/` is a file:
 
-- **Nineteen plates**, each in `.avif`, `.webp` and `.jpg` — the page offers
+- **Twenty plates**, each in `.avif`, `.webp` and `.jpg` — the page offers
   all three through `<picture>` and the browser takes the first it understands.
   Five of them — `hall`, `candles`, `rings`, `river` and `bar` — are written by
   `clip.py --still` out of their own clip's first frame rather than by

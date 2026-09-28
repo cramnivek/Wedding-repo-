@@ -10,10 +10,19 @@ Each one gets only the treatment it actually needs, which differs per image:
                a good share of the original left in — enough to kill the blue,
                not so much that the candlelight goes with it.
   garments     ink already, on cream paper. Border trimmed, ground darkened so
-               the paper stops glowing against a near-black page.
+               the paper stops glowing against a near-black page. Superseded on
+               the page by `attire`; the row and the source are kept.
+  attire       the guest attire chart, and the only plate here whose job is to
+               be read rather than looked at. Keeps 0.85 of itself: graded like
+               the others its burgundy swatches come out gold, which is the one
+               thing this image must never do.
   hands        already black-ground line art. Nothing but a resize.
 
-Run from the scratchpad once the files are in ./incoming/.
+Run from the scratchpad once the files are in ./incoming/. Name one or more
+plates as arguments to rebuild only those — without it every row runs, and a
+row whose source is not in ./incoming/ fails the whole pass:
+
+    python3 place.py attire
 """
 
 from PIL import Image, ImageEnhance
@@ -123,6 +132,15 @@ JOBS = [
     # palette rather than corrected into it, so it barely needs the ramp.
     ("bar",         0.0,   0.0,      0.55,         1.12,     0.94,  1152),
 
+    # The guest attire chart the couple had made — an information graphic, not a
+    # picture, and the only plate here whose job is to be read. So it keeps
+    # almost all of itself: pulled to 0.55 the burgundy swatches come out gold,
+    # which is the one thing this image must never do, since those swatches are
+    # what a guest reads the dress code off. All 0.85 does is take the glare off
+    # a near-white card sitting on a near-black page. No border trim: the paper
+    # edge is part of the layout.
+    ("attire",      0.0,   0.0,      0.85,         1.00,     0.95,  1312),
+
     # The chamber portrait is the one render where the faces read as themselves,
     # so it keeps most of its own light — grading it as hard as the rest would
     # cost the likeness, which is the only reason it is on the page.
@@ -146,7 +164,10 @@ def find(name):
 def main():
     os.makedirs(OUT, exist_ok=True)
     missing = []
+    only = set(sys.argv[1:])
     for name, border, crop_top, keep, contrast, bright, longest in JOBS:
+        if only and name not in only:
+            continue
         path = find(name)
         if not path:
             missing.append(name)
