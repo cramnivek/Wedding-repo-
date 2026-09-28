@@ -127,9 +127,8 @@ BEATS = [
          # Five o'clock is the reception's, not the ceremony's, so it is set
          # here rather than on the date beat.
          text=[("THE RECEPTION, FIVE O'CLOCK", "eyebrow"),
-               ("Smoque Bistro", "head"),
-               ("Carlos P. Garcia East Avenue", "hand"),
-               ("Tagbilaran City, Bohol", "hand")]),
+               ("Loboc River Resort", "head"),
+               ("Loboc, Bohol", "hand")]),
 
     dict(clip="candles", at=0.5, secs=3.4,
          grade=(0.50, 1.15, 0.92), delay=0.5,
