@@ -635,6 +635,22 @@
 
   .status { font-size: 0.875rem; color: var(--muted); }
 
+  /* ---------- the route map ---------- */
+  .routemap { display: block; width: 100%; height: auto; margin-block: 1.4rem 0.4rem; overflow: visible; }
+  .rm-road { fill: none; stroke: var(--gold); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; opacity: 0.34; }
+  .rm-road--core { stroke: var(--bone); stroke-width: 2.4; opacity: 0.92; filter: none; }
+  .rm-dot { fill: var(--blood-lt); stroke: var(--bone); stroke-width: 2.5; }
+  .rm-time { font-family: "Diablo", "Cinzel", Georgia, serif; font-size: 40px; fill: var(--bone); }
+  .rm-name { font-family: "Cinzel", Georgia, serif; font-size: 23px; letter-spacing: 0.12em;
+             fill: var(--bone-soft); text-transform: uppercase; }
+  .rm-note { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; font-size: 26px; fill: var(--muted); }
+  /* Under about 30rem the two end labels would meet in the middle. */
+  @media (max-width: 30rem) {
+    .rm-name { font-size: 34px; letter-spacing: 0.08em; }
+    .rm-time { font-size: 54px; }
+    .rm-note { font-size: 34px; }
+  }
+
   /* ---------- faq ---------- */
   .faq { display: grid; gap: 1.75rem; }
   .qa { display: flex; flex-direction: column; gap: 0.35rem; }
@@ -1187,8 +1203,10 @@
            target="_blank" rel="noopener">Open in maps</a>
       </div>
       <p class="hand">
-        The ceremony is at two o'clock at the court in Tagbilaran City, about an
-        hour from here by road &mdash; so there is time between the two.
+        The ceremony is at two o'clock at
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=Hall+of+Justice+Tagbilaran+City+Bohol"
+           target="_blank" rel="noopener">the court in Tagbilaran City</a>, about
+        an hour from here by road &mdash; so there is time between the two.
       </p>
     </div>
   </section>
@@ -1360,6 +1378,37 @@
              alt="The river at dusk, paper lanterns hung low over the water and breaking in the reflection, a long boat moored at a bamboo landing.">
         </picture>
       </figure>
+      <!-- The real road, not a drawn line: 330 points of OSRM driving geometry
+           between the two towns, simplified to 38 by Ramer-Douglas-Peucker and
+           projected equirectangular with a cos(lat) correction. The viewBox
+           height comes from the ground's own aspect rather than being chosen,
+           so the road is not stretched in either direction.
+
+           The western dot is Tagbilaran, not the courthouse — the route was
+           measured from the city, so the label says the city and the sentence
+           under the map names the court. OSRM puts the drive at 29 minutes;
+           the couple say about an hour, and theirs is the number a guest should
+           plan around. -->
+      <svg class="routemap" viewBox="0 0 1000 460" role="img"
+           aria-label="Route map: Tagbilaran City east to Loboc River Resort, about eighteen kilometres, roughly an hour by road.">
+        <defs>
+          <filter id="rmglow" x="-20%" y="-60%" width="140%" height="220%">
+            <feGaussianBlur stdDeviation="7" result="g"/>
+            <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g transform="translate(0 126)">
+          <path class="rm-road" d="M54.0 65.2 L72.0 71.1 L93.2 73.4 L153.2 71.4 L232.1 94.5 L257.8 97.9 L265.3 101.5 L274.6 98.9 L287.5 100.9 L321.9 111.2 L349.1 125.0 L375.2 129.8 L474.1 167.3 L548.4 175.4 L634.3 198.8 L664.0 196.5 L685.3 209.1 L707.9 217.5 L753.5 222.0 L772.8 221.4 L800.8 213.8 L824.6 201.7 L846.3 215.7 L851.1 195.7 L855.7 190.9 L856.3 178.0 L879.2 150.4 L888.6 122.5 L898.6 109.2 L908.7 106.7 L911.0 102.4 L916.4 104.1 L920.2 99.6 L922.8 89.1 L917.8 84.3 L916.8 65.0 L930.8 54.1 L946.0 71.4" filter="url(#rmglow)"/>
+          <path class="rm-road rm-road--core" d="M54.0 65.2 L72.0 71.1 L93.2 73.4 L153.2 71.4 L232.1 94.5 L257.8 97.9 L265.3 101.5 L274.6 98.9 L287.5 100.9 L321.9 111.2 L349.1 125.0 L375.2 129.8 L474.1 167.3 L548.4 175.4 L634.3 198.8 L664.0 196.5 L685.3 209.1 L707.9 217.5 L753.5 222.0 L772.8 221.4 L800.8 213.8 L824.6 201.7 L846.3 215.7 L851.1 195.7 L855.7 190.9 L856.3 178.0 L879.2 150.4 L888.6 122.5 L898.6 109.2 L908.7 106.7 L911.0 102.4 L916.4 104.1 L920.2 99.6 L922.8 89.1 L917.8 84.3 L916.8 65.0 L930.8 54.1 L946.0 71.4"/>
+          <circle class="rm-dot" cx="54" cy="65" r="9"/>
+          <circle class="rm-dot" cx="946" cy="71" r="9"/>
+          <text class="rm-time" x="54" y="-27" text-anchor="start">2:00</text>
+          <text class="rm-name" x="54" y="19" text-anchor="start">Tagbilaran City</text>
+          <text class="rm-time" x="946" y="-21" text-anchor="end">5:00</text>
+          <text class="rm-name" x="946" y="25" text-anchor="end">Loboc River Resort</text>
+          <text class="rm-note" x="500" y="310" text-anchor="middle">18 km east &#183; about an hour by road</text>
+        </g>
+      </svg>
       <div class="blocks">
         <div class="block">
           <h3>Finding Loboc River Resort</h3>

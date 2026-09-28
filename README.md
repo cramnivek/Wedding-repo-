@@ -230,6 +230,33 @@ If a list is ever wanted instead of a mailbox, a Google Form behind the same
 button is the smallest change: no markup beyond the `href`, and answers land in
 a spreadsheet.
 
+### The route map
+
+The line between Tagbilaran and Loboc is the actual road, not a drawn curve:
+330 points of OSRM driving geometry, simplified to 38 by Ramer–Douglas–Peucker,
+projected equirectangular with a `cos(lat)` correction. Inline SVG, about 2 KB,
+no request and no third-party map widget — an embedded Google map would have put
+a bright, differently-designed rectangle in the middle of this page, and a
+tracker with it.
+
+The viewBox height is computed from the ground's own aspect rather than chosen,
+so the road is never stretched in either direction. It came out 0.188, which is
+why the map is a wide shallow strip: that is the shape of the journey.
+
+Two things the map deliberately does not claim:
+
+- **The western dot is Tagbilaran, not the courthouse.** The route was measured
+  from the city, so the label says the city and the sentence beneath names the
+  court. Pinning a building the route does not actually start at would be a
+  guess dressed as a survey.
+- **The time is the couple's, not the router's.** OSRM puts the drive at 29
+  minutes. They say about an hour, and theirs is the number a guest should plan
+  around — it knows about the mountain road, and the routing engine does not.
+
+Label clearance is set in viewBox units, which is easy to get wrong: 22 units
+looked generous in the file and rendered as 7 real pixels at 390px, with the
+names sitting on the road. It is 46 now, and the fonts step up under 30rem.
+
 ## Interaction
 
 - Live countdown to five o'clock on the seventh, ticking every second
@@ -238,6 +265,7 @@ a spreadsheet.
 - The invitation leans toward the pointer
 - Add-to-calendar as a Google Calendar link, which opens on any device
 - No RSVP form. Guests reply directly, by email or wherever they got the link
+- A route map drawn from the real road between the two venues
 
 Before any of that there is a gate: a Behelit drawn as a manga page, inked in
 front of you and branded. Pressing the brand strikes it, the ink runs, it wakes,
