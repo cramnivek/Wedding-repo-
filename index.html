@@ -1903,7 +1903,7 @@
     var w = 0, h = 0, cx = 0, cy = 0, EW = 0, EH = 0, unit = 0;
     var targetY = 0, targetR = 0;
     var t0 = 0, struck = false, raf = 0, done = false, fired = false;
-    var tone = {}, cracks = [], tears = [];
+    var tone = {}, cracks = [], tears = [], wob = [0, 0, 0];
 
     var PAPER = "#E6D9BE";
     var INK = "#17120E";
@@ -2032,99 +2032,6 @@
       return k < 1 ? [cx, y + dh * k] : null;
     }
 
-    /* ---------- the envelope ---------- */
-
-    function envRect() {
-      return { x: cx - EW / 2, y: cy - EH / 2, w: EW, h: EH };
-    }
-
-    /* Outline, flap, hatching, tone. `k` inks it in front of you: the four
-       edges first, then the flap's two diagonals, then its shading.
-
-       `alpha` takes it away again. Once the paper gives way the envelope has
-       done its job, and leaving its outline drawn means the eruption plays
-       inside a rectangle — a box sitting on top of the thing it was supposed to
-       release. Faded out across the tear, what is left is the opening. */
-    function drawEnvelope(k, tearK, alpha) {
-      if (alpha !== undefined && alpha <= 0.002) return;
-      var e = envRect();
-      var lw = Math.max(2, unit * 0.075);
-      var restore = alpha !== undefined && alpha < 1;
-      if (restore) { ctx.save(); ctx.globalAlpha = alpha; }
-
-      /* Paper body, slightly off the ground so the envelope reads as a
-         separate sheet lying on the page. */
-      if (k > 0.02) {
-        ctx.fillStyle = "#EFE4CC";
-        ctx.fillRect(e.x, e.y, e.w, e.h);
-      }
-
-      /* The four edges, inked in sequence. */
-      var edges = [
-        [e.x, e.y, e.x + e.w, e.y],
-        [e.x + e.w, e.y, e.x + e.w, e.y + e.h],
-        [e.x + e.w, e.y + e.h, e.x, e.y + e.h],
-        [e.x, e.y + e.h, e.x, e.y]
-      ];
-      for (var i = 0; i < 4; i++) {
-        var seg = (k - i * 0.17) / 0.17;
-        if (seg <= 0) break;
-        brushTo(edges[i][0], edges[i][1], edges[i][2], edges[i][3],
-                lw, lw * 0.8, seg);
-      }
-
-      var apexX = e.x + e.w / 2;
-      var apexY = e.y + e.h * 0.46 + (tearK || 0) * e.h * 0.30;
-
-      /* The two seams running up from the bottom corners to the flap's point.
-         A real envelope's front is four panels meeting there, and drawing them
-         is what stops the shape reading as a rectangle with a V in it. The
-         bottom panel they bound is the one surface that takes tone. */
-      var sk = (k - 0.66) / 0.22;
-      if (sk > 0) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(e.x, e.y + e.h);
-        ctx.lineTo(apexX, apexY);
-        ctx.lineTo(e.x + e.w, e.y + e.h);
-        ctx.closePath();
-        ctx.clip();
-        /* Multiplied by the outer alpha rather than set from scratch: this is
-           inside its own save(), so assigning would discard the fade. */
-        ctx.globalAlpha = 0.55 * Math.min(1, sk) * (alpha === undefined ? 1 : alpha);
-        ctx.fillStyle = tone.light;
-        ctx.fillRect(e.x, e.y, e.w, e.h);
-        ctx.restore();
-        brushTo(e.x, e.y + e.h, apexX, apexY, lw * 0.7, lw * 0.5, sk);
-        brushTo(e.x + e.w, e.y + e.h, apexX, apexY, lw * 0.7, lw * 0.5, sk);
-      }
-
-      /* The flap: two diagonals meeting at that same point, hinged at the top.
-         When `tearK` rises the point swings down and the fold line breaks. */
-      var fk = (k - 0.68) / 0.2;
-      if (fk > 0) {
-        brushTo(e.x, e.y, apexX, apexY, lw, lw * 0.7, fk);
-        brushTo(e.x + e.w, e.y, apexX, apexY, lw, lw * 0.7, fk);
-      }
-
-      /* Flap hatching — the shaded side of the fold. */
-      var hk = (k - 0.86) / 0.14;
-      if (hk > 0) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(e.x, e.y);
-        ctx.lineTo(apexX, apexY);
-        ctx.lineTo(e.x + e.w, e.y);
-        ctx.closePath();
-        ctx.clip();
-        hatch(e.x, e.y, e.w, e.h * 0.8, -0.62, Math.max(5, unit * 0.12),
-              Math.max(1, unit * 0.014), hk);
-        ctx.restore();
-      }
-
-      if (restore) ctx.restore();
-    }
-
     /* The Eclipse is not the disc — it is the ground underneath it. This is that
        ground, taken from the sequence itself rather than drawn: fourteen frames
        of the field, cropped to the horizon and below so the gate keeps its own
@@ -2227,6 +2134,9 @@
       for (var t = 0; t <= 26; t++) {
         tears.push((Math.random() - 0.5) * unit * 0.34);
       }
+      /* Phases for the dark's edge. Seeded here with everything else so a
+         resize does not reshape it mid-animation. */
+      wob = [Math.random() * 6.283, Math.random() * 6.283, Math.random() * 6.283];
     }
 
     /* What comes out of it. Ten frames of the eruption itself, cut from the
@@ -2259,25 +2169,59 @@
         cx - dw / 2, cy - dh / 2, dw, dh);
     }
 
-    /* The tear: a ragged black mouth opening along the flap's fold, widening
-       until it is large enough to become the eclipse. */
+    /* Where its mouth is, in canvas pixels.
+
+       Measured off the sprite rather than guessed: the mouth cavity's centroid
+       sits at 0.65, 0.71 of the frame, and it stays there across every darkness
+       threshold tried, so it is the mouth and not the jaw shadow. Derived from
+       exactly the numbers drawBehelit draws with, so the two cannot drift
+       apart if the behelit is ever resized. */
+    function mouth() {
+      var R = unit * 1.42, dh = R * 2, dw = dh * (BEH_W / BEH_H);
+      return { x: cx - dw / 2 + dw * 0.65, y: cy - dh / 2 + dh * 0.71,
+               w: dw * 0.38, h: dh * 0.22 };
+    }
+
+    /* The dark, coming out of its mouth.
+
+       This used to be a rip along the envelope's fold, which is a different
+       object in a different place — so the beat read as two things: the
+       behelit screams, and separately some paper tears near it. With the
+       envelope gone there is nothing to tear and nothing should. What opens is
+       the mouth that is already open.
+
+       It starts as exactly the mouth's own aperture, which is invisible because
+       the mouth is already black there, and swells out of it. The centre drifts
+       back to the middle of the frame as it grows, so it reads as pouring out
+       and then swallowing everything rather than as a blob inflating off to one
+       side. The edge keeps the rip's jitter: out of a screaming mouth it should
+       still be ragged, not a clean oval. */
     function drawTear(k) {
       if (k <= 0) return;
-      var e = envRect();
-      var y = e.y + e.h * 0.46;
-      var half = (e.w * 0.52) * k;
+      var m = mouth();
+      var g = k * k;                      /* slow to leave, then fast */
+      /* The centre drifts to the middle later than the size grows — on g
+         alone it recentred almost at once and the whole thing read as an oval
+         appearing behind the head rather than as something leaving the mouth. */
+      var c = g * g;
+      var mx = m.x + (cx - m.x) * c;
+      var my = m.y + (cy - m.y) * c;
+      var rx = m.w / 2 + (EW * 0.50 - m.w / 2) * g;
+      var ry = m.h / 2 + (EH * 0.46 - m.h / 2) * g;
       ctx.fillStyle = INK;
       ctx.beginPath();
-      ctx.moveTo(cx - half, y);
-      for (var i = 0; i <= 26; i++) {
-        var f = i / 26;
-        ctx.lineTo(cx - half + half * 2 * f,
-                   y - Math.sin(f * Math.PI) * e.h * 0.42 * k + tears[i] * k);
-      }
-      for (var j = 26; j >= 0; j--) {
-        var f2 = j / 26;
-        ctx.lineTo(cx - half + half * 2 * f2,
-                   y + Math.sin(f2 * Math.PI) * e.h * 0.30 * k - tears[j] * k);
+      for (var i = 0; i <= 52; i++) {
+        var ang = (i / 52) * Math.PI * 2;
+        /* A low-frequency wobble, not per-vertex jitter. Random at every one
+           of 52 points made a spiked star — which is what a splat looks like,
+           not what something leaving a mouth looks like. Three harmonics,
+           seeded once, so the edge is uneven without being serrated. */
+        var j = 1 + k * (0.085 * Math.sin(ang * 2 + wob[0])
+                       + 0.055 * Math.sin(ang * 3 + wob[1])
+                       + 0.030 * Math.sin(ang * 5 + wob[2]));
+        var px = mx + Math.cos(ang) * rx * j;
+        var py = my + Math.sin(ang) * ry * j;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
       }
       ctx.closePath();
       ctx.fill();
@@ -2295,14 +2239,17 @@
        frame the gate paints is therefore already the first frame of the page
        behind it, and the fade between them has nothing left to give away. */
     function drawEclipseHint(e) {
-      /* It opens at the tear and travels to where the page actually draws its
+      /* It opens where the dark came out and travels to where the page draws its
          eclipse — read off the header rather than assumed, because the two are
          126px apart on a desktop and a different size again on a phone, and any
          gap between them is exactly what the fade would expose. */
       var k = Math.min(1, e / 0.62);
       var ease = k * k * (3 - 2 * k);
       var R = targetR * k;
-      var ey = cy + (targetY - cy) * ease;
+      /* It opens at the mouth, not at the middle of the frame — that is
+         where the dark came from, so that is where the light does. */
+      var my0 = mouth().y;
+      var ey = my0 + (targetY - my0) * ease;
 
       /* The blast. A flash on the frame the tear gives way, then a ring running
          out past the edges of the screen — without these the eclipse merely
@@ -2364,6 +2311,10 @@
       cx = w / 2; cy = h * 0.47;
       /* The envelope is sized off the smaller axis so it stays whole on a
          phone in portrait and does not go letterbox-wide on a desktop. */
+      /* This was the envelope's size and is now just the gate's sizing box:
+         unit comes off it, and so does everything drawn here. Kept rather
+         than replaced with a number, because every proportion in this gate
+         was tuned against it. */
       EW = Math.min(w * 0.86, h * 0.62, 560);
       EH = EW * 0.66;
       unit = EH * 0.20;
@@ -2405,9 +2356,9 @@
           ctx.restore();
         }
 
-        var ENV = 1150, SEAL = 340, BRAND = 1150;
-        drawEnvelope(Math.min(1, ms / ENV), 0);
-
+        /* No envelope to ink in first: it opens on the behelit dropping into
+           an empty frame, so SEAL starts at zero instead of at 1150. */
+        var ENV = 0, SEAL = 900, BRAND = 1150;
         if (ms > ENV) {
           /* The seal lands with an overshoot and throws speed lines on the
              frame it hits. */
@@ -2437,13 +2388,11 @@
 
         if (ms < STRIKE) {
           /* Impact frame: everything in reverse, speed lines at full force. */
-          drawEnvelope(1, 0);
           drawBehelit(0, 1);
           drawBrand(1, PAPER, 0.85, unit * 2.45);
           speedLines(cx, cy, unit * 1.6, Math.max(w, h) * 0.9, 54, PAPER, 1);
         } else if (ms < STRIKE + BLEED) {
           var b = (ms - STRIKE) / BLEED;
-          drawEnvelope(1, 0);
           /* Blood reaches it and it wakes: the scattered features slide into a
              face over the first half, the lids come up once they have landed,
              and only then does it weep. Doing those three at once reads as a
@@ -2464,17 +2413,18 @@
             fired = true;
             document.dispatchEvent(new CustomEvent("eclipse:ignite"));
           }
-          /* Going as it gives way. Held to full for the first third so the
-             paper is still visibly the thing being torn, then gone by the time
-             the tear is open — otherwise the eruption plays inside a drawn
-             rectangle, which is a box sitting on top of what it released. */
-          drawEnvelope(1, tk, 1 - Math.max(0, (tk - 0.34) / 0.66));
-          /* Awake, weeping, and now screaming — the mouth goes wide as the
-             paper gives way under it. */
-          drawBehelit(25 + tk * 13, 1);
-          drawBrand(1, INK, 0.85, unit * 2.45);
+          /* The dark first, so it grows out from behind the face instead of
+             over it. Painted last it covered the behelit the moment it left the
+             mouth, which reads as a blob arriving in front of a screaming head;
+             behind, the head stays whole and readable until the dark is simply
+             bigger than it, and the black of the mouth and the black pouring
+             out of it are never two different blacks meeting. */
           drawBloom(1);
           drawTear(tk);
+          /* Awake, weeping, and now screaming — the mouth goes wide as the dark
+             leaves it. */
+          drawBehelit(25 + tk * 13, 1);
+          drawBrand(1, INK, 0.85, unit * 2.45);
         } else {
           var e = Math.min(1, (ms - STRIKE - BLEED - TEAR) / ERUPT);
 
@@ -2496,7 +2446,6 @@
              blood before it drowns in black. Two veils: crimson rising fast,
              then the page's own ink rising behind it a beat later. That order is
              the whole difference between a light going out and an Eclipse. */
-          /* No envelope here at all — it finished going as the tear opened. */
           drawTear(1);
           var red = Math.min(1, e / 0.38);
           ctx.save();

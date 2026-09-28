@@ -226,19 +226,42 @@ To collect them properly, pick one:
 
 ## Interaction
 
-- Live countdown to five o'clock on the sixth, ticking every second
+- Live countdown to five o'clock on the seventh, ticking every second
 - Scroll-driven reveals using native `animation-timeline: view()`, wrapped in
   `@supports` so browsers without it render everything at rest
 - The invitation leans toward the pointer
 - Add-to-calendar as a Google Calendar link, which opens on any device
 - The RSVP folds away party size, diet and song on a decline
 
-Before any of that there is a gate: an invitation drawn as a manga page, inked
-in front of you, sealed in wax and branded. Pressing the brand breaks the seal,
-the ink runs, and the envelope tears — and goes with the tear, fading out across
-it rather than staying drawn around the opening, which would leave the eruption
-playing inside a rectangle. What is left is the tear, and it opens into the
-eclipse.
+Before any of that there is a gate: a Behelit drawn as a manga page, inked in
+front of you and branded. Pressing the brand strikes it, the ink runs, it wakes,
+and the dark comes out of its mouth and swallows the page.
+
+There used to be an envelope around it, with a rip that opened along the flap's
+fold. The rip was the problem: a different object in a different place, so the
+beat read as two things — the Behelit screams, and separately some paper tears
+near it. Now there is nothing to tear and nothing does. What opens is the mouth
+that is already open.
+
+Three things make that hold up, and each was wrong first:
+
+- **The mouth is measured, not guessed.** Its cavity's centroid sits at 0.65,
+  0.71 of the sprite frame and stays there across every darkness threshold
+  tried, so it is the mouth and not the jaw shadow. `mouth()` derives from
+  exactly the numbers `drawBehelit()` draws with, so the two cannot drift apart
+  if the Behelit is ever resized.
+- **The dark is drawn behind the face and in front of the blood.** Painted last
+  it covered the Behelit the instant it left the mouth, which reads as a blob
+  arriving in front of a screaming head. Painted first the blood spray landed on
+  top of it and speckled the black red. Between the two, the head stays whole
+  and readable until the dark is simply bigger than it.
+- **The edge wobbles at low frequency.** Jitter at every one of 52 vertices —
+  the rip's own noise, reused — made a spiked star, which is what a splat looks
+  like, not what something leaving a mouth looks like. Three seeded harmonics
+  instead: uneven without being serrated.
+
+The eclipse then opens at the mouth rather than at the middle of the frame,
+because that is where the dark came from.
 
 ## Plates that move
 
