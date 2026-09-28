@@ -138,10 +138,10 @@ Outstanding:
 - **The ceremony venue.** Its hour is known — three o'clock, a civil ceremony
   for family and witnesses — but not where. It is a sentence in the reception
   section rather than a `slot`.
-- **How long the drive to Loboc takes**, and **whether the resort has parking.**
-  Both are `slot`s. The parking answer was known for the old venue and is not
-  transferable, so it was taken out rather than carried across — a wrong "there
-  is parking on the premises" is worse on the night than an admitted gap.
+Both of the slots the venue move opened are filled: about an hour by road from
+Tagbilaran, and plenty of parking on the resort grounds. Neither was carried
+across from Smoque Bistro — the old parking line happened to be true of a
+restaurant in Bool and would have been a guess anywhere else.
 
 The reception moved from Smoque Bistro in Tagbilaran City to Loboc River Resort,
 inland, nine days out. The venue is in the meta description, the og description,
