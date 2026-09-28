@@ -834,6 +834,17 @@
   @keyframes pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
   @keyframes appear { from { opacity: 0; letter-spacing: 0.6em; } to { opacity: 0.55; letter-spacing: 0.34em; } }
 
+  /* "Tap to break the seal" is half as long again as the line that was here
+     before, and the rule is nowrap: at 320px it reached both edges with three
+     pixels to spare. The tracking cannot be overridden here — `appear` ends on
+     a letter-spacing and its fill-mode holds it, so an animation beats any
+     plain declaration — but the tracking is in em, so bringing the font size
+     down takes the glyphs and the spacing with it and leaves the line looking
+     the same, only smaller. */
+  @media (max-width: 22rem) {
+    .gate-hint { font-size: 0.6875rem; }
+  }
+
   /* The ground under the invitation. Full-bleed across the bottom of the
      header, masked so it rises out of black rather than starting at an edge,
      and colour-treated to the page's own ramp so it reads as the same world
@@ -1015,7 +1026,7 @@
 <div id="gate">
   <canvas id="gate-art" aria-hidden="true"></canvas>
   <button class="gate-btn" id="gate-btn" type="button" aria-label="Break the seal to enter the site"></button>
-  <p class="gate-hint">Break the seal</p>
+  <p class="gate-hint">Tap to break the seal</p>
 </div>
 
 <button id="sound-toggle" type="button" aria-pressed="false">Sound on</button>
