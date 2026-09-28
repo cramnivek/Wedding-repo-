@@ -185,13 +185,10 @@ Travel is filled in from public sources: the airport transfer, the Cebu ferry,
 named hotels in Tagbilaran and what October weather does. Fares and schedules
 drift — worth a check closer to the date.
 
-The contact address is filled in — `marcarlinghaus@gmail.com`. It lives in three
-places that must agree, so change all three together: the RSVP note, the footer's
-`mailto:` link, and the `TO` variable near the bottom of the `<script>` block.
-
-```js
-var TO = "marcarlinghaus@gmail.com";
-```
+The contact address is filled in — `marcarlinghaus@gmail.com`. It lives in
+three places that must agree, so change all three together: the RSVP card's
+button, the small print under it, and the footer's `mailto:` link. There is no
+longer a copy of it in the script.
 
 The date lives in one place — the `data-` attributes on `.stack`. The countdown
 and the Google Calendar link both read from there, so they can't disagree. The
@@ -202,27 +199,36 @@ several hours out.
 ```html
 <div class="stack"
      data-when="2026-10-07T17:00+08:00"
-     data-ends="2026-10-07T23:00+08:00"
+     data-ends="2026-10-07T21:00+08:00"
      data-title="Wedding of Marc-Kevin &amp; Florence"
      data-where="Loboc River Resort, Loboc, Bohol">
 ```
 
-## How RSVPs work right now
+## How RSVPs work
 
-There is no backend. When a guest submits the form, the page composes a
-plain-text reply, shows it to them, and hands it to their own email app via a
-`mailto:` link. Nothing can be silently lost, but replies arrive as individual
-emails rather than as a list.
+Guests reply directly. The section asks the question, gives an address and a
+button, and that is the whole mechanism.
 
-To collect them properly, pick one:
+There was a form. It had no backend: it composed a plain-text reply, showed it,
+and handed it to the guest's own mail app through a `mailto:`. The trouble was
+what it looked like from the guest's side — they filled it in, the form vanished,
+and a panel headed *"Here is your reply"* appeared. Nothing on it said the reply
+had not been sent yet. A guest who read that as a confirmation and closed the tab
+was never counted, and the couple had no way of knowing that guest had ever tried.
+On a phone it was worse: the `mailto:` opens whatever mail app is configured, and
+on a handset signed into webmail, or with no mail account set up at all, it opens
+the wrong thing or nothing, with no fallback and no error.
 
-- **Google Form** — free. Delete the `<form>` and point the RSVP button at your
-  form instead. Answers land in a spreadsheet.
-- **Netlify Forms** — free tier, ~100 submissions a month, only if you host on
-  Netlify. Add `netlify` and `name="rsvp"` to the `<form>` tag and remove the
-  submit handler.
-- **Formspree** — works on any host, free tier ~50 a month. Set the form's
-  `action` to your Formspree endpoint and `method="POST"`.
+A form that can silently lose an RSVP is worse than no form, because it also
+convinces the guest they have replied. So: no form. 51 lines of markup, 85 lines
+of script and 60 lines of CSS came out with it, along with the last two notes
+addressed to whoever was building this rather than to a guest reading it — the
+form's own help text read *"Swap in a form service if you'd rather they land in a
+spreadsheet."*
+
+If a list is ever wanted instead of a mailbox, a Google Form behind the same
+button is the smallest change: no markup beyond the `href`, and answers land in
+a spreadsheet.
 
 ## Interaction
 
@@ -231,7 +237,7 @@ To collect them properly, pick one:
   `@supports` so browsers without it render everything at rest
 - The invitation leans toward the pointer
 - Add-to-calendar as a Google Calendar link, which opens on any device
-- The RSVP folds away party size, diet and song on a decline
+- No RSVP form. Guests reply directly, by email or wherever they got the link
 
 Before any of that there is a gate: a Behelit drawn as a manga page, inked in
 front of you and branded. Pressing the brand strikes it, the ink runs, it wakes,

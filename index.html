@@ -604,6 +604,8 @@
   #sound-toggle[aria-pressed="false"] { color: var(--muted); }
 
   /* ---------- rsvp ---------- */
+  /* The form is gone — guests reply directly — so what is left here is the
+     card it sat in, the button, and the small print under it. */
   .card {
     border: 1px solid var(--hairline);
     background: rgba(14, 10, 7, 0.62);
@@ -612,51 +614,6 @@
     flex-direction: column;
     gap: 1.4rem;
   }
-  .field { display: flex; flex-direction: column; gap: 0.45rem; }
-  .field > label, .choice-set > legend {
-    font-family: "Cinzel", Georgia, serif;
-    font-size: 0.6875rem;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--muted);
-    padding: 0;
-  }
-  input[type="text"], input[type="email"], input[type="number"], textarea {
-    font-family: inherit;
-    font-weight: 300;
-    font-size: var(--s-0);
-    color: var(--bone);
-    background: transparent;
-    border: 0;
-    border-bottom: 1px solid var(--hairline-2);
-    border-radius: 0;
-    padding: 0.45rem 0.1rem;
-    width: 100%;
-    transition: border-color 0.3s var(--ease);
-  }
-  input:focus, textarea:focus { border-bottom-color: var(--rose); }
-  input::placeholder, textarea::placeholder { color: #5C5650; }
-  textarea { resize: vertical; min-height: 3.5rem; }
-
-  .choice-set { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
-  .choices { display: flex; flex-wrap: wrap; gap: 0.6rem; }
-  .choice {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    border: 1px solid var(--hairline);
-    padding: 0.55rem 1rem;
-    cursor: pointer;
-    font-size: 0.9375rem;
-    color: var(--bone-soft);
-    transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
-  }
-  .choice input { accent-color: var(--blood-lt); margin: 0; }
-  .choice:has(input:checked) { border-color: var(--sage); color: var(--white); }
-  .choice:has(input:focus-visible) { outline: 1px solid var(--rose); outline-offset: 3px; }
-
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
-  .row:has(.if-attending[hidden]) { grid-template-columns: 1fr; }
 
   button, .btn-link {
     font-family: "Cinzel", Georgia, serif;
@@ -675,23 +632,7 @@
     transition: background-color 0.35s var(--ease), color 0.35s var(--ease);
   }
   button:hover, .btn-link:hover { background: var(--blood); color: var(--white); }
-  button.ghost { border-color: var(--hairline-2); color: var(--bone-soft); }
-  button.ghost:hover { background: transparent; border-color: var(--sage); color: var(--rose); }
 
-  .sent { display: flex; flex-direction: column; gap: 1.1rem; }
-  .sent h3 { font-size: var(--s-2); }
-  .sent pre {
-    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
-    font-size: 0.8125rem;
-    line-height: 1.65;
-    background: var(--ink);
-    border: 1px solid var(--hairline);
-    padding: 1.1rem;
-    margin: 0;
-    white-space: pre-wrap;
-    color: var(--bone-soft);
-  }
-  .sent-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; }
   .status { font-size: 0.875rem; color: var(--muted); }
 
   /* ---------- faq ---------- */
@@ -1006,12 +947,10 @@
     .pair { grid-template-columns: 1fr; }
   }
 
-  .if-attending[hidden] { display: none; }
 
   @media (max-width: 30rem) {
     .band, .invite { padding-block: 3.5rem; }
     .item { grid-template-columns: 3.75rem 1.25rem 1fr; gap: 0 0.7rem; }
-    .row { grid-template-columns: 1fr; }
     .share { grid-template-columns: 1fr; justify-items: center; text-align: center; }
     .share-copy { align-items: center; }
     .rail { gap: 0.3rem 1rem; }
@@ -1510,57 +1449,18 @@
         </picture>
       </figure>
 
-      <form class="card" id="rsvp-form" novalidate>
-        <div class="field">
-          <label for="guest-name">Name (or names)</label>
-          <input type="text" id="guest-name" name="name" autocomplete="name" required>
-        </div>
-
-        <fieldset class="choice-set">
-          <legend>Will you be there?</legend>
-          <div class="choices">
-            <label class="choice"><input type="radio" name="attending" value="Joyfully accepts" checked> Joyfully accepts</label>
-            <label class="choice"><input type="radio" name="attending" value="Regretfully declines"> Regretfully declines</label>
-          </div>
-        </fieldset>
-
-        <div class="row">
-          <div class="field if-attending">
-            <label for="party-size">How many, of those named</label>
-            <input type="number" id="party-size" name="party" min="1" max="12" value="1" inputmode="numeric">
-          </div>
-          <div class="field">
-            <label for="guest-email">Email</label>
-            <input type="email" id="guest-email" name="email" autocomplete="email">
-          </div>
-        </div>
-
-        <div class="field if-attending">
-          <label for="diet">Anything we should know about food</label>
-          <textarea id="diet" name="diet" placeholder="Allergies, vegetarian, a child's plate…"></textarea>
-        </div>
-
-        <div class="field if-attending">
-          <label for="song">One song that will get you dancing</label>
-          <input type="text" id="song" name="song">
-        </div>
-
-        <button type="submit">Send our reply</button>
-        <p class="status" id="form-note">
-          Replies open your email app addressed to marcarlinghaus@gmail.com.
-          Swap in a form service if you'd rather they land in a spreadsheet.
+      <div class="card reply">
+        <p>
+          No form to fill in &mdash; just tell us. Send a message or an email
+          with who is coming, and anything we should know about food.
         </p>
-      </form>
-
-      <div class="card sent" id="rsvp-sent" hidden>
-        <h3>Here is your reply</h3>
-        <pre id="rsvp-text"></pre>
-        <div class="sent-actions">
-          <a class="btn-link" id="rsvp-mail" href="#">Open email</a>
-          <button type="button" class="ghost" id="rsvp-copy">Copy text</button>
-          <button type="button" class="ghost" id="rsvp-edit">Change something</button>
-        </div>
-        <p class="status" id="copy-status" role="status"></p>
+        <a class="btn-link" href="mailto:marcarlinghaus@gmail.com?subject=RSVP">
+          Email us
+        </a>
+        <p class="status">
+          marcarlinghaus@gmail.com &middot; or reply wherever you got the link.
+        </p>
+      </div>
       </div>
     </div>
   </section>
@@ -3238,89 +3138,4 @@
     window.addEventListener("resize", function () { size(); seed(); });
   })();
 
-  /* Party size, dietary notes and a song only apply to a guest who is coming;
-     they fold away the moment someone picks the other answer. */
-  (function () {
-    var form = document.getElementById("rsvp-form");
-    if (!form) return;
-    var conditional = form.querySelectorAll(".if-attending");
-    function sync() {
-      var coming = form.querySelector('input[name="attending"]:checked').value === "Joyfully accepts";
-      for (var i = 0; i < conditional.length; i++) conditional[i].hidden = !coming;
-    }
-    form.addEventListener("change", function (e) {
-      if (e.target.name === "attending") sync();
-    });
-    sync();
-  })();
-
-  /* The form composes a plain-text reply and hands it to the guest's own mail
-     app. No backend is involved, so nothing here can silently lose an RSVP —
-     the guest sees the exact text before it is sent. */
-  (function () {
-    var form = document.getElementById("rsvp-form");
-    var sent = document.getElementById("rsvp-sent");
-    var out = document.getElementById("rsvp-text");
-    var mail = document.getElementById("rsvp-mail");
-    var copyBtn = document.getElementById("rsvp-copy");
-    var editBtn = document.getElementById("rsvp-edit");
-    var copyStatus = document.getElementById("copy-status");
-
-    var TO = "marcarlinghaus@gmail.com";
-
-    function compose(data) {
-      var coming = data.attending === "Joyfully accepts";
-      var lines = ["Name: " + (data.name || "—"), "Reply: " + data.attending];
-      /* A decline carries no party size, diet or song — those inputs were
-         folded away, so repeating their defaults back would be noise. */
-      if (coming) lines.push("Party of: " + (data.party || "1"));
-      if (data.email) lines.push("Email: " + data.email);
-      if (coming && data.diet) lines.push("Food notes: " + data.diet);
-      if (coming && data.song) lines.push("Song request: " + data.song);
-      return lines.join("\n");
-    }
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      var name = document.getElementById("guest-name");
-      if (!name.value.trim()) {
-        name.focus();
-        document.getElementById("form-note").textContent =
-          "Please add a name so we know who is replying.";
-        return;
-      }
-      var fd = new FormData(form);
-      var body = compose({
-        name: fd.get("name"), attending: fd.get("attending"), party: fd.get("party"),
-        email: fd.get("email"), diet: fd.get("diet"), song: fd.get("song")
-      });
-      out.textContent = body;
-      mail.href = "mailto:" + TO +
-        "?subject=" + encodeURIComponent("RSVP — " + fd.get("name")) +
-        "&body=" + encodeURIComponent(body);
-      form.hidden = true;
-      sent.hidden = false;
-      copyStatus.textContent = "";
-      sent.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
-    });
-
-    copyBtn.addEventListener("click", function () {
-      var text = out.textContent;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function () {
-          copyStatus.textContent = "Copied.";
-        }, function () {
-          copyStatus.textContent = "Couldn't copy — select the text above instead.";
-        });
-      } else {
-        copyStatus.textContent = "Select the text above to copy it.";
-      }
-    });
-
-    editBtn.addEventListener("click", function () {
-      sent.hidden = true;
-      form.hidden = false;
-      document.getElementById("guest-name").focus();
-    });
-  })();
 </script>
