@@ -96,10 +96,11 @@ fill rate, not the gradients. Pre-rendering those alone had only bought 1.8.
 
 Everything else in `img/` is a file:
 
-- **Seventeen plates**, each in `.avif`, `.webp` and `.jpg` — the page offers
+- **Nineteen plates**, each in `.avif`, `.webp` and `.jpg` — the page offers
   all three through `<picture>` and the browser takes the first it understands.
-  Three of them, `hall`, `candles` and `rings`, are written by `clip.py --still`
-  out of their own clip's first frame rather than by `place.py` out of a render.
+  Five of them — `hall`, `candles`, `rings`, `river` and `bar` — are written by
+  `clip.py --still` out of their own clip's first frame rather than by
+  `place.py` out of a render.
   `place.py` grades them: it maps each one's luminance through the page's own
   palette ramp, so a render made in any light still belongs here. The `longest`
   column in its `JOBS` table is a *measured* number — twice the widest the page
@@ -135,9 +136,8 @@ so the dashed underline goes away.
 
 Outstanding:
 
-- **The ceremony venue.** Its hour is known — three o'clock, a civil ceremony
-  for family and witnesses — but not where. It is a sentence in the reception
-  section rather than a `slot`.
+Nothing. The ceremony is at two o'clock at the court in Tagbilaran City, about
+an hour by road from the reception, which is the last thing that was missing.
 Both of the slots the venue move opened are filled: about an hour by road from
 Tagbilaran, and plenty of parking on the resort grounds. Neither was carried
 across from Smoque Bistro — the old parking line happened to be true of a
@@ -480,11 +480,25 @@ replaced was a 1180px drawing and the new one is a 1070px frame of the clip:
 Safari) and 13 KB of still to a section that had no picture at all. A local run
 puts the full scroll at **5.16 MB**.
 
-Seven clips now, and `rings` was worth breaking the ceiling for: it is the only
-plate on the page that is a picture of a real object the couple own. Its wrap
-measures **x1.0** against its own median frame, the cleanest seam of any of
-them. The ones worth spending the bytes on are where motion says something a
-still can't: firelight moving across a face, wind in a cloak, gold catching.
+Nine clips now, at **6130 KB** for a full scroll and **2237 KB** cold — the
+cold figure has not moved through any of this, because nothing about a plate is
+fetched until you reach it. The ones worth spending the bytes on are where
+motion says something a still can't: firelight moving across a face, wind in a
+cloak, gold catching, lanterns breaking on water.
+
+`river` and `bar` came back from prompts written against what this repo had
+already learned — locked off, no faces, generated into the palette rather than
+corrected into it. All three of that batch measured **x1.000** on camera
+movement, which no earlier generation managed: the instruction is in the prompt
+three separate ways because asking once demonstrably did not work.
+
+They also broke `report_seam`. Both are a couple of lanterns moving against an
+otherwise still frame, so their median frame is 0.15 and a wrap of 1.0 reads as
+6.8x — while `hall`, which is on the page and looks right, reads as 1.6x.
+Measured on the worst 1% of pixels instead of the mean, the two flagged ones
+move 10 levels and the one that passed moves 47. The ratio was crying wolf on
+stillness, so there is a floor under it now: below a mean wrap of 2.0 the seam
+is invisible whatever it divides by.
 
 Breaking the seal also plays a sound, synthesised in the browser rather than
 loaded — a file cannot follow the gate, and this is built off the same timeline

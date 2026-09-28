@@ -47,11 +47,15 @@ import place
 # Twice the widest CSS width the page ever renders each plate at, measured by
 # check/maxsize.cjs. Re-run it after a layout change rather than trusting these.
 TARGETS = {
-    "battlefield": 3200, "camp": 1152, "candles": 1152, "chamber": 748,
+    "bar": 1152, "battlefield": 3200, "camp": 1152, "candles": 1152, "chamber": 748,
     "garments": 768, "hall": 1152, "hands": 608, "knight": 748, "rescue": 960,
-    "ridge": 748, "rings": 1152, "sun": 832, "them-ink": 748, "us-1": 748, "us-2": 748,
+    "ridge": 748, "rings": 1152, "river": 1152, "sun": 832, "them-ink": 748, "us-1": 748, "us-2": 748,
     "vow": 832, "walk": 3200,
 }
+
+# Below this, a wrap is invisible however large it looks next to a clip that
+# barely moves. In mean levels out of 255, measured on the 320x180 compare.
+QUIET = 2.0
 
 # Where the generator burns its sparkle, in source pixels. Same spot in every
 # clip that has come back so far; check a frame before trusting it on a new one.
@@ -213,6 +217,15 @@ def report_seam(frames, size=(320, 180)):
     about 2.5x, move the wrap by changing --trim or --loop until it sits in a
     quiet stretch. The median is sampled rather than exhaustive — it only has to
     be the right order of magnitude to put the wrap in context.
+
+    The ratio alone cries wolf on a clip that barely moves. The river and the
+    bar are two lanterns and some candle flame against a still frame, so their
+    median is 0.15 and a wrap of 1.0 reads as 6.8x — while `hall`, which is on
+    the page and looks right, wraps at 5.6 on a median of 3.6 and reads as 1.6x.
+    Measured on the worst 1% of pixels rather than the mean, the two supposedly
+    bad ones move 10 levels and the good one moves 47. So there is a floor: a
+    wrap this small is invisible whatever it divides by, and only the ratio
+    above it is worth acting on.
     """
     def px(path):
         return np.asarray(Image.open(path).convert("RGB").resize(size, Image.BILINEAR),
@@ -223,9 +236,9 @@ def report_seam(frames, size=(320, 180)):
               for i in range(0, len(frames) - 1, step)]
     med = float(np.median(motion)) or 1e-6
     wrap = np.abs(px(frames[0]) - px(frames[-1])).mean()
-    print("          wrap %.2f against a median frame of %.2f — x%.1f"
-          % (wrap, med, wrap / med))
-    if wrap / med > 2.5:
+    print("          wrap %.2f against a median frame of %.2f — x%.1f%s"
+          % (wrap, med, wrap / med, "" if wrap >= QUIET else "  (both tiny)"))
+    if wrap / med > 2.5 and wrap >= QUIET:
         print("          that will snap. Move the wrap: it falls between the "
               "frames at %.2fs and %.2fs of the trimmed span, so shift --trim "
               "or --loop until it sits somewhere quieter."

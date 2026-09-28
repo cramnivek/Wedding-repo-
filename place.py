@@ -114,6 +114,15 @@ JOBS = [
     # this one either — clip.py --still writes it from the clip's first frame.
     ("rings",       0.0,   0.0,      0.42,         1.16,     0.92,  1152),
 
+    # The river at Loboc, where the reception is. Blue-black water against amber
+    # lanterns, so it keeps more of itself than the drawings do — pulled hard the
+    # water goes the same gold as the lights and the depth goes out of it.
+    ("river",       0.0,   0.0,      0.46,         1.18,     0.94,  1152),
+
+    # The open bar. Candlelight on stone and dark glass: generated into the
+    # palette rather than corrected into it, so it barely needs the ramp.
+    ("bar",         0.0,   0.0,      0.55,         1.12,     0.94,  1152),
+
     # The chamber portrait is the one render where the faces read as themselves,
     # so it keeps most of its own light — grading it as hard as the rest would
     # cost the likeness, which is the only reason it is on the page.
