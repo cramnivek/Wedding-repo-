@@ -232,30 +232,34 @@ a spreadsheet.
 
 ### The route map
 
-The line between Tagbilaran and Loboc is the actual road, not a drawn curve:
-330 points of OSRM driving geometry, simplified to 38 by Ramer–Douglas–Peucker,
-projected equirectangular with a `cos(lat)` correction. Inline SVG, about 2 KB,
+The line between the courthouse and the resort is the actual road, not a drawn
+curve: 424 points of OSRM driving geometry, simplified to 47 by
+Ramer–Douglas–Peucker, projected equirectangular with a `cos(lat)` correction. Inline SVG, about 2 KB,
 no request and no third-party map widget — an embedded Google map would have put
 a bright, differently-designed rectangle in the middle of this page, and a
 tracker with it.
 
 The viewBox height is computed from the ground's own aspect rather than chosen,
-so the road is never stretched in either direction. It came out 0.188, which is
-why the map is a wide shallow strip: that is the shape of the journey.
+so the road is never stretched in either direction.
 
-Two things the map deliberately does not claim:
+**The origin mattered more than expected.** The first version routed from the
+middle of Tagbilaran, because that was all the geocoder would give up, and it
+measured 18 km with an aspect of 0.188 — a wide shallow strip. Re-routed from
+the Regional Trial Court once the couple named it, the same journey is 23 km
+with an aspect of 0.346, because the road out of the court bows north before it
+turns east. Five kilometres and a quite different picture, from moving one end
+of the line across a town.
 
-- **The western dot is Tagbilaran, not the courthouse.** The route was measured
-  from the city, so the label says the city and the sentence beneath names the
-  court. Pinning a building the route does not actually start at would be a
-  guess dressed as a survey.
-- **The time is the couple's, not the router's.** OSRM puts the drive at 29
-  minutes. They say about an hour, and theirs is the number a guest should plan
-  around — it knows about the mountain road, and the routing engine does not.
+**The time on it is the couple's, not the router's.** OSRM puts the drive at 39
+minutes. They say about an hour, and theirs is the number a guest should plan
+around — it knows about the mountain road, and the routing engine does not.
 
-Label clearance is set in viewBox units, which is easy to get wrong: 22 units
-looked generous in the file and rendered as 7 real pixels at 390px, with the
-names sitting on the road. It is 46 now, and the fonts step up under 30rem.
+Label clearance is in viewBox units, which is twice now been got wrong by
+eye. 22 units looked generous in the file and rendered as 7 real pixels at
+390px, with the names sitting on the road. Then each time sat 46 units above its
+own name, which is 15 pixels against an 18-pixel numeral, so every label
+overlapped its own time. Both were found by testing every pair of label
+rectangles for intersection at 360, 390 and 1280 rather than by looking.
 
 ## Interaction
 
